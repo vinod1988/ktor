@@ -5,6 +5,7 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.http.*
+import io.ktor.http.cio.websocket.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -84,6 +85,62 @@ internal fun startServer(): ApplicationEngine {
                     }
                 }
             }
+            route("/benchmarks") {
+                val testData = "{'message': 'Hello World'}"
+
+                /**
+                 * Receive json data-class.
+                 */
+                get("/json") {
+                    call.respondText(testData, ContentType.Application.Json)
+                }
+
+                /**
+                 * Send json data-class.
+                 */
+                post("/json") {
+                    val request = call.receiveText()
+                    check(testData == request)
+                    call.respond(HttpStatusCode.OK, "OK")
+                }
+
+                /**
+                 * Submit url form.
+                 */
+                get("/form-url") {
+                }
+
+                /**
+                 * Submit body form.
+                 */
+                post("/form-body") {
+                }
+
+                /**
+                 * Download file.
+                 */
+                get("/file-download") {
+                }
+
+                /**
+                 * Upload file
+                 */
+                post("/file-upload") {
+                }
+
+                route("/websockets") {
+                    webSocket("/get/{count}") {
+                        println("connected")
+                        val count = call.parameters["count"]!!.toInt()
+
+                        repeat(count) {
+                            send("$it")
+                        }
+                    }
+                }
+
+            }
+
         }
     }.start()
 }
