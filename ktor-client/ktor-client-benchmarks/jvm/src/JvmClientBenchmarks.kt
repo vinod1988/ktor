@@ -1,18 +1,17 @@
 package io.ktor.client.benchmarks
 
-import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.engine.apache.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.engine.jetty.*
 import io.ktor.client.engine.okhttp.*
 
-internal class ApacheClientBenchmarks : KtorClientBenchmarks(HttpClient(Apache))
+internal class ApacheClientBenchmarks : KtorClientBenchmarks(Apache)
 
-internal class OkHttpClientBenchmarks : KtorClientBenchmarks(HttpClient(OkHttp))
+internal class OkHttpClientBenchmarks : KtorClientBenchmarks(OkHttp)
 
-internal class AndroidClientBenchmarks : KtorClientBenchmarks(HttpClient(Android))
+internal class AndroidClientBenchmarks : KtorClientBenchmarks(Android)
 
-internal class CIOClientBenchmarks : KtorClientBenchmarks(HttpClient(CIO))
+internal class CIOClientBenchmarks : KtorClientBenchmarks(CIO)
 
-internal class JettyClientBenchmarks : KtorClientBenchmarks(HttpClient(Jetty))
+internal class JettyClientBenchmarks : KtorClientBenchmarks(Jetty)
