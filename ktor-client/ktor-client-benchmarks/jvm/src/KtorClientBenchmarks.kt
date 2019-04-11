@@ -49,7 +49,7 @@ internal abstract class KtorClientBenchmarks(
     }
 
     @TearDown
-    fun end() {
+    fun stop() {
         client.close()
     }
 }
