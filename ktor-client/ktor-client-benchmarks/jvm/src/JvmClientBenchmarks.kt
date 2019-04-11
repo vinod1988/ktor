@@ -5,7 +5,6 @@ import io.ktor.client.engine.apache.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.engine.jetty.*
 import io.ktor.client.engine.okhttp.*
-import okhttp3.*
 
 internal class ApacheClientBenchmarks : KtorClientBenchmarks(Apache)
 
