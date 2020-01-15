@@ -29,7 +29,7 @@ class PostTest : ClientLoader() {
     }
 
     @Test
-    fun testWithPause() = clientTests(listOf("Js")) {
+    fun testWithPause() = clientTests(listOf("Js", "Curl")) {
         test { client ->
             val content = makeString(16 * 1024 * 1024)
 

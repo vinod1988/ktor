@@ -217,7 +217,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testDownloadStreamChannelWithCancel() = clientTests(listOf("Js")) {
+    fun testDownloadStreamChannelWithCancel() = clientTests(listOf("Js", "Curl")) {
         test { client ->
             val content = client.get<ByteReadChannel>("$TEST_SERVER/content/stream")
             content.cancel()
@@ -225,7 +225,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testDownloadStreamResponseWithClose() = clientTests(listOf("Js")) {
+    fun testDownloadStreamResponseWithClose() = clientTests(listOf("Js", "Curl")) {
         test { client ->
             client.get<HttpStatement>("$TEST_SERVER/content/stream").execute {
             }
@@ -233,7 +233,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testDownloadStreamResponseWithCancel() = clientTests(listOf("Js")) {
+    fun testDownloadStreamResponseWithCancel() = clientTests(listOf("Js", "Curl")) {
         test { client ->
             client.get<HttpStatement>("$TEST_SERVER/content/stream").execute {
                 it.cancel()
@@ -242,7 +242,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testDownloadStreamArrayWithTimeout() = clientTests(listOf("Js")) {
+    fun testDownloadStreamArrayWithTimeout() = clientTests(listOf("Js", "Curl")) {
         test { client ->
             val result: ByteArray? = withTimeoutOrNull(100) {
                 client.get<ByteArray>("$TEST_SERVER/content/stream")

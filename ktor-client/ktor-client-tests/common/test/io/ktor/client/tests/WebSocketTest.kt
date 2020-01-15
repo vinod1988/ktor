@@ -13,7 +13,7 @@ import kotlin.test.*
 class WebSocketTest : ClientLoader() {
 
     @Test
-    fun testEcho() = clientTests(listOf("Apache", "Android")) {
+    fun testEcho() = clientTests(listOf("Apache", "Android", "Curl")) {
         config {
             install(WebSockets)
         }
