@@ -82,6 +82,7 @@ kotlin {
 
         configure(project.ext.nativeTargets) {
 //            binaries.getTest("DEBUG").optimized = true
+            binaries.getTest("DEBUG").freeCompilerArgs = ["-Xallocator=mimalloc"]
         }
 
         project.ext.nativeCompilations = project.ext.nativeTargets.collect { it.compilations.main }

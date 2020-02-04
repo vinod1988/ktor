@@ -71,15 +71,16 @@ internal actual fun CharsetEncoder.encodeImpl(input: CharSequence, fromIndex: In
     val length = toIndex - fromIndex
     if (length == 0) return 0
 
-    val chars = input.substring(fromIndex, toIndex).toCharArray()
+    //val chars = input.substring(fromIndex, toIndex).toCharArray()
     val charset = iconvCharsetName(_charset._name)
     val cd: COpaquePointer? = iconv_open(charset, platformUtf16)
     checkErrors(cd, charset)
 
     var charsConsumed = 0
+
     try {
         dst.writeDirect { buffer ->
-            chars.usePinned { pinned ->
+            (input as String).usePinned { pinned ->
                 memScoped {
                     val inbuf = alloc<CPointerVar<ByteVar>>()
                     val outbuf = alloc<CPointerVar<ByteVar>>()
@@ -87,7 +88,7 @@ internal actual fun CharsetEncoder.encodeImpl(input: CharSequence, fromIndex: In
                     val outbytesleft = alloc<size_tVar>()
                     val dstRemaining = dst.writeRemaining.convert<size_t>()
 
-                    inbuf.value = pinned.addressOf(0)
+                    inbuf.value = pinned.addressOf(fromIndex).reinterpret<ByteVar>()
                     outbuf.value = buffer
                     inbytesleft.value = (length * 2).convert<size_t>()
                     outbytesleft.value = dstRemaining

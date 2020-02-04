@@ -83,13 +83,12 @@ abstract class AbstractInput(
             if (newValue < 0) {
                 error("tailRemaining is negative: $newValue")
             }
+            val tailSize = _head.next?.remainingAll() ?: 0L
             if (newValue == 0L) {
-                val tail = _head.next?.remainingAll() ?: 0L
-                if (tail != 0L) {
-                    error("tailRemaining is set 0 while there is a tail of size $tail")
+                if (tailSize != 0L) {
+                    error("tailRemaining is set 0 while there is a tail of size $tailSize")
                 }
             }
-            val tailSize = _head.next?.remainingAll() ?: 0L
             if (newValue != tailSize) {
                 error("tailRemaining is set to a value that is not consistent with the actual tail: $newValue != $tailSize")
             }
