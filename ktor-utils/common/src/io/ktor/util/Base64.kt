@@ -102,7 +102,9 @@ fun String.decodeBase64(): String = decodeBase64String()
 fun ByteReadPacket.decodeBase64(): String = decodeBase64Bytes().readText()
 
 internal fun ByteArray.clearFrom(from: Int) {
-    (from until size).forEach { this[it] = 0 }
+    for (i in from until size) {
+        this[i] = 0
+    }
 }
 
 internal fun Int.toBase64(): Char = BASE64_ALPHABET[this]
