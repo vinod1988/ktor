@@ -175,7 +175,7 @@ actual fun Memory.copyTo(
 
 @PublishedApi
 internal inline fun Memory.assertIndex(offset: Int, valueSize: Int): Int {
-    assert(offset in 0..size - valueSize) {
+    assert(offset >= 0 && offset <= size - valueSize) {
         throw IndexOutOfBoundsException("offset $offset outside of range [0; ${size - valueSize})")
     }
     return offset
@@ -183,7 +183,7 @@ internal inline fun Memory.assertIndex(offset: Int, valueSize: Int): Int {
 
 @PublishedApi
 internal inline fun Memory.assertIndex(offset: Long, valueSize: Long): Long {
-    assert(offset in 0..size - valueSize) {
+    assert(offset >= 0 && offset <= size - valueSize) {
         throw IndexOutOfBoundsException("offset $offset outside of range [0; ${size - valueSize})")
     }
     return offset

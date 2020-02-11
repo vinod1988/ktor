@@ -343,32 +343,32 @@ private fun Memory.encodeUTF8Stage2(
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun charactersSize(v: Int) = when {
-    v in 1..0x7f -> 1
-    v in 0x80..0x7ff -> 2
-    v in 0x800..0xffff -> 3
-    v in 0x10000..0x10ffff -> 4
+    (v >= 1 && v <= 0x7f) -> 1
+    (v >= 0x80 && v <= 0x7ff) -> 2
+    (v >= 0x800 && v <= 0xffff) -> 3
+    (v >= 0x10000 && v <= 0x10ffff) -> 4
     else -> malformedCodePoint(v)
 }
 
 // TODO optimize it, now we are simply do naive encoding here
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun Memory.putUtf8Char(offset: Int, v: Int): Int = when {
-    v in 0..0x7f -> {
+    (v >= 0 && v <= 0x7f) -> {
         storeAt(offset, v.toByte())
         1
     }
-    v in 0x80..0x7ff -> {
+    (v >= 0x80 && v <= 0x7ff) -> {
         this[offset] = (0xc0 or ((v shr 6) and 0x1f)).toByte()
         this[offset + 1] = (0x80 or (v and 0x3f)).toByte()
         2
     }
-    v in 0x800..0xffff -> {
+    (v >= 0x800 && v <= 0xffff) -> {
         this[offset] = (0xe0 or ((v shr 12) and 0x0f)).toByte()
         this[offset + 1] = (0x80 or ((v shr 6) and 0x3f)).toByte()
         this[offset + 2] = (0x80 or (v and 0x3f)).toByte()
         3
     }
-    v in 0x10000..0x10ffff -> {
+    (v >= 0x10000 && v <= 0x10ffff) -> {
         this[offset] = (0xf0 or ((v shr 18) and 0x07)).toByte() // 3 bits
         this[offset + 1] = (0x80 or ((v shr 12) and 0x3f)).toByte() // 6 bits
         this[offset + 2] = (0x80 or ((v shr 6) and 0x3f)).toByte() // 6 bits
