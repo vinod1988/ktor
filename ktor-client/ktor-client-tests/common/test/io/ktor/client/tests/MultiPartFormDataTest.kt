@@ -19,7 +19,7 @@ import kotlin.test.*
 class MultiPartFormDataTest : ClientLoader() {
 
     @Test
-    fun testMultiPartFormData() = clientTests {
+    fun testMultiPartFormData() = clientTests("Curl") {
         test { client ->
             val result = client.post<HttpStatement>("$TEST_SERVER/multipart") {
                 body = MultiPartFormDataContent(formData {

@@ -12,7 +12,7 @@ import kotlin.test.*
 
 class DownloadTest : ClientLoader() {
     @Test
-    fun testDownloadGoogle() = clientTests {
+    fun testDownloadGoogle() = clientTests("Curl") {
         test { client ->
             val response = client.get<String>("http://www.google.com/")
             assertTrue { response.isNotEmpty() }
@@ -20,7 +20,7 @@ class DownloadTest : ClientLoader() {
     }
 
     @Test
-    fun testLocalhostEcho() = clientTests {
+    fun testLocalhostEcho() = clientTests("Curl") {
         val text = "Hello, world"
         test { client ->
             val response = client.post<String>("$TEST_SERVER/echo") {

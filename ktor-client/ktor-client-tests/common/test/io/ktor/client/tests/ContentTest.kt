@@ -27,7 +27,7 @@ class ContentTest : ClientLoader() {
     )
 
     @Test
-    fun testGetFormData() = clientTests(listOf("Js")) {
+    fun testGetFormData() = clientTests("Js") {
         test { client ->
             val form = parametersOf(
                 "user" to listOf("myuser"),
@@ -43,7 +43,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testByteArray() = clientTests(listOf("Js")) {
+    fun testByteArray() = clientTests("Js") {
         test { client ->
             testSize.forEach { size ->
                 val content = makeArray(size)
@@ -55,7 +55,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testByteReadChannel() = clientTests(listOf("Js")) {
+    fun testByteReadChannel() = clientTests("Js") {
         test { client ->
             testSize.forEach { size ->
                 val content = makeArray(size)
@@ -66,7 +66,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testString() = clientTests(listOf("Js")) {
+    fun testString() = clientTests("Js", "iOS", "Curl") {
         test { client ->
             testSize.forEach { size ->
                 val content = makeString(size)
@@ -79,7 +79,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testEmptyContent() = clientTests(listOf("js")) {
+    fun testEmptyContent() = clientTests("js", "Curl") {
         val size = 0
         val content = makeString(size)
         repeatCount = 200
@@ -95,7 +95,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testTextContent() = clientTests(listOf("Js")) {
+    fun testTextContent() = clientTests("Js", "iOS", "Curl") {
         test { client ->
             testSize.forEach { size ->
                 val content = makeString(size)
@@ -107,7 +107,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testByteArrayContent() = clientTests(listOf("Js")) {
+    fun testByteArrayContent() = clientTests("Js") {
         test { client ->
             testSize.forEach { size ->
                 val content = makeArray(size)
@@ -119,7 +119,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testPostFormData() = clientTests(listOf("Js")) {
+    fun testPostFormData() = clientTests("Js", "Curl") {
         test { client ->
             val form = parametersOf(
                 "user" to listOf("myuser"),
@@ -132,7 +132,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testMultipartFormData() = clientTests(listOf("Js")) {
+    fun testMultipartFormData() = clientTests("Js") {
         val data = {
             formData {
                 append("name", "hello")
@@ -163,7 +163,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testFormDataWithContentLength() = clientTests(listOf("Js")) {
+    fun testFormDataWithContentLength() = clientTests("Js") {
         test { client ->
             client.submitForm<Unit> {
                 url("$TEST_SERVER/content/file-upload")
@@ -186,7 +186,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testJsonPostWithEmptyBody() = clientTests {
+    fun testJsonPostWithEmptyBody() = clientTests("Curl") {
         config {
             install(JsonFeature) {
                 serializer = KotlinxSerializer()
@@ -203,7 +203,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testPostWithEmptyBody() = clientTests {
+    fun testPostWithEmptyBody() = clientTests("Curl") {
         config {
         }
 
@@ -217,7 +217,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testDownloadStreamChannelWithCancel() = clientTests(listOf("Js", "Curl")) {
+    fun testDownloadStreamChannelWithCancel() = clientTests("Js", "Curl", "iOS") {
         test { client ->
             val content = client.get<ByteReadChannel>("$TEST_SERVER/content/stream")
             content.cancel()
@@ -225,7 +225,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testDownloadStreamResponseWithClose() = clientTests(listOf("Js", "Curl")) {
+    fun testDownloadStreamResponseWithClose() = clientTests("Js", "Curl", "iOS") {
         test { client ->
             client.get<HttpStatement>("$TEST_SERVER/content/stream").execute {
             }
@@ -233,7 +233,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testDownloadStreamResponseWithCancel() = clientTests(listOf("Js", "Curl")) {
+    fun testDownloadStreamResponseWithCancel() = clientTests("Js", "Curl", "iOS") {
         test { client ->
             client.get<HttpStatement>("$TEST_SERVER/content/stream").execute {
                 it.cancel()
@@ -242,7 +242,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testDownloadStreamArrayWithTimeout() = clientTests(listOf("Js", "Curl")) {
+    fun testDownloadStreamArrayWithTimeout() = clientTests("Js", "Curl", "iOS") {
         test { client ->
             val result: ByteArray? = withTimeoutOrNull(100) {
                 client.get<ByteArray>("$TEST_SERVER/content/stream")

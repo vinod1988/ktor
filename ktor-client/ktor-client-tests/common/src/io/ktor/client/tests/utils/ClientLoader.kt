@@ -23,3 +23,11 @@ expect abstract class ClientLoader() {
      */
     fun dumpCoroutines()
 }
+
+/**
+ * Perform test against all clients from dependencies.
+ */
+fun ClientLoader.clientTests(
+    vararg skipEngines: String,
+    block: suspend TestClientBuilder<HttpClientEngineConfig>.() -> Unit
+) = clientTests(skipEngines.toList(), block)

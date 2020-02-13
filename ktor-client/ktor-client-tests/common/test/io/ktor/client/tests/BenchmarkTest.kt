@@ -34,7 +34,7 @@ class BenchmarkTest : ClientLoader() {
     }
 
     @Test
-    fun testUpload() = clientTests {
+    fun testUpload() = clientTests("Curl") {
         test { client ->
             val uploaded = client.post<String>("$TEST_BENCHMARKS_SERVER/bytes") {
                 body = testData[size]!!

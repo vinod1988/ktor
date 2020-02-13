@@ -34,7 +34,7 @@ class FullFormTest : ClientLoader() {
     }
 
     @Test
-    fun testPost() = clientTests {
+    fun testPost() = clientTests("Curl") {
         test { client ->
             val text = client.request<HttpStatement> {
                 url {
@@ -52,7 +52,7 @@ class FullFormTest : ClientLoader() {
     }
 
     @Test
-    fun testRequest() = clientTests {
+    fun testRequest() = clientTests("Curl") {
         test { client ->
             val requestBuilder = request {
                 url {
