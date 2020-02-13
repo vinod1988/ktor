@@ -32,6 +32,7 @@ internal class CurlProcessor(
     }
 
     suspend fun executeRequest(request: CurlRequestData, callContext: CoroutineContext): CurlSuccess {
+        println("Execute started")
         val deferred = CompletableDeferred<CurlSuccess>()
         responseConsumers[request] = deferred
 
@@ -43,15 +44,19 @@ internal class CurlProcessor(
         }
 
         try {
-
             activeRequests.incrementAndGet()
 
+            println("start loop")
             while (deferred.isActive) {
                 val completedResponses = poll()
-                while (completedResponses.state == FutureState.SCHEDULED) delay(100)
+                while (completedResponses.state == FutureState.SCHEDULED) {
+                    delay(100)
+                }
+
                 processPoll(completedResponses.result)
             }
 
+            println("await result")
             return deferred.await()
         } finally {
             requestCleaner.dispose()

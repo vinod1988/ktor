@@ -75,6 +75,8 @@ internal class CurlMultiApiHandler : Closeable {
             }
         }
 
+        println("add handle")
+
         curl_multi_add_handle(multiHandle, easyHandle).verify()
 
         return easyHandle
@@ -92,7 +94,7 @@ internal class CurlMultiApiHandler : Closeable {
             do {
                 curl_multi_perform(multiHandle, transfersRunning.ptr).verify()
                 curl_multi_wait(multiHandle, null, 0.toUInt(), millis, activeTasks.ptr).verify()
-
+                println("f ${transfersRunning.value} ${activeTasks.value}")
                 repeats = if (activeTasks.value == 0) repeats + 1 else 0
             } while (repeats <= 1 && transfersRunning.value != 0)
         }
@@ -178,6 +180,7 @@ internal class CurlMultiApiHandler : Closeable {
         easyHandle: EasyHandle,
         result: CURLcode
     ): CurlResponseData = memScoped {
+        println("read response data")
         try {
             val responseDataRef = alloc<COpaquePointerVar>()
             val httpProtocolVersion = alloc<LongVar>()
@@ -220,6 +223,7 @@ internal class CurlMultiApiHandler : Closeable {
                     val headers = headersBytes.build().readBytes()
                     val body = bodyBytes.build().readBytes()
 
+                    println("Success $request")
                     CurlSuccess(
                         request,
                         httpStatusCode.value.toInt(), httpProtocolVersion.value.toUInt(),

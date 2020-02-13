@@ -25,6 +25,7 @@ internal class CurlClientEngine(
     private val curlProcessor = CurlProcessor(coroutineContext)
 
     override suspend fun execute(data: HttpRequestData): HttpResponseData {
+        println("Execute $data")
         val callContext = callContext()
 
         val requestTime = GMTDate()
@@ -32,6 +33,7 @@ internal class CurlClientEngine(
         val curlRequest = data.toCurlRequest(config)
         val responseData = curlProcessor.executeRequest(curlRequest, callContext)
 
+        println("Executed")
         return with(responseData) {
             val headerBytes = ByteReadChannel(headersBytes).apply {
                 readUTF8Line()
@@ -49,6 +51,7 @@ internal class CurlClientEngine(
                 rawHeaders.release()
             }
 
+            println("Response $status")
             HttpResponseData(
                 status, requestTime, headers, version.fromCurl(),
                 body, callContext

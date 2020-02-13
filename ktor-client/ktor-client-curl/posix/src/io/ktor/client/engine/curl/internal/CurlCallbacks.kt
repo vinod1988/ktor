@@ -30,6 +30,7 @@ internal inline fun selectPacket(
     val chunkSize = (size * count).toLong()
     val chunk = buffer.readBytes(chunkSize.toInt())
     block(userData.fromCPointer()).writeFully(chunk)
+    println("Select: $chunkSize")
     return chunkSize
 }
 
@@ -41,10 +42,14 @@ internal fun onBodyChunkRequested(
     val body: ByteReadPacket = dataRef.fromCPointer()
     val requested = (size * count).toLong()
 
-    if (body.isEmpty) return 0
+    if (body.isEmpty) {
+        println("Return 0")
+        return 0
+    }
 
     val readCount = minOf(body.remaining, requested)
     val chunk = body.readBytes(readCount.toInt())
     chunk.copyToBuffer(buffer, readCount.toULong())
+    println("Return $readCount")
     return readCount
 }

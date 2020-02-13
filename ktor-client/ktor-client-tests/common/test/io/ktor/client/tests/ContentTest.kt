@@ -186,7 +186,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testJsonPostWithEmptyBody() = clientTests("Curl") {
+    fun testJsonPostWithEmptyBody() = clientTests("ios") {
         config {
             install(JsonFeature) {
                 serializer = KotlinxSerializer()
