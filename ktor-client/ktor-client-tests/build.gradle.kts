@@ -81,7 +81,7 @@ kotlin.sourceSets {
             api(project(":ktor-client:ktor-client-curl"))
         }
     }
-    listOf("macosX64Test").map { getByName(it) }.forEach {
+    listOf("macosX64Test", "iosX64Test").map { getByName(it) }.forEach {
         it.dependencies {
             api(project(":ktor-client:ktor-client-ios"))
         }
@@ -103,7 +103,7 @@ val testTasks = mutableListOf(
     "jsBrowserTest",
     "macosX64Test",
     "linuxX64Test",
-    "iosTest",
+    "iosX64Test",
     "mingwX64Test",
     "jsNodeTest",
     "jsBrowserTest"
