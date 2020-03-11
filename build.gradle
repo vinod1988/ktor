@@ -9,10 +9,10 @@ buildscript {
      * Additionally, mavenLocal and Sonatype snapshots are added to repository list and stress tests are disabled.
      * DO NOT change the name of these properties without adapting kotlinx.train build chain.
      */
-    def prop = rootProject.properties['build_snapshot_train']
+    def prop = rootProject.properties["build_snapshot_train"]
     ext.build_snapshot_train = prop != null && prop != ""
     if (build_snapshot_train) {
-        ext.kotlin_version = rootProject.properties['kotlin_snapshot_version']
+        ext.kotlin_version = rootProject.properties["kotlin_snapshot_version"]
         if (kotlin_version == null) {
             throw new IllegalArgumentException("'kotlin_snapshot_version' should be defined when building with snapshot compiler")
         }
@@ -23,7 +23,7 @@ buildscript {
 
         configurations.classpath {
             resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-                if (details.requested.group == 'org.jetbrains.kotlin') {
+                if (details.requested.group == "org.jetbrains.kotlin") {
                     details.useVersion kotlin_version
                 }
             }
@@ -38,12 +38,12 @@ buildscript {
         maven {
             url "https://kotlin.bintray.com/kotlin-dev"
             credentials {
-                username = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER') ?: ""
-                password = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY') ?: ""
+                username = project.hasProperty("bintrayUser") ? project.property("bintrayUser") : System.getenv("BINTRAY_USER") ?: ""
+                password = project.hasProperty("bintrayApiKey") ? project.property("bintrayApiKey") : System.getenv("BINTRAY_API_KEY") ?: ""
             }
         }
         maven { url "https://dl.bintray.com/orangy/maven" }
-        maven { url 'https://kotlin.bintray.com/kotlinx' }
+        maven { url "https://kotlin.bintray.com/kotlinx" }
     }
 
     dependencies {
@@ -64,8 +64,7 @@ ext.globalM2 = "$buildDir/m2"
 ext.publishLocal = project.hasProperty("publishLocal")
 
 apply from: "gradle/experimental.gradle"
-apply from: 'gradle/verifier.gradle'
-
+apply from: "gradle/verifier.gradle"
 /**
  * `darwin` is subset of `posix`.
  * Don't create `posix` and `darwin` sourceSets in single project.
@@ -104,18 +103,18 @@ allprojects {
     project.ext.hostManager = new HostManager()
 
     if (build_snapshot_train) {
-        ext.kotlin_version = rootProject.properties['kotlin_snapshot_version']
+        ext.kotlin_version = rootProject.properties["kotlin_snapshot_version"]
         println "Using Kotlin $kotlin_version for project $it"
-        def deployVersion = properties['DeployVersion']
+        def deployVersion = properties["DeployVersion"]
         if (deployVersion != null) version = deployVersion
 
-        def skipSnapshotChecks = rootProject.properties['skip_snapshot_checks'] != null
+        def skipSnapshotChecks = rootProject.properties["skip_snapshot_checks"] != null
         if (!skipSnapshotChecks) {
             check(version, atomicfu_version, "atomicfu")
             check(version, coroutines_version, "coroutines")
             check(version, serialization_version, "serialization")
         }
-        kotlin_version = rootProject.properties['kotlin_snapshot_version']
+        kotlin_version = rootProject.properties["kotlin_snapshot_version"]
         repositories {
             mavenLocal()
             maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
@@ -127,16 +126,16 @@ allprojects {
         maven {
             url "https://dl.bintray.com/kotlin/kotlinx/"
             credentials {
-                username = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER') ?: ""
-                password = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY') ?: ""
+                username = project.hasProperty("bintrayUser") ? project.property("bintrayUser") : System.getenv("BINTRAY_USER") ?: ""
+                password = project.hasProperty("bintrayApiKey") ? project.property("bintrayApiKey") : System.getenv("BINTRAY_API_KEY") ?: ""
             }
         }
         maven { url "https://dl.bintray.com/kotlin/kotlin-eap" }
         maven {
             url "https://kotlin.bintray.com/kotlin-dev"
             credentials {
-                username = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER') ?: ""
-                password = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY') ?: ""
+                username = project.hasProperty("bintrayUser") ? project.property("bintrayUser") : System.getenv("BINTRAY_USER") ?: ""
+                password = project.hasProperty("bintrayApiKey") ? project.property("bintrayApiKey") : System.getenv("BINTRAY_API_KEY") ?: ""
             }
         }
         maven { url "https://dl.bintray.com/orangy/maven" }
@@ -155,11 +154,6 @@ allprojects {
                 apply from: rootProject.file("gradle/${platform}.gradle")
             }
         }
-    }
-
-    if (!rootProject.ext.skipPublish.contains(project.name)) {
-        apply from: rootProject.file('gradle/dokka.gradle')
-        apply from: rootProject.file('gradle/publish.gradle')
     }
 
     configurations { testOutput }
@@ -183,10 +177,15 @@ allprojects {
             }
         }
     }
-
-
 }
 
+apply from: rootProject.file("gradle/dokka.gradle")
+
+allprojects {
+    if (!rootProject.ext.skipPublish.contains(project.name)) {
+//        apply from: rootProject.file("gradle/publish.gradle")
+    }
+}
 
 task rootAllTest(type: org.jetbrains.kotlin.gradle.testing.internal.KotlinTestReport) {
     def rootAllTest = it
@@ -216,15 +215,15 @@ if (build_snapshot_train) {
     println "Hacking test tasks, removing stress and flaky tests"
     allprojects {
         tasks.withType(Test).all {
-            exclude '**/*ServerSocketTest*'
-            exclude '**/*NettyStressTest*'
-            exclude '**/*CIOMultithreadedTest*'
-            exclude '**/*testBlockingConcurrency*'
-            exclude '**/*testBigFile*'
-            exclude '**/*numberTest*'
-            exclude '**/*testWithPause*'
-            exclude '**/*WebSocketTest*'
-            exclude '**/*PostTest*'
+            exclude "**/*ServerSocketTest*"
+            exclude "**/*NettyStressTest*"
+            exclude "**/*CIOMultithreadedTest*"
+            exclude "**/*testBlockingConcurrency*"
+            exclude "**/*testBigFile*"
+            exclude "**/*numberTest*"
+            exclude "**/*testWithPause*"
+            exclude "**/*WebSocketTest*"
+            exclude "**/*PostTest*"
         }
     }
 
@@ -233,7 +232,7 @@ if (build_snapshot_train) {
         configurations.matching { it.name == "kotlinCompilerClasspath" }.all {
             resolvedConfiguration.getFiles().findAll { it.name.contains("kotlin-compiler-embeddable") }.each {
                 def manifest = zipTree(it).matching {
-                    include 'META-INF/MANIFEST.MF'
+                    include "META-INF/MANIFEST.MF"
                 }.getFiles().first()
 
                 manifest.readLines().each {
@@ -251,15 +250,6 @@ afterEvaluate {
 
     configure(allCompileKotlinTasks) {
         kotlinOptions.freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
-    }
-
-    task dokkaWebsite(type: dokka.getClass()) {
-        outputFormat = 'kotlin-website'
-        outputDirectory = "${rootProject.projectDir}/apidoc"
-
-        kotlinTasks { allCompileKotlinTasks }
-
-        reportUndocumented = false
     }
 }
 

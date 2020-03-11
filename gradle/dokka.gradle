@@ -1,21 +1,38 @@
-apply plugin: 'org.jetbrains.dokka'
+def skipDokka = [
+    "ktor-server-benchmarks"
+]
 
-dokka {
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/kdoc"
-
-    kotlinTasks {
-        defaultKotlinTasks().findAll { it.name.contains("Jvm") }
+allprojects {
+    if (skipDokka.contains(project.name)) {
+        return
     }
 
-    reportUndocumented = false
+    apply plugin: "org.jetbrains.dokka"
+
+    dokka {
+        outputFormat = "html"
+        outputDirectory = "$buildDir/kdoc"
+    }
+
+    task dokkaJar(type: Jar) {
+        classifier = "kdoc"
+        from fileTree(new File(project.buildDir, "kdoc"))
+    }
+
+    task dokkaJavadoc(type: Jar) {
+    }
 }
 
-task dokkaJar(type: Jar, dependsOn: 'dokka') {
-    classifier 'kdoc'
-    from fileTree(new File(project.buildDir, 'kdoc'))
-}
+def allCompileTasks = allprojects.tasks.collect {
+    def dokkaTask = it.findByName("dokka")
+    dokkaTask != null ? dokkaTask.defaultKotlinTasks() : []
+}.flatten()
 
-task dokkaJavadoc {
-    // do nothing
+task dokkaWebsite(type: dokka.getClass()) {
+    outputFormat = "html"
+    outputDirectory = "${rootProject.projectDir}/apidoc"
+
+    configuration {
+        kotlinTasks { allCompileTasks }
+    }
 }

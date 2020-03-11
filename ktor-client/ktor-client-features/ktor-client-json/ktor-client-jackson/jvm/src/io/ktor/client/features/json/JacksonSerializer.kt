@@ -11,7 +11,14 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.utils.io.core.*
 
-class JacksonSerializer(jackson: ObjectMapper = jacksonObjectMapper(), block: ObjectMapper.() -> Unit = {}) : JsonSerializer {
+/**
+ * Client json serializer that uses jackson library as a backend.
+ *
+ * You can set [ObjectMapper] using the [jackson] parameter, or pass configuration in the [block] builder.
+ */
+class JacksonSerializer(
+    jackson: ObjectMapper = jacksonObjectMapper(), block: ObjectMapper.() -> Unit = {}
+) : JsonSerializer {
 
     private val backend = jackson.apply(block)
 
