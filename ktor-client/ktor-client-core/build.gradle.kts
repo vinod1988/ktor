@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.plugin.*
 
 description = "Ktor http client"
 
-val ideaActive: Boolean by project
 val coroutines_version: String by project
 
 val node_fetch_version: String by project

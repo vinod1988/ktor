@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.targets.native.tasks.*
 
-val ideaActive: Boolean by project.extra
 val serialization_version: String by project.extra
 
 plugins {
@@ -14,11 +13,10 @@ kotlin {
         // Workaround: 1.3.60. Possible because of the new inference.
         (this as NamedDomainObjectCollection<KotlinTarget>)
 
-        val current = mutableListOf<KotlinTarget>()
-        if (ideaActive) {
-            current.add(getByName("posix"))
-        } else {
-            current.addAll(listOf(getByName("macosX64"), getByName("linuxX64"), getByName("mingwX64")))
+        val current: MutableList<KotlinTarget> = mutableListOf()
+
+        current += listOf("macosX64", "linuxX64", "mingwX64").map {
+            getByName(it)
         }
 
         val paths = listOf("C:/msys64/mingw64/include/curl", "C:/Tools/msys64/mingw64/include/curl")
@@ -60,13 +58,13 @@ kotlin {
     }
 
     sourceSets {
-        posixMain {
+        val posixMain by getting {
             dependencies {
                 api(project(":ktor-client:ktor-client-core"))
                 api(project(":ktor-http:ktor-http-cio"))
             }
         }
-        posixTest {
+        val posixTest by getting {
             dependencies {
                 api(project(":ktor-client:ktor-client-features:ktor-client-logging"))
                 api(project(":ktor-client:ktor-client-features:ktor-client-json"))

@@ -184,9 +184,11 @@ allprojects {
         }
     }
 
-
 }
 
+allprojects {
+    gradle.startParameter.excludedTaskNames.add('allMetadataJar')
+}
 
 task rootAllTest(type: org.jetbrains.kotlin.gradle.testing.internal.KotlinTestReport) {
     def rootAllTest = it

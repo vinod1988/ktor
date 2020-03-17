@@ -1,8 +1,14 @@
+/*
+ * Copyright 2014-2020 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
+ */
+
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
+package io.ktor.test.dispatcher
+
 import kotlinx.coroutines.*
-import kotlin.coroutines.*
 import platform.Foundation.*
+import kotlin.coroutines.*
 
 /**
  * Amount of time any task is processed and can't be rescheduled.

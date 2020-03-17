@@ -5,7 +5,6 @@
 package io.ktor.client.engine.ios
 
 import io.ktor.http.*
-import platform.CFNetwork.*
 import platform.CoreFoundation.*
 import platform.Foundation.*
 
@@ -23,9 +22,9 @@ internal fun NSURLSessionConfiguration.setupProxy(config: IosClientEngineConfig)
 
 internal fun NSURLSessionConfiguration.setupHttpProxy(url: Url) {
     connectionProxyDictionary = mapOf(
-        kCFNetworkProxiesHTTPEnable.toNSString() to 1,
-        kCFNetworkProxiesHTTPProxy.toNSString() to url.host,
-        kCFNetworkProxiesHTTPPort.toNSString() to url.port
+        "HTTPEnable" to 1,
+        "HTTPProxy" to url.host,
+        "HTTPPort" to url.port
     )
 }
 

@@ -10,14 +10,39 @@ kotlin {
         project.ext.isLinuxHost = linuxEnabled
         project.ext.isMacosHost = macosEnabled
         project.ext.isWinHost = winEnabled
+    }
+}
 
-        if (project.ext.ideaActive) {
-            def ideaPreset = presets.linuxX64
-            if (macosEnabled) ideaPreset = presets.macosX64
-            if (winEnabled) ideaPreset = presets.mingwX64
+project.ext.sourceSetSuffixes = ["Main", "Test"]
 
-            project.ext.ideaPreset = ideaPreset
+def configureNativeSourceSetPreset(name, preset) {
+    def hostMainCompilation = project.kotlin.targetFromPreset(preset).compilations.main
+    def compileConfiguration = configurations[hostMainCompilation.compileDependencyConfigurationName]
+    def hostNativePlatformLibs = files(provider {
+        compileConfiguration.findAll {
+            it.path.endsWith(".klib") || it.absolutePath.contains("klib${File.separator}platform")
         }
+    })
+    for (suffix in project.ext.sourceSetSuffixes) {
+        configure(kotlin.sourceSets[name + suffix]) {
+            dependencies.add(implementationMetadataConfigurationName, hostNativePlatformLibs)
+        }
+    }
+}
+
+def defineSourceSet(newName, dependsOn) {
+    for (suffix in project.ext.sourceSetSuffixes) {
+        def newSourceSet = kotlin.sourceSets.create(newName + suffix)
+        for (child in dependsOn) {
+            kotlin.sourceSets[child.name + suffix].dependsOn newSourceSet
+        }
+    }
+}
+
+project.ext.createUmbrellaSourceSets = { name, platforms, preset ->
+    defineSourceSet(name, platforms)
+    if (project.ext.ideaActive) {
+        configureNativeSourceSetPreset(name, preset)
     }
 }
 

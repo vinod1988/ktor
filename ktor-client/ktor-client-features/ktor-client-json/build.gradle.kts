@@ -1,7 +1,5 @@
 description = "Ktor client JSON support"
 
-val ideaActive: Boolean by project.extra
-
 plugins {
     id("kotlinx-serialization")
 }
