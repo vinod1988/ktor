@@ -75,6 +75,8 @@ fun <T : HttpClientEngineConfig> testWithEngine(
         } catch (cause: Throwable) {
             client.cancel("Test failed", cause)
             throw cause
+        } finally {
+            builder.after(client)
         }
     }
 }
@@ -84,6 +86,7 @@ fun <T : HttpClientEngineConfig> testWithEngine(
 class TestClientBuilder<T : HttpClientEngineConfig>(
     var config: HttpClientConfig<T>.() -> Unit = {},
     var test: suspend (client: HttpClient) -> Unit = {},
+    var after: suspend (client: HttpClient) -> Unit = {},
     var repeatCount: Int = 1,
     var dumpAfterDelay: Long = -1
 )
@@ -98,4 +101,10 @@ fun <T : HttpClientEngineConfig> TestClientBuilder<T>.config(block: HttpClientCo
 @Suppress("KDocMissingDocumentation")
 fun TestClientBuilder<*>.test(block: suspend (client: HttpClient) -> Unit): Unit {
     test = block
+}
+
+@InternalAPI
+@Suppress("KDocMissingDocumentation")
+fun TestClientBuilder<*>.after(block: suspend (client: HttpClient) -> Unit): Unit {
+    after = block
 }
