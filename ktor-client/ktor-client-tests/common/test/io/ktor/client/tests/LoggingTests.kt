@@ -77,6 +77,7 @@ class LoggingTest : ClientLoader() {
             "FROM: http://localhost:8080/logging/",
             "COMMON HEADERS",
             "???-> Connection: keep-alive",
+            "???-> Connection: close",
             "-> Content-Length: 9",
             "-> Content-Type: text/plain; charset=UTF-8",
             "BODY Content-Type: text/plain; charset=UTF-8",
@@ -100,6 +101,7 @@ class LoggingTest : ClientLoader() {
             "METHOD: HttpMethod(value=GET)",
             "FROM: http://localhost:8080/logging/",
             "COMMON HEADERS",
+            "???-> Connection: close",
             "???-> Connection: keep-alive",
             "-> Content-Length: 9",
             "-> Content-Type: text/plain; charset=UTF-8"
@@ -139,6 +141,7 @@ class LoggingTest : ClientLoader() {
             "METHOD: HttpMethod(value=POST)",
             "FROM: http://localhost:8080/logging/",
             "COMMON HEADERS",
+            "???-> Connection: close",
             "???-> connection: keep-alive",
             "-> content-length: 1",
             "-> content-type: text/plain; charset=UTF-8",
@@ -179,7 +182,7 @@ class LoggingTest : ClientLoader() {
     }
 
     @Test
-    fun logRedirectTest() = clientTests {
+    fun logRedirectTest() = clientTests(listOf("js")) {
         val testLogger = TestLogger(
             "REQUEST: http://127.0.0.1:8080/logging/301",
             "METHOD: HttpMethod(value=GET)",
@@ -196,6 +199,7 @@ class LoggingTest : ClientLoader() {
             "FROM: http://127.0.0.1:8080/logging/301",
             "COMMON HEADERS",
             "???-> Connection: keep-alive",
+            "???-> Connection: close",
             "-> Content-Length: 0",
             "-> Location: /logging",
             "BODY Content-Type: null",
@@ -250,7 +254,7 @@ class LoggingTest : ClientLoader() {
     }
 
     @Test
-    fun customServerHeadersLoggingTest() = clientTests(listOf("Curl", "iOS")) {
+    fun customServerHeadersLoggingTest() = clientTests(listOf("Curl", "iOS", "Js")) {
         val testLogger = TestLogger(
             "REQUEST: http://google.com/",
             "METHOD: HttpMethod(value=GET)",
