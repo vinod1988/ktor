@@ -10,5 +10,5 @@ package io.ktor.http
  *
  * It uses "localhost" for all platforms except js.
  */
-actual val URLBuilder.Companion.originHost: String
-    get() = "localhost"
+internal actual val URLBuilder.Companion.originHost: String
+    get() = "http://localhost/"
