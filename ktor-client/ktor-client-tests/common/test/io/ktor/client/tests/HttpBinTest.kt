@@ -25,14 +25,13 @@ class HttpBinTest : ClientLoader() {
 
     @Test
     fun testGet() = clientTests(listOf("iOS")) {
-
         config {
             testConfiguration()
         }
 
         test { client ->
             // TODO: unmute when JS IR serialization is fixed https://github.com/Kotlin/kotlinx.serialization/issues/751
-            if (isKotlinJsIr) return@clientTests
+            if (isKotlinJsIr) return@test
 
             val response = client.get<HttpBinResponse>("https://httpbin.org/get")
 
@@ -55,7 +54,7 @@ class HttpBinTest : ClientLoader() {
 
         test { client ->
             // TODO: unmute when JS IR serialization is fixed https://github.com/Kotlin/kotlinx.serialization/issues/751
-            if (isKotlinJsIr) return@clientTests
+            if (isKotlinJsIr) return@test
 
             val response = client.post<HttpBinResponse>("https://httpbin.org/post") {
                 body = "Hello, bin!"
