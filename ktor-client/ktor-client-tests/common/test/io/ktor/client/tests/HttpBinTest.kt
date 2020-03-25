@@ -24,15 +24,16 @@ data class HttpBinResponse(
 class HttpBinTest : ClientLoader() {
 
     @Test
-    fun testGet() = clientTests {
-        // TODO: unmute when JS IR serialization is fixed https://github.com/Kotlin/kotlinx.serialization/issues/751
-        if (isKotlinJsIr) return@clientTests
+    fun testGet() = clientTests(listOf("iOS")) {
 
         config {
             testConfiguration()
         }
 
         test { client ->
+            // TODO: unmute when JS IR serialization is fixed https://github.com/Kotlin/kotlinx.serialization/issues/751
+            if (isKotlinJsIr) return@clientTests
+
             val response = client.get<HttpBinResponse>("https://httpbin.org/get")
 
             assertEquals("https://httpbin.org/get", response.url)
@@ -47,15 +48,15 @@ class HttpBinTest : ClientLoader() {
     }
 
     @Test
-    fun testPost() = clientTests {
-        // TODO: unmute when JS IR serialization is fixed https://github.com/Kotlin/kotlinx.serialization/issues/751
-        if (isKotlinJsIr) return@clientTests
-
+    fun testPost() = clientTests(listOf("iOS")) {
         config {
             testConfiguration()
         }
 
         test { client ->
+            // TODO: unmute when JS IR serialization is fixed https://github.com/Kotlin/kotlinx.serialization/issues/751
+            if (isKotlinJsIr) return@clientTests
+
             val response = client.post<HttpBinResponse>("https://httpbin.org/post") {
                 body = "Hello, bin!"
             }
@@ -73,7 +74,7 @@ class HttpBinTest : ClientLoader() {
     }
 
     @Test
-    fun testBytes() = clientTests {
+    fun testBytes() = clientTests(listOf("iOS")) {
         test { client ->
             val size = 100 * 1024
             val response = client.get<HttpStatement>("https://httpbin.org/bytes/$size").execute {
