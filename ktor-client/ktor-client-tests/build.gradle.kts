@@ -69,6 +69,9 @@ kotlin.sourceSets {
             runtimeOnly(project(":ktor-client:ktor-client-cio"))
             runtimeOnly(project(":ktor-client:ktor-client-android"))
             runtimeOnly(project(":ktor-client:ktor-client-okhttp"))
+
+            implementation(project(":ktor-client:ktor-client-features:ktor-client-json:ktor-client-jackson"))
+            implementation(project(":ktor-client:ktor-client-features:ktor-client-encoding"))
 //            runtimeOnly(project(":ktor-client:ktor-client-jetty"))
         }
     }
