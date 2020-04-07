@@ -227,6 +227,11 @@ public final class io/ktor/util/NIOKt {
 	public static final fun moveToByteArray (Ljava/nio/ByteBuffer;)[B
 }
 
+public final class io/ktor/util/NativeUtilsJvmKt {
+	public static final fun makeShared (Ljava/lang/Object;)V
+	public static final fun preventFreeze (Ljava/lang/Object;)V
+}
+
 public final class io/ktor/util/NioPathKt {
 	public static final fun combineSafe (Ljava/io/File;Ljava/nio/file/Path;)Ljava/io/File;
 	public static final fun combineSafe (Ljava/nio/file/Path;Ljava/nio/file/Path;)Ljava/io/File;

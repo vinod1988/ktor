@@ -278,7 +278,7 @@ fun valuesOf(name: String, values: List<String>, caseInsensitiveKey: Boolean = f
 /**
  * Build an empty [StringValues] instance.
  */
-fun valuesOf() = StringValues.Empty
+fun valuesOf(): StringValues = StringValues.Empty
 
 /**
  * Build an instance of [StringValues] from the specified [map]

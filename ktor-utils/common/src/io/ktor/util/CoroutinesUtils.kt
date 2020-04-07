@@ -11,7 +11,7 @@ import kotlin.coroutines.*
  * Print [Job] children tree.
  */
 @InternalAPI
-fun Job.printDebugTree(offset: Int = 0) {
+public fun Job.printDebugTree(offset: Int = 0) {
     println(" ".repeat(offset) + this)
 
     children.forEach {
@@ -33,6 +33,7 @@ internal expect inline fun <R, A>
 /**
  * Supervisor with empty coroutine exception handler ignoring all exceptions.
  */
+@Suppress("FunctionName")
 @InternalAPI
-fun SilentSupervisor(parent: Job? = null): CoroutineContext =
+public fun SilentSupervisor(parent: Job? = null): CoroutineContext =
     SupervisorJob(parent) + CoroutineExceptionHandler { _, _ -> }
