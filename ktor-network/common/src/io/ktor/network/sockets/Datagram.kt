@@ -6,8 +6,8 @@ package io.ktor.network.sockets
 
 import io.ktor.network.util.*
 import io.ktor.util.*
-import kotlinx.coroutines.channels.*
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.channels.*
 
 internal const val MAX_DATAGRAM_SIZE = 65535
 
@@ -16,7 +16,10 @@ internal const val MAX_DATAGRAM_SIZE = 65535
  * @property packet content
  * @property address to send to
  */
-class Datagram(val packet: ByteReadPacket, val address: NetworkAddress) {
+public class Datagram(
+    public val packet: ByteReadPacket,
+    public val address: NetworkAddress
+) {
     init {
         require(packet.remaining <= MAX_DATAGRAM_SIZE) {
             "Datagram size limit exceeded: ${packet.remaining} of possible $MAX_DATAGRAM_SIZE"
@@ -28,16 +31,16 @@ class Datagram(val packet: ByteReadPacket, val address: NetworkAddress) {
  * A channel for sending datagrams
  */
 @KtorExperimentalAPI
-interface DatagramWriteChannel {
+public interface DatagramWriteChannel {
     /**
      * Datagram outgoing channel
      */
-    val outgoing: SendChannel<Datagram>
+    public val outgoing: SendChannel<Datagram>
 
     /**
-     * Send datagram
+     * Send datagram.
      */
-    suspend fun send(datagram: Datagram) {
+    public suspend fun send(datagram: Datagram) {
         outgoing.send(datagram)
     }
 }
@@ -46,29 +49,30 @@ interface DatagramWriteChannel {
  * A channel for receiving datagrams
  */
 @KtorExperimentalAPI
-interface DatagramReadChannel {
+public interface DatagramReadChannel {
     /**
      * Incoming datagrams channel
      */
-    val incoming: ReceiveChannel<Datagram>
+    public val incoming: ReceiveChannel<Datagram>
 
     /**
-     * Receive a datagram
+     * Receive a datagram.
      */
-    suspend fun receive(): Datagram = incoming.receive()
+    public suspend fun receive(): Datagram = incoming.receive()
 }
 
 /**
  * A channel for sending and receiving datagrams
  */
-interface DatagramReadWriteChannel : DatagramReadChannel, DatagramWriteChannel
+public interface DatagramReadWriteChannel : DatagramReadChannel, DatagramWriteChannel
 
 /**
  * Represents a bound datagram socket
  */
-interface BoundDatagramSocket : ASocket, ABoundSocket, AReadable, DatagramReadWriteChannel
+public interface BoundDatagramSocket : ASocket, ABoundSocket, AReadable, DatagramReadWriteChannel
 
 /**
  * Represents a connected datagram socket.
  */
-interface ConnectedDatagramSocket : ASocket, ABoundSocket, AConnectedSocket, ReadWriteSocket, DatagramReadWriteChannel
+public interface ConnectedDatagramSocket
+    : ASocket, ABoundSocket, AConnectedSocket, ReadWriteSocket, DatagramReadWriteChannel

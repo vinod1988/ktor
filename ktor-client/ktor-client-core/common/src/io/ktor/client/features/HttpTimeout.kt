@@ -72,7 +72,8 @@ class HttpTimeout(
             return value
         }
 
-        companion object {
+        public companion object {
+            @SharedImmutable
             val key = AttributeKey<HttpTimeoutCapabilityConfiguration>("TimeoutConfiguration")
         }
     }
@@ -86,7 +87,7 @@ class HttpTimeout(
     /**
      * Companion object for feature installation.
      */
-    companion object Feature : HttpClientFeature<HttpTimeoutCapabilityConfiguration, HttpTimeout>,
+    public companion object Feature : HttpClientFeature<HttpTimeoutCapabilityConfiguration, HttpTimeout>,
         HttpClientEngineCapability<HttpTimeoutCapabilityConfiguration> {
 
         override val key: AttributeKey<HttpTimeout> = AttributeKey("TimeoutFeature")
@@ -94,7 +95,7 @@ class HttpTimeout(
         /**
          * Infinite timeout in milliseconds.
          */
-        const val INFINITE_TIMEOUT_MS = Long.MAX_VALUE
+        public const val INFINITE_TIMEOUT_MS = Long.MAX_VALUE
 
         override fun prepare(block: HttpTimeoutCapabilityConfiguration.() -> Unit): HttpTimeout =
             HttpTimeoutCapabilityConfiguration().apply(block).build()

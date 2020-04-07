@@ -37,7 +37,8 @@ open class HttpClientEngineConfig {
 
     @Deprecated(
         "Response config is deprecated. See [HttpPlainText] feature for charset configuration",
-        level = DeprecationLevel.ERROR
+        level = DeprecationLevel.ERROR,
+        replaceWith = ReplaceWith("")
     )
     val response: Nothing get() =
         error("Unbound [HttpClientCall] is deprecated. Consider using [request<HttpResponse>(block)] in instead.")

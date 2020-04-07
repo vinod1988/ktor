@@ -22,10 +22,9 @@ public class ConcurrentMap<Key : Any, Value : Any>(
     initialCapacity: Int = INITIAL_CAPACITY
 ) : MutableMap<Key, Value> {
     private var table by shared(
-        SharedList<SharedForwardList<MapItem>>(
-            initialCapacity
-        )
+        SharedList<SharedForwardList<MapItem<Key, Value>>>(initialCapacity)
     )
+
     private val _size = atomic(0)
 
     private var appendSize by shared(0)
@@ -58,8 +57,7 @@ public class ConcurrentMap<Key : Any, Value : Any>(
         val bucket = findBucket(key) ?: return@locked null
         val item = bucket.find { it.key == key }
 
-        @Suppress("UNCHECKED_CAST")
-        return@locked item?.value as Value?
+        return@locked item?.value
     }
 
     override fun isEmpty(): Boolean = size == 0
@@ -79,8 +77,7 @@ public class ConcurrentMap<Key : Any, Value : Any>(
         if (item != null) {
             val oldValue = item.value
             item.value = value
-            @Suppress("UNCHECKED_CAST")
-            return@locked oldValue as Value
+            return@locked oldValue
         }
 
         bucket.appendHead(MapItem(key, value))
@@ -109,8 +106,7 @@ public class ConcurrentMap<Key : Any, Value : Any>(
                     _size.decrementAndGet()
                     remove()
 
-                    @Suppress("UNCHECKED_CAST")
-                    return@locked result as Value
+                    return@locked result
                 }
             }
         }
@@ -127,6 +123,34 @@ public class ConcurrentMap<Key : Any, Value : Any>(
     override val values: MutableCollection<Value>
         get() = ConcurrentMapValues(this)
 
+    internal fun iterator(): MutableIterator<MutableMap.MutableEntry<Key, Value>> =
+        object : MutableIterator<MutableMap.MutableEntry<Key, Value>> {
+            private val items = mutableListOf<MapItem<Key, Value>>()
+            private var index by shared(0)
+
+            init {
+                locked {
+                    table.forEach {
+                        it ?: return@forEach
+                        it.forEach {
+                            items.add(it)
+                        }
+                    }
+                }
+
+                makeShared()
+            }
+
+            override fun hasNext(): Boolean = index < keys.size
+
+            override fun next(): MutableMap.MutableEntry<Key, Value> = items[index++]
+
+            override fun remove() {
+                check(index > 0)
+                remove(items[index - 1].key)
+            }
+        }
+
     /**
      * Computes [block] and inserts result in map. The [block] will be evaluated at most once.
      */
@@ -141,17 +165,17 @@ public class ConcurrentMap<Key : Any, Value : Any>(
         return@locked newValue
     }
 
-    private fun findBucket(key: Key): SharedForwardList<MapItem>? {
+    private fun findBucket(key: Key): SharedForwardList<MapItem<Key, Value>>? {
         val bucketId = key.hashCode() and (table.size - 1)
         return table[bucketId]
     }
 
-    private fun findOrCreateBucket(key: Key): SharedForwardList<MapItem> {
+    private fun findOrCreateBucket(key: Key): SharedForwardList<MapItem<Key, Value>> {
         val bucketId = key.hashCode() and (table.size - 1)
         val result = table[bucketId]
 
         if (result == null) {
-            val bucket = SharedForwardList<MapItem>()
+            val bucket = SharedForwardList<MapItem<Key, Value>>()
             table[bucketId] = bucket
             return bucket
         }
@@ -170,11 +194,17 @@ public class ConcurrentMap<Key : Any, Value : Any>(
     private fun <T> locked(block: () -> T): T = lock.withLock { block() }
 }
 
-private class MapItem(val key: Any, value: Any) {
-    var value: Any by shared(value)
+private class MapItem<Key, Value>(override val key: Key, value: Value) : MutableMap.MutableEntry<Key, Value> {
+    override var value: Value by shared(value)
     val hash: Int = key.hashCode()
 
     init {
         makeShared()
+    }
+
+    override fun setValue(newValue: Value): Value {
+        val result = value
+        value = newValue
+        return result
     }
 }

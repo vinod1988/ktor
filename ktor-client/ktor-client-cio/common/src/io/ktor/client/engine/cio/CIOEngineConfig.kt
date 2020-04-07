@@ -16,6 +16,7 @@ class CIOEngineConfig : HttpClientEngineConfig() {
      * [Endpoint] settings.
      */
     val endpoint: EndpointConfig = EndpointConfig()
+
     /**
      * [https] settings.
      */

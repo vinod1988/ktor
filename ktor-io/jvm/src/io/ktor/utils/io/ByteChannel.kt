@@ -11,13 +11,13 @@ fun ByteReadChannel(content: ByteBuffer): ByteReadChannel = ByteBufferChannel(co
 /**
  * Creates buffered channel for asynchronous reading and writing of sequences of bytes.
  */
-actual fun ByteChannel(autoFlush: Boolean): ByteChannel = ByteBufferChannel(autoFlush = autoFlush)
+public actual fun ByteChannel(autoFlush: Boolean): ByteChannel = ByteBufferChannel(autoFlush = autoFlush)
 
 
 /**
  * Creates channel for reading from the specified byte array.
  */
-actual fun ByteReadChannel(content: ByteArray, offset: Int, length: Int): ByteReadChannel =
+public actual fun ByteReadChannel(content: ByteArray, offset: Int, length: Int): ByteReadChannel =
     ByteBufferChannel(ByteBuffer.wrap(content, offset, length))
 
 /**

@@ -12,7 +12,7 @@ import kotlin.contracts.*
  */
 @Suppress("DIFFERENT_NAMES_FOR_THE_SAME_PARAMETER_IN_SUPERTYPES", "DEPRECATION")
 @Deprecated("Use Memory, Input or Output instead.")
-expect class IoBuffer : Input, Output, ChunkBuffer {
+public expect class IoBuffer : Input, Output, ChunkBuffer {
 
     @Suppress("ConvertSecondaryConstructorToPrimary")
     constructor(memory: Memory, origin: ChunkBuffer?)

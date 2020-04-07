@@ -303,7 +303,9 @@ abstract class ByteChannelSequentialBase(
     }
 
     private suspend fun readIntSlow(): Int {
-        readNSlow(4) { return readable.readInt().reverseRead().also { afterRead() } }
+        readNSlow(4) {
+            return readable.readInt().reverseRead().also { afterRead() }
+        }
     }
 
     override suspend fun readLong(): Long {
@@ -315,31 +317,33 @@ abstract class ByteChannelSequentialBase(
     }
 
     private suspend fun readLongSlow(): Long {
-        readNSlow(8) { return readable.readLong().reverseRead().also { afterRead() } }
+        readNSlow(8) {
+            return readable.readLong().reverseRead().also { afterRead() }
+        }
     }
 
-    override suspend fun readFloat(): Float {
-        return if (readable.hasBytes(4)) {
-            readable.readFloat().reverseRead().also { afterRead() }
-        } else {
-            readFloatSlow()
-        }
+    override suspend fun readFloat(): Float = if (readable.hasBytes(4)) {
+        readable.readFloat().reverseRead().also { afterRead() }
+    } else {
+        readFloatSlow()
     }
 
     private suspend fun readFloatSlow(): Float {
-        readNSlow(4) { return readable.readFloat().reverseRead().also { afterRead() } }
-    }
-
-    override suspend fun readDouble(): Double {
-        return if (readable.hasBytes(8)) {
-            readable.readDouble().reverseRead().also { afterRead() }
-        } else {
-            readDoubleSlow()
+        readNSlow(4) {
+            return readable.readFloat().reverseRead().also { afterRead() }
         }
     }
 
+    override suspend fun readDouble(): Double = if (readable.hasBytes(8)) {
+        readable.readDouble().reverseRead().also { afterRead() }
+    } else {
+        readDoubleSlow()
+    }
+
     private suspend fun readDoubleSlow(): Double {
-        readNSlow(8) { return readable.readDouble().reverseRead().also { afterRead() } }
+        readNSlow(8) {
+            return readable.readDouble().reverseRead().also { afterRead() }
+        }
     }
 
     override suspend fun readRemaining(limit: Long, headerSizeHint: Int): ByteReadPacket {
@@ -409,27 +413,22 @@ abstract class ByteChannelSequentialBase(
 
     protected fun readAvailableClosed(): Int {
         closedCause?.let { throw it }
-        -1
         return -1
     }
 
-    override suspend fun readAvailable(dst: IoBuffer): Int {
-        return readAvailable(dst as Buffer)
-    }
+    override suspend fun readAvailable(dst: IoBuffer): Int = readAvailable(dst as Buffer)
 
-    internal suspend fun readAvailable(dst: Buffer): Int {
-        return when {
-            closedCause != null -> throw closedCause!!
-            readable.canRead() -> {
-                val size = minOf(dst.writeRemaining.toLong(), readable.remaining).toInt()
-                readable.readFully(dst, size)
-                afterRead()
-                size
-            }
-            closed -> readAvailableClosed()
-            !dst.canWrite() -> 0
-            else -> readAvailableSuspend(dst)
+    internal suspend fun readAvailable(dst: Buffer): Int = when {
+        closedCause != null -> throw closedCause!!
+        readable.canRead() -> {
+            val size = minOf(dst.writeRemaining.toLong(), readable.remaining).toInt()
+            readable.readFully(dst, size)
+            afterRead()
+            size
         }
+        closed -> readAvailableClosed()
+        !dst.canWrite() -> 0
+        else -> readAvailableSuspend(dst)
     }
 
     private suspend fun readAvailableSuspend(dst: Buffer): Int {
@@ -458,17 +457,15 @@ abstract class ByteChannelSequentialBase(
         return readFully(dst, n)
     }
 
-    override suspend fun readAvailable(dst: ByteArray, offset: Int, length: Int): Int {
-        return when {
-            readable.canRead() -> {
-                val size = minOf(length.toLong(), readable.remaining).toInt()
-                readable.readFully(dst, offset, size)
-                afterRead()
-                size
-            }
-            closed -> readAvailableClosed()
-            else -> readAvailableSuspend(dst, offset, length)
+    override suspend fun readAvailable(dst: ByteArray, offset: Int, length: Int): Int = when {
+        readable.canRead() -> {
+            val size = minOf(length.toLong(), readable.remaining).toInt()
+            readable.readFully(dst, offset, size)
+            afterRead()
+            size
         }
+        closed -> readAvailableClosed()
+        else -> readAvailableSuspend(dst, offset, length)
     }
 
     private suspend fun readAvailableSuspend(dst: ByteArray, offset: Int, length: Int): Int {
@@ -533,9 +530,10 @@ abstract class ByteChannelSequentialBase(
         return awaitSuspend(atLeast)
     }
 
-    internal suspend fun awaitInternalAtLeast1(): Boolean {
-        if (readable.isNotEmpty) return true
-        return awaitSuspend(1)
+    internal suspend fun awaitInternalAtLeast1(): Boolean = if (readable.isNotEmpty) {
+        true
+    } else {
+        awaitSuspend(1)
     }
 
     protected suspend fun awaitSuspend(atLeast: Int): Boolean {
@@ -548,7 +546,10 @@ abstract class ByteChannelSequentialBase(
 
     override fun discard(n: Int): Int {
         closedCause?.let { throw it }
-        if (n == 0) return 0
+
+        if (n == 0) {
+            return 0
+        }
 
         return readable.discard(n).also {
             afterRead()
@@ -606,9 +607,7 @@ abstract class ByteChannelSequentialBase(
         }
     }
 
-    override fun startReadSession(): SuspendableReadSession {
-        return this
-    }
+    override fun startReadSession(): SuspendableReadSession = this
 
     override fun endReadSession() {
         completeReading()
@@ -651,7 +650,10 @@ abstract class ByteChannelSequentialBase(
     }
 
     override fun cancel(cause: Throwable?): Boolean {
-        if (closedCause != null || closed) return false
+        if (closedCause != null || closed) {
+            return false
+        }
+
         return close(cause ?: io.ktor.utils.io.CancellationException("Channel cancelled"))
     }
 

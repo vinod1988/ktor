@@ -34,6 +34,7 @@ actual abstract class ClientLoader {
 
         val failures = mutableListOf<TestFailure>()
         for (engine in filteredEngines) {
+            println("Test with $engine")
             val result = runCatching {
                 testWithEngine(engine) {
                     withTimeout(3000) {

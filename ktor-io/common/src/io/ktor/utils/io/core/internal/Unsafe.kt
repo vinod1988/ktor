@@ -14,10 +14,10 @@ import kotlin.native.concurrent.*
 @Suppress("DEPRECATION")
 @RequiresOptIn(level = RequiresOptIn.Level.ERROR)
 @Experimental(level = Experimental.Level.ERROR)
-annotation class DangerousInternalIoApi
+public annotation class DangerousInternalIoApi
 
 @DangerousInternalIoApi
-fun ByteReadPacket.`$unsafeAppend$`(builder: BytePacketBuilder) {
+public fun ByteReadPacket.`$unsafeAppend$`(builder: BytePacketBuilder) {
     val builderHead = builder.stealAll() ?: return
     val builderSize = builder.size
 
@@ -32,12 +32,12 @@ fun ByteReadPacket.`$unsafeAppend$`(builder: BytePacketBuilder) {
 @Suppress("DEPRECATION", "UNUSED")
 @JvmName("prepareReadFirstHead")
 @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-fun Input.prepareReadFirstHeadOld(minSize: Int): IoBuffer? {
+public fun Input.prepareReadFirstHeadOld(minSize: Int): IoBuffer? {
     return prepareReadFirstHead(minSize) as IoBuffer?
 }
 
 @DangerousInternalIoApi
-fun Input.prepareReadFirstHead(minSize: Int): ChunkBuffer? {
+public fun Input.prepareReadFirstHead(minSize: Int): ChunkBuffer? {
     if (this is AbstractInput) {
         return prepareReadHead(minSize)
     }

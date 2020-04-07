@@ -5,6 +5,7 @@ package io.ktor.network.selector
 
 import io.ktor.network.interop.*
 import io.ktor.network.util.*
+import io.ktor.util.*
 import io.ktor.util.collections.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
@@ -12,12 +13,17 @@ import platform.posix.*
 import kotlin.coroutines.*
 import kotlin.math.*
 import kotlin.native.concurrent.*
+import io.ktor.util.debug.*
 
 internal data class EventInfo(
     val descriptor: Int,
     val interest: SelectInterest,
     val continuation: Continuation<Unit>
-)
+) {
+    init {
+        makeShared()
+    }
+}
 
 internal fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>) = memScoped {
     val readSet = alloc<fd_set>()
@@ -109,6 +115,7 @@ internal fun processSelectedEvents(
         }
         if (select_fd_isset(event.descriptor, set.ptr) != 0) {
             completed.add(event)
+            debug("Event completed: ${event.interest}")
             event.continuation.resume(Unit)
             continue
         }
@@ -118,4 +125,4 @@ internal fun processSelectedEvents(
     completed.clear()
 }
 
-class SocketError : IllegalStateException()
+public class SocketError : IllegalStateException()

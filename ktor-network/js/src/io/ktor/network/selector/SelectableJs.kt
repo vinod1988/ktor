@@ -10,4 +10,4 @@ import io.ktor.util.*
  * A selectable entity with selectable NIO [channel], [interestedOps] subscriptions
  */
 @KtorExperimentalAPI
-actual interface Selectable
+public actual interface Selectable

@@ -4,18 +4,15 @@
 
 package io.ktor.network.util
 
-actual class NetworkAddress actual constructor(
+public actual class NetworkAddress public actual constructor(
     internal val hostname: String,
     internal val port: Int
 )
 
-actual val NetworkAddress.hostname: String
+public actual val NetworkAddress.hostname: String
     get() = hostname
 
-actual val NetworkAddress.port: Int
+public actual val NetworkAddress.port: Int
     get() = port
 
-actual class UnresolvedAddressException : IllegalArgumentException()
-
-actual val NetworkAddress.isResolved: Boolean
-    get() = error("isResolved property is unsupported on JS platform")
+public actual class UnresolvedAddressException : IllegalArgumentException()

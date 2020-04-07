@@ -4,6 +4,6 @@
 
 package io.ktor.network.tls
 
-expect class TLSConfigBuilder() {
-    fun build(): TLSConfig
+public expect class TLSConfigBuilder() {
+    public fun build(): TLSConfig
 }

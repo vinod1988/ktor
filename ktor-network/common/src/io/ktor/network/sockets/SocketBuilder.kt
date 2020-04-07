@@ -8,32 +8,32 @@ import io.ktor.network.selector.*
 /**
  * Start building a socket
  */
-fun aSocket(selector: SelectorManager): SocketBuilder = SocketBuilder(selector, SocketOptions.create())
+public fun aSocket(selector: SelectorManager): SocketBuilder = SocketBuilder(selector, SocketOptions.create())
 
 /**
  * Socket builder
  */
 @Suppress("PublicApiImplicitType", "unused")
-class SocketBuilder internal constructor(
+public class SocketBuilder internal constructor(
     private val selector: SelectorManager,
     override var options: SocketOptions
 ) : Configurable<SocketBuilder, SocketOptions> {
 
     /**
-     * Build TCP socket
+     * Build TCP socket.
      */
-    fun tcp(): TCPSocketBuilder = TCPSocketBuilder(selector, options.peer())
+    public fun tcp(): TCPSocketBuilder = TCPSocketBuilder(selector, options.peer())
 
     /**
-     * Build UDP socket
+     * Build UDP socket.
      */
-    fun udp(): UDPSocketBuilder = UDPSocketBuilder(selector, options.peer().udp())
+    public fun udp(): UDPSocketBuilder = UDPSocketBuilder(selector, options.peer().udp())
 }
 
 /**
  * Set TCP_NODELAY socket option to disable the Nagle algorithm.
  */
-fun <T : Configurable<T, *>> T.tcpNoDelay(): T {
+public fun <T : Configurable<T, *>> T.tcpNoDelay(): T {
     return configure {
         if (this is SocketOptions.TCPClientSocketOptions) {
             noDelay = true
@@ -44,16 +44,16 @@ fun <T : Configurable<T, *>> T.tcpNoDelay(): T {
 /**
  * Represent a configurable socket
  */
-interface Configurable<out T : Configurable<T, Options>, Options : SocketOptions> {
+public interface Configurable<out T : Configurable<T, Options>, Options : SocketOptions> {
     /**
      * Current socket options
      */
-    var options: Options
+    public var options: Options
 
     /**
      * Configure socket options in [block] function
      */
-    fun configure(block: Options.() -> Unit): T {
+    public fun configure(block: Options.() -> Unit): T {
         @Suppress("UNCHECKED_CAST")
         val newOptions = options.copy() as Options
 

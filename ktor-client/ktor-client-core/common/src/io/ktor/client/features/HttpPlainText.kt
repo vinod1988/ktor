@@ -11,6 +11,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.util.*
+import io.ktor.util.debug.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
@@ -127,7 +128,9 @@ class HttpPlainText internal constructor(
             scope.requestPipeline.intercept(HttpRequestPipeline.Render) { content ->
                 feature.addCharsetHeaders(context)
 
-                if (content !is String) return@intercept
+                if (content !is String) {
+                    return@intercept
+                }
 
                 val contentType = context.contentType()
                 if (contentType != null && contentType.contentType != ContentType.Text.Plain.contentType) return@intercept
@@ -138,6 +141,7 @@ class HttpPlainText internal constructor(
 
             scope.responsePipeline.intercept(HttpResponsePipeline.Parse) { (info, body) ->
                 if (info.type != String::class || body !is ByteReadChannel) return@intercept
+
                 val content = feature.read(context, body.readRemaining())
                 proceedWith(HttpResponseContainer(info, content))
             }

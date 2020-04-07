@@ -7,7 +7,7 @@ import kotlinx.coroutines.*
  * A selectable entity with selectable NIO [channel], [interestedOps] subscriptions.
  */
 @KtorExperimentalAPI
-expect interface Selectable
+public expect interface Selectable
 
 @Suppress("KDocMissingDocumentation")
-class ClosedChannelCancellationException : CancellationException("Closed channel.")
+public class ClosedChannelCancellationException : CancellationException("Closed channel.")

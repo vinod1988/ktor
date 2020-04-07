@@ -5,4 +5,4 @@
 package io.ktor.network.sockets
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias SocketTimeoutException = java.net.SocketTimeoutException
+public actual typealias SocketTimeoutException = java.net.SocketTimeoutException

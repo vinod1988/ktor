@@ -100,6 +100,7 @@ class HttpStatement(
     @PublishedApi
     internal suspend fun executeUnsafe(): HttpResponse {
         val builder = HttpRequestBuilder().takeFromWithExecutionContext(builder)
+
         @Suppress("DEPRECATION_ERROR")
         val call = client.execute(builder)
         return call.response

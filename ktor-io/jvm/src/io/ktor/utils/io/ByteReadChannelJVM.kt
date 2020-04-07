@@ -241,7 +241,7 @@ public actual interface ByteReadChannel {
     }
 }
 
-actual suspend fun ByteReadChannel.joinTo(dst: ByteWriteChannel, closeOnEnd: Boolean) {
+public actual suspend fun ByteReadChannel.joinTo(dst: ByteWriteChannel, closeOnEnd: Boolean) {
     require(dst !== this)
 
     if (this is ByteBufferChannel && dst is ByteBufferChannel) {
@@ -265,7 +265,7 @@ private suspend fun ByteReadChannel.joinToImplSuspend(dst: ByteWriteChannel, clo
  * Closes [dst] channel if fails to read or write with cause exception.
  * @return a number of copied bytes
  */
-actual suspend fun ByteReadChannel.copyTo(dst: ByteWriteChannel, limit: Long): Long {
+public actual suspend fun ByteReadChannel.copyTo(dst: ByteWriteChannel, limit: Long): Long {
     require(this !== dst)
     require(limit >= 0L)
 

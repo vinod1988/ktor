@@ -10,16 +10,16 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.*
 
 @InternalAPI
-actual fun SelectorManager(dispatcher: CoroutineContext): SelectorManager {
+public actual fun SelectorManager(dispatcher: CoroutineContext): SelectorManager {
     error("Selector manager is unsupported on JS platform")
 }
 
 @InternalAPI
-actual interface SelectorManager : CoroutineScope, Closeable {
+public actual interface SelectorManager : CoroutineScope, Closeable {
     /**
      * Notifies the selector that selectable has been closed.
      */
-    actual fun notifyClosed(selectable: Selectable)
+    public actual fun notifyClosed(selectable: Selectable)
 
     /**
      * Suspends until [interest] is selected for [selectable]
@@ -30,11 +30,11 @@ actual interface SelectorManager : CoroutineScope, Closeable {
      * In other words you can select for read and write at the same time but should never
      * try to read twice for the same selectable.
      */
-    actual suspend fun select(
+    public actual suspend fun select(
         selectable: Selectable,
         interest: SelectInterest
     )
 
-    actual companion object
+    public actual companion object
 
 }

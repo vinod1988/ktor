@@ -5,17 +5,24 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 
+/**
+ * Creates the selector manager for current platform.
+ */
+@Suppress("FunctionName")
 @InternalAPI
-expect fun SelectorManager(
+public expect fun SelectorManager(
     dispatcher: CoroutineContext = EmptyCoroutineContext
 ): SelectorManager
 
+/**
+ * SelectorManager interface allows [Selectable] wait for [SelectInterest].
+ */
 @InternalAPI
-expect interface SelectorManager : CoroutineScope, Closeable {
+public expect interface SelectorManager : CoroutineScope, Closeable {
     /**
      * Notifies the selector that selectable has been closed.
      */
-    fun notifyClosed(selectable: Selectable)
+    public fun notifyClosed(selectable: Selectable)
 
     /**
      * Suspends until [interest] is selected for [selectable]
@@ -26,9 +33,9 @@ expect interface SelectorManager : CoroutineScope, Closeable {
      * In other words you can select for read and write at the same time but should never
      * try to read twice for the same selectable.
      */
-    suspend fun select(selectable: Selectable, interest: SelectInterest)
+    public suspend fun select(selectable: Selectable, interest: SelectInterest)
 
-    companion object
+    public companion object
 }
 
 /**
@@ -38,10 +45,10 @@ expect interface SelectorManager : CoroutineScope, Closeable {
 @Suppress("KDocMissingDocumentation")
 @KtorExperimentalAPI
 @InternalAPI
-enum class SelectInterest {
+public enum class SelectInterest {
     READ, WRITE, ACCEPT, CONNECT;
 
-    companion object {
-        val AllInterests: Array<SelectInterest> = values()
+    public companion object {
+        public val AllInterests: Array<SelectInterest> = values()
     }
 }

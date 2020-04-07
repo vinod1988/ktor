@@ -4,4 +4,4 @@
 
 package io.ktor.network.tls
 
-actual class TLSConfig()
+public actual class TLSConfig()

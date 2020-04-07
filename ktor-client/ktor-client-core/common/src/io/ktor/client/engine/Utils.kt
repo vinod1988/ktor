@@ -53,7 +53,7 @@ fun mergeHeaders(
  * Returns current call context if exists, otherwise null.
  */
 @InternalAPI
-suspend fun callContext(): CoroutineContext = coroutineContext[KtorCallContextElement]!!.callContext
+public suspend fun callContext(): CoroutineContext = coroutineContext[KtorCallContextElement]!!.callContext
 
 /**
  * Coroutine context element containing call job.

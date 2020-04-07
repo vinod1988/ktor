@@ -6,20 +6,23 @@ package io.ktor.http.cio
 
 import io.ktor.http.*
 import io.ktor.http.cio.internals.*
+import io.ktor.util.*
 import io.ktor.utils.io.*
 import kotlin.native.concurrent.*
 
 /**
  * An HTTP parser exception
  */
-class ParserException(message: String) : Exception(message)
+@InternalAPI
+public class ParserException(message: String) : Exception(message)
 
 private const val HTTP_LINE_LIMIT = 8192
 
 /**
  * Parse an HTTP request line and headers
  */
-suspend fun parseRequest(input: ByteReadChannel): Request? {
+@InternalAPI
+public suspend fun parseRequest(input: ByteReadChannel): Request? {
     val builder = CharArrayBuilder()
     val range = MutableRange(0, 0)
 
@@ -56,7 +59,8 @@ suspend fun parseRequest(input: ByteReadChannel): Request? {
 /**
  * Parse an HTTP response status line and headers
  */
-suspend fun parseResponse(input: ByteReadChannel): Response? {
+@InternalAPI
+public suspend fun parseResponse(input: ByteReadChannel): Response? {
     val builder = CharArrayBuilder()
     val range = MutableRange(0, 0)
 
@@ -82,7 +86,8 @@ suspend fun parseResponse(input: ByteReadChannel): Response? {
 /**
  * Parse http headers. Not applicable to request and response status lines.
  */
-suspend fun parseHeaders(input: ByteReadChannel): HttpHeadersMap {
+@InternalAPI
+public suspend fun parseHeaders(input: ByteReadChannel): HttpHeadersMap {
     val builder = CharArrayBuilder()
     return parseHeaders(input, builder) ?: HttpHeadersMap(builder)
 }
@@ -232,8 +237,9 @@ internal fun parseHeaderName(text: CharArrayBuilder, range: MutableRange): Int {
 
 private fun parseHeaderNameFailed(text: CharArrayBuilder, index: Int, start: Int, ch: Char): Nothing {
     if (index == start) {
-        throw ParserException("Multiline headers via line folding is not supported " +
-            "since it is deprecated as per RFC7230.")
+        throw ParserException(
+            "Multiline headers via line folding is not supported since it is deprecated as per RFC7230."
+        )
     }
     characterIsNotAllowed(text, ch)
 }

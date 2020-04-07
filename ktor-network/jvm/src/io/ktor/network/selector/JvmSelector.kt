@@ -6,22 +6,22 @@ import java.io.*
 import java.nio.channels.*
 
 @InternalAPI
-actual interface Selectable : Closeable, DisposableHandle {
+public actual interface Selectable : Closeable, DisposableHandle {
     /**
      * Current selectable suspensions map
      */
     @InternalAPI
-    val suspensions: InterestSuspensionsMap
+    public val suspensions: InterestSuspensionsMap
 
     /**
      * current interests
      */
-    val interestedOps: Int
+    public val interestedOps: Int
 
     /**
      * Apply [state] flag of [interest] to [interestedOps]. Notice that is doesn't actually change selection key.
      */
-    fun interestOp(interest: SelectInterest, state: Boolean)
+    public fun interestOp(interest: SelectInterest, state: Boolean)
 
-    val channel: SelectableChannel
+    public val channel: SelectableChannel
 }

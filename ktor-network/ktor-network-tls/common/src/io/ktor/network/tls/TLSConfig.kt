@@ -4,4 +4,4 @@
 
 package io.ktor.network.tls
 
-expect class TLSConfig
+public expect class TLSConfig

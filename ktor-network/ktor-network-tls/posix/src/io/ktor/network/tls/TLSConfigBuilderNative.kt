@@ -4,6 +4,6 @@
 
 package io.ktor.network.tls
 
-actual class TLSConfigBuilder {
-    actual fun build(): TLSConfig = TLSConfig()
+public actual class TLSConfigBuilder {
+    public actual fun build(): TLSConfig = TLSConfig()
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright 2014-2019 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
-package io.ktor.util
+package io.ktor.util.collections
 
 import io.ktor.util.*
 import kotlin.native.concurrent.*
@@ -20,7 +20,7 @@ private typealias Core<E> = LockFreeMPSCQueueCore<E>
  * ```
  */
 @InternalAPI
-class LockFreeMPSCQueue<E : Any> {
+public class LockFreeMPSCQueue<E : Any> {
     private val _cur = AtomicReference(Core<E>(Core.INITIAL_CAPACITY))
     private val closed = AtomicInt(0)
 

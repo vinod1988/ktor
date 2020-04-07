@@ -4,13 +4,12 @@
 package io.ktor.network.selector
 
 import io.ktor.util.*
+import io.ktor.util.debug.*
 import io.ktor.util.collections.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
-import kotlin.native.concurrent.*
 
-
-class WorkerSelectorManager : SelectorManager {
+public class WorkerSelectorManager : SelectorManager {
     private val selectorContext = newSingleThreadContext("WorkerSelectorManager")
     override val coroutineContext: CoroutineContext = selectorContext
     override fun notifyClosed(selectable: Selectable) {}
@@ -18,10 +17,17 @@ class WorkerSelectorManager : SelectorManager {
     private val events: LockFreeMPSCQueue<EventInfo> = LockFreeMPSCQueue()
 
     init {
-        freeze()
+        makeShared()
 
         launch {
-            selectHelper(events)
+            try {
+                debug("Starting select helper")
+                selectHelper(events)
+            } catch (cause: Throwable) {
+                debug("Select helper error: $cause")
+            } finally {
+                debug("Finish select helper")
+            }
         }
     }
 
@@ -29,12 +35,14 @@ class WorkerSelectorManager : SelectorManager {
         selectable: Selectable,
         interest: SelectInterest
     ) {
-        if (events.isClosed) return
+        if (events.isClosed) {
+            throw CancellationException("Socket closed.")
+        }
 
         return suspendCancellableCoroutine { continuation ->
             require(selectable is SelectableNative)
 
-            val selectorState = EventInfo(selectable.descriptor, interest, continuation).freeze()
+            val selectorState = EventInfo(selectable.descriptor, interest, continuation)
             if (!events.addLast(selectorState)) {
                 continuation.resumeWithException(CancellationException("Socked closed."))
             }
@@ -42,6 +50,7 @@ class WorkerSelectorManager : SelectorManager {
     }
 
     override fun close() {
+        debug("Stop selecting")
         events.close()
         selectorContext.worker.requestTermination(processScheduledJobs = true)
     }

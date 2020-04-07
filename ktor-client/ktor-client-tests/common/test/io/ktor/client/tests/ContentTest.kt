@@ -73,7 +73,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testString() = clientTests(listOf("Js", "iOS", "Curl")) {
+    fun testString() = clientTests(listOf("Js", "iOS", "Curl", "CIO")) {
         test { client ->
             testSize.forEach { size ->
                 val content = makeString(size)
@@ -102,7 +102,7 @@ class ContentTest : ClientLoader() {
     }
 
     @Test
-    fun testTextContent() = clientTests(listOf("Js", "iOS", "Curl")) {
+    fun testTextContent() = clientTests(listOf("Js", "iOS", "Curl", "CIO")) {
         test { client ->
             testSize.forEach { size ->
                 val content = makeString(size)

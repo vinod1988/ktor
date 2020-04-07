@@ -4,8 +4,8 @@
 
 package io.ktor.network.selector
 
-actual interface Selectable {
-    val descriptor: Int
+public actual interface Selectable {
+    public val descriptor: Int
 }
 
 internal class SelectableNative(override val descriptor: Int) : Selectable {

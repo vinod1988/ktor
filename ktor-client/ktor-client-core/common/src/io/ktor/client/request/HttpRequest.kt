@@ -84,8 +84,11 @@ class HttpRequestBuilder : HttpMessageBuilder {
      * A deferred used to control the execution of this request.
      */
     @KtorExperimentalAPI
-    var executionContext: Job = Job()
-        internal set
+    public var executionContext: Job = Job().also { it.makeShared() }
+        internal set(value) {
+            value.makeShared()
+            field = value
+        }
 
     /**
      * Call specific attributes.

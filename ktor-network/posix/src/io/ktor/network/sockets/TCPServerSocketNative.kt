@@ -61,8 +61,8 @@ internal class TCPServerSocketNative(
 
         TCPSocketNative(
             clientDescriptor, selectorManager,
-            remoteAddress = NetworkAddress(remoteAddress),
-            localAddress = NetworkAddress(localAddress),
+            remoteAddress = NetworkAddress("", remoteAddress.port, remoteAddress),
+            localAddress = NetworkAddress("", localAddress.port, localAddress),
             parent = selfContext() + coroutineContext
         )
     }
@@ -76,6 +76,4 @@ internal class TCPServerSocketNative(
     }
 }
 
-private suspend inline fun selfContext(): CoroutineContext {
-    return coroutineContext
-}
+private suspend inline fun selfContext(): CoroutineContext = coroutineContext

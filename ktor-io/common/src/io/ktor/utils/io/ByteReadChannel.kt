@@ -242,14 +242,14 @@ suspend inline fun ByteReadChannel.discardExact(n: Long) {
 suspend fun ByteReadChannel.readAvailable(dst: ByteArray) = readAvailable(dst, 0, dst.size)
 suspend fun ByteReadChannel.readFully(dst: ByteArray) = readFully(dst, 0, dst.size)
 
-expect suspend fun ByteReadChannel.joinTo(dst: ByteWriteChannel, closeOnEnd: Boolean)
+public expect suspend fun ByteReadChannel.joinTo(dst: ByteWriteChannel, closeOnEnd: Boolean)
 
 /**
  * Reads up to [limit] bytes from receiver channel and writes them to [dst] channel.
  * Closes [dst] channel if fails to read or write with cause exception.
  * @return a number of copied bytes
  */
-expect suspend fun ByteReadChannel.copyTo(dst: ByteWriteChannel, limit: Long = Long.MAX_VALUE): Long
+public expect suspend fun ByteReadChannel.copyTo(dst: ByteWriteChannel, limit: Long = Long.MAX_VALUE): Long
 
 /**
  * Reads all the bytes from receiver channel and writes them to [dst] channel and then closes it.

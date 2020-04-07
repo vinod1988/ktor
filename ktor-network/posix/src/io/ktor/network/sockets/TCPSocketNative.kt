@@ -7,8 +7,10 @@ package io.ktor.network.sockets
 import io.ktor.network.selector.*
 import io.ktor.network.util.*
 import io.ktor.util.*
+import io.ktor.util.debug.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import io.ktor.utils.io.errors.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import platform.posix.*
@@ -29,17 +31,23 @@ internal class TCPSocketNative(
     override val socketContext: Job
         get() = _context
 
+    init {
+        makeShared()
+    }
+
     @KtorExperimentalAPI
     override fun attachForReading(userChannel: ByteChannel): WriterJob = writer(Dispatchers.Unconfined, userChannel) {
         channel.writeSuspendSession {
             while (!channel.isClosedForWrite) {
                 tryAwait(1)
                 val buffer = request(1) ?: error("Internal error. Buffer unavailable")
+                debug("Prepared buffer for reading: ${buffer.writeRemaining}")
 
-                val count = buffer.writeDirect {
-                    val arg2 = buffer.writeRemaining.convert<size_t>()
-                    val result = recv(descriptor, it, arg2, 0).toInt()
+                val count: Int = buffer.writeDirect {
+                    val count = buffer.writeRemaining.convert<size_t>()
+                    val result = recv(descriptor, it, count, 0).toInt()
 
+                    debug("Recv finished with $result")
                     if (result == 0) {
                         channel.close()
                     }
@@ -48,15 +56,19 @@ internal class TCPSocketNative(
                             return@writeDirect 0
                         }
 
-                        error("Receive error: $errno")
+                        throw PosixException.forErrno()
                     }
 
 
                     result.convert()
                 }
 
+                debug("Received: $count bytes")
+
                 if (count == 0 && !channel.isClosedForWrite) {
+                    debug("Select $descriptor for READ")
                     selector.select(selectable, SelectInterest.READ)
+                    debug("Selected for READ")
                 }
 
                 written(count)
@@ -65,6 +77,7 @@ internal class TCPSocketNative(
         }
     }.apply {
         invokeOnCompletion {
+            debug("Finish read: $it ")
             shutdown(descriptor, SHUT_RD)
         }
     }
@@ -78,7 +91,7 @@ internal class TCPSocketNative(
                     buffer = request() ?: error("Internal error; Can't request buffer.")
                 }
 
-                buffer.readDirect {
+                val count = buffer.readDirect {
                     val result = send(descriptor, it, buffer.readRemaining.convert(), 0).toInt()
 
                     if (result == -1) {
@@ -92,13 +105,18 @@ internal class TCPSocketNative(
                     result.convert()
                 }
 
+                debug("Sent $count bytes.")
+
                 if (buffer.canRead()) {
+                    debug("Select $descriptor for WRITE")
                     selector.select(selectable, SelectInterest.WRITE)
+                    debug("Selected for WRITE")
                 }
             }
         }
     }.apply {
         invokeOnCompletion {
+            debug("Finish write: $it ")
             shutdown(descriptor, SHUT_WR)
         }
     }

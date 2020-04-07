@@ -1,7 +1,6 @@
 package io.ktor.utils.io
 
 import io.ktor.utils.io.concurrent.*
-import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 

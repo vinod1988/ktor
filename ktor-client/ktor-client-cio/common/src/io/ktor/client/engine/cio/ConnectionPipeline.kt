@@ -9,17 +9,13 @@ import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.http.cio.*
 import io.ktor.network.sockets.*
-import io.ktor.util.cio.*
 import io.ktor.util.date.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.*
-import kotlinx.coroutines.channels.Channel
-import io.ktor.utils.io.*
-import io.ktor.utils.io.core.*
-import io.ktor.utils.io.pool.*
 import kotlinx.coroutines.sync.*
-import java.nio.channels.*
 import kotlin.coroutines.*
 
 internal class ConnectionPipeline(
@@ -55,7 +51,6 @@ internal class ConnectionPipeline(
                 task.request.write(networkOutput, task.context, overProxy, false)
                 networkOutput.flush()
             }
-        } catch (_: ClosedChannelException) {
         } catch (_: ClosedReceiveChannelException) {
         } catch (_: CancellationException) {
         } finally {
@@ -116,14 +111,18 @@ internal class ConnectionPipeline(
                     val response = HttpResponseData(status, requestTime, headers, version, body, callContext)
                     task.response.resume(response)
 
-                    responseChannel?.use {
-                        parseHttpBody(
-                            contentLength,
-                            transferEncoding,
-                            connectionType,
-                            networkInput,
-                            this
-                        )
+                    if (responseChannel != null) {
+                        try {
+                            parseHttpBody(
+                                contentLength,
+                                transferEncoding,
+                                connectionType,
+                                networkInput,
+                                responseChannel
+                            )
+                        } finally {
+                            responseChannel.close()
+                        }
                     }
 
                     skipTask?.join()
@@ -152,25 +151,22 @@ private fun CoroutineScope.skipCancels(
     output: ByteWriteChannel
 ): Job = launch {
     try {
-        HttpClientDefaultPool.useInstance { buffer ->
-            while (true) {
-                buffer.clear()
+        input.readSuspendableSession {
+            var cancel = false
+            while (await()) {
+                val buffer = request() ?: break
+                if (cancel) {
+                    buffer.discard()
+                }
 
-                val count = input.readAvailable(buffer)
-                if (count < 0) break
-
-                buffer.flip()
                 try {
                     output.writeFully(buffer)
                 } catch (_: Throwable) {
-                    // Output channel has been canceled, discard remaining
-                    input.discard()
+                    buffer.discard()
+                    cancel = true
                 }
             }
         }
-    } catch (cause: Throwable) {
-        output.close(cause)
-        throw cause
     } finally {
         output.close()
     }

@@ -150,7 +150,6 @@ public final class io/ktor/http/cio/Request : io/ktor/http/cio/HttpMessage {
 public final class io/ktor/http/cio/RequestResponseBuilder {
 	public fun <init> ()V
 	public final fun build ()Lio/ktor/utils/io/core/ByteReadPacket;
-	public final fun bytes (Ljava/nio/ByteBuffer;)V
 	public final fun bytes ([BII)V
 	public static synthetic fun bytes$default (Lio/ktor/http/cio/RequestResponseBuilder;[BIIILjava/lang/Object;)V
 	public final fun emptyLine ()V
@@ -159,6 +158,10 @@ public final class io/ktor/http/cio/RequestResponseBuilder {
 	public final fun release ()V
 	public final fun requestLine (Lio/ktor/http/HttpMethod;Ljava/lang/CharSequence;Ljava/lang/CharSequence;)V
 	public final fun responseLine (Ljava/lang/CharSequence;ILjava/lang/CharSequence;)V
+}
+
+public final class io/ktor/http/cio/RequestResponseBuilderKt {
+	public static final fun bytes (Lio/ktor/http/cio/RequestResponseBuilder;Ljava/nio/ByteBuffer;)V
 }
 
 public final class io/ktor/http/cio/Response : io/ktor/http/cio/HttpMessage {

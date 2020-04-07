@@ -4,8 +4,8 @@
 
 package io.ktor.client.utils
 
+import io.ktor.client.*
 import io.ktor.util.*
-import kotlinx.coroutines.*
 import io.ktor.utils.io.pool.*
 import java.nio.*
 

@@ -1,9 +1,23 @@
 package io.ktor.network.util
 
-expect class NetworkAddress(hostname: String, port: Int)
+/**
+ * Represents remote endpoint with [hostname] and [port].
+ *
+ * The address will be resolved after construction.
+ *
+ * @throws UnresolvedAddressException if the [hostname] cannot be resolved.
+ */
+public expect class NetworkAddress(hostname: String, port: Int)
 
-expect val NetworkAddress.hostname: String
-expect val NetworkAddress.port: Int
-expect val NetworkAddress.isResolved: Boolean
+/**
+ * Network address hostname.
+ */
+public expect val NetworkAddress.hostname: String
 
-expect class UnresolvedAddressException() : IllegalArgumentException
+/**
+ * Network address port.
+ */
+public expect val NetworkAddress.port: Int
+
+@Suppress("KDocMissingDocumentation")
+public expect class UnresolvedAddressException() : IllegalArgumentException

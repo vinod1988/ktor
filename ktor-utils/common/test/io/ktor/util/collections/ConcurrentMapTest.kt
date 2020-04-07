@@ -40,5 +40,22 @@ class ConcurrentMapTest {
         assertFalse { 1 in map }
     }
 
+    @Test
+    fun testForEach() {
+        val map = create()
+
+        map[1] = 2
+
+        var count = 0
+        map.forEach { (key, value) ->
+            assertEquals(1, key)
+            assertEquals(2, value)
+
+            count += 1
+        }
+
+        assertEquals(1, count)
+    }
+
     private fun create(): ConcurrentMap<Int, Int> = ConcurrentMap<Int, Int>()
 }

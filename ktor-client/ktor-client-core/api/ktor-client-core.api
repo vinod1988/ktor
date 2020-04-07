@@ -236,8 +236,21 @@ public final class io/ktor/client/engine/ProxyBuilder {
 	public final fun socks (Ljava/lang/String;I)Ljava/net/Proxy;
 }
 
+public final class io/ktor/client/engine/ProxyConfigJvmKt {
+	public static final fun getType (Ljava/net/Proxy;)Lio/ktor/client/engine/ProxyType;
+	public static final fun resolveAddress (Ljava/net/Proxy;)Ljava/net/InetSocketAddress;
+}
+
 public final class io/ktor/client/engine/ProxyConfigKt {
 	public static final fun http (Lio/ktor/client/engine/ProxyBuilder;Ljava/lang/String;)Ljava/net/Proxy;
+}
+
+public final class io/ktor/client/engine/ProxyType : java/lang/Enum {
+	public static final field HTTP Lio/ktor/client/engine/ProxyType;
+	public static final field SOCKS Lio/ktor/client/engine/ProxyType;
+	public static final field UNKNOWN Lio/ktor/client/engine/ProxyType;
+	public static fun valueOf (Ljava/lang/String;)Lio/ktor/client/engine/ProxyType;
+	public static fun values ()[Lio/ktor/client/engine/ProxyType;
 }
 
 public final class io/ktor/client/engine/UtilsKt {
@@ -1054,6 +1067,13 @@ public final class io/ktor/client/utils/CoroutineDispatcherUtilsKt {
 	public static synthetic fun fixedThreadPoolDispatcher$default (Lkotlinx/coroutines/Dispatchers;ILjava/lang/String;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineDispatcher;
 }
 
+public final class io/ktor/client/utils/CoroutineUtilsJvmKt {
+	public static final fun clientDispatcher (Lkotlinx/coroutines/Dispatchers;ILjava/lang/String;)Lkotlinx/coroutines/CoroutineDispatcher;
+	public static synthetic fun clientDispatcher$default (Lkotlinx/coroutines/Dispatchers;ILjava/lang/String;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineDispatcher;
+	public static final synthetic fun fixedThreadPoolDispatcher (Lkotlinx/coroutines/Dispatchers;ILjava/lang/String;)Lkotlinx/coroutines/CoroutineDispatcher;
+	public static synthetic fun fixedThreadPoolDispatcher$default (Lkotlinx/coroutines/Dispatchers;ILjava/lang/String;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineDispatcher;
+}
+
 public final class io/ktor/client/utils/EmptyContent : io/ktor/http/content/OutgoingContent$NoContent {
 	public static final field INSTANCE Lio/ktor/client/utils/EmptyContent;
 	public fun getContentLength ()Ljava/lang/Long;
@@ -1081,7 +1101,7 @@ public final class io/ktor/network/sockets/SocketTimeoutException : java/net/Soc
 	public fun getCause ()Ljava/lang/Throwable;
 }
 
-public final class io/ktor/network/sockets/TimeoutExceptionsJvmKt {
+public final class io/ktor/network/sockets/TimeoutExceptionsKt {
 	public static final fun mapEngineExceptions (Lkotlinx/coroutines/CoroutineScope;Lio/ktor/utils/io/ByteReadChannel;Lio/ktor/client/request/HttpRequestData;)Lio/ktor/utils/io/ByteReadChannel;
 	public static final fun mapEngineExceptions (Lkotlinx/coroutines/CoroutineScope;Lio/ktor/utils/io/ByteWriteChannel;Lio/ktor/client/request/HttpRequestData;)Lio/ktor/utils/io/ByteWriteChannel;
 }
