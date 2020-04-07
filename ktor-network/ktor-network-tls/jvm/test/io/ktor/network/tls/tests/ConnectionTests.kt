@@ -8,9 +8,9 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.network.tls.*
 import io.ktor.network.tls.certificates.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.debug.junit4.*
-import io.ktor.utils.io.*
 import org.junit.*
 import java.io.*
 import java.net.*
@@ -23,7 +23,6 @@ class ConnectionTests {
 
     @Test
     fun tlsWithoutCloseTest(): Unit = runBlocking {
-
         val selectorManager = ActorSelectorManager(Dispatchers.IO)
         val socket = aSocket(selectorManager)
             .tcp()

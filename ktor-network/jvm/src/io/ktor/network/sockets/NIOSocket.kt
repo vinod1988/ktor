@@ -20,7 +20,7 @@ internal abstract class NIOSocketImpl<out S>(
     val pool: ObjectPool<ByteBuffer>?,
     private val socketOptions: SocketOptions.TCPClientSocketOptions? = null
 ) : ReadWriteSocket, SelectableBase(channel), CoroutineScope
-    where S : java.nio.channels.ByteChannel, S : java.nio.channels.SelectableChannel {
+    where S : java.nio.channels.ByteChannel, S : SelectableChannel {
 
     private val closeFlag = AtomicBoolean()
     private val readerJob = AtomicReference<ReaderJob?>()

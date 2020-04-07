@@ -14,4 +14,12 @@ kotlin {
             }
         }
     }
+
+    nativeCompilations.forEach {
+        it.cinterops {
+            val network by creating {
+                defFile = projectDir.resolve("posix/interop/network.def")
+            }
+        }
+    }
 }

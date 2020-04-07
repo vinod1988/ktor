@@ -5,7 +5,8 @@
 package io.ktor.network.sockets
 
 import io.ktor.network.selector.*
-import java.net.*
+import io.ktor.network.util.*
+import java.net.SocketAddress
 import java.nio.channels.*
 
 internal class SocketImpl<out S : SocketChannel>(
@@ -16,14 +17,14 @@ internal class SocketImpl<out S : SocketChannel>(
 ) : NIOSocketImpl<S>(channel, selector, pool = null, socketOptions = socketOptions),
     Socket {
     init {
-        require(!channel.isBlocking) { "channel need to be configured as non-blocking" }
+        require(!channel.isBlocking) { "Channel need to be configured as non-blocking." }
     }
 
-    override val localAddress: SocketAddress
-        get() = socket.localSocketAddress
+    override val localAddress: NetworkAddress
+        get() = socket.localSocketAddress as NetworkAddress
 
-    override val remoteAddress: SocketAddress
-        get() = socket.remoteSocketAddress
+    override val remoteAddress: NetworkAddress
+        get() = socket.remoteSocketAddress as NetworkAddress
 
     @Suppress("BlockingMethodInNonBlockingContext")
     internal suspend fun connect(target: SocketAddress): Socket {

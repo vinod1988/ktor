@@ -11,13 +11,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.debug.junit4.*
 import io.ktor.utils.io.*
 import org.junit.*
-import org.junit.Test
 import org.junit.rules.*
 import java.net.ServerSocket
 import java.nio.*
 import java.util.concurrent.*
 import kotlin.concurrent.*
 import kotlin.test.*
+import kotlin.test.Test
 
 class ClientSocketTest {
     private val exec = Executors.newCachedThreadPool()

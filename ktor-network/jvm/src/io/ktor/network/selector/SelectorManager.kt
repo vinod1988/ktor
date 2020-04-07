@@ -5,14 +5,18 @@
 package io.ktor.network.selector
 
 import io.ktor.util.*
-import java.io.*
-import java.nio.channels.*
+import io.ktor.utils.io.core.*
+import kotlinx.coroutines.*
 import java.nio.channels.spi.*
+import kotlin.coroutines.*
+
+@InternalAPI
+actual fun SelectorManager(dispatcher: CoroutineContext): SelectorManager = ActorSelectorManager(dispatcher)
 
 /**
  * Selector manager is a service that manages NIO selectors and selection threads
  */
-interface SelectorManager {
+actual interface SelectorManager : CoroutineScope, Closeable {
     /**
      * NIO selector provider
      */
@@ -22,7 +26,7 @@ interface SelectorManager {
     /**
      * Notifies the selector that selectable has been closed.
      */
-    fun notifyClosed(s: Selectable)
+    actual fun notifyClosed(selectable: Selectable)
 
     /**
      * Suspends until [interest] is selected for [selectable]
@@ -33,51 +37,30 @@ interface SelectorManager {
      * In other words you can select for read and write at the same time but should never
      * try to read twice for the same selectable.
      */
-    suspend fun select(selectable: Selectable, interest: SelectInterest)
+    actual suspend fun select(
+        selectable: Selectable,
+        interest: SelectInterest
+    )
 
-    companion object
-}
-
-/**
- * Select interest kind
- * @property flag to be set in NIO selector
- */
-@Suppress("KDocMissingDocumentation")
-@KtorExperimentalAPI
-enum class SelectInterest(val flag: Int) {
-    READ(SelectionKey.OP_READ),
-    WRITE(SelectionKey.OP_WRITE),
-    ACCEPT(SelectionKey.OP_ACCEPT),
-    CONNECT(SelectionKey.OP_CONNECT);
-
-    companion object {
-        @InternalAPI
-        val AllInterests: Array<SelectInterest> = values()
-
-        /**
-         * interest's flags in enum entry order
-         */
-        @InternalAPI
-        val flags: IntArray = values().map { it.flag }.toIntArray()
-
-        @InternalAPI
-        val size: Int = values().size
-    }
+    actual companion object
 }
 
 /**
  * Creates a NIO entity via [create] and calls [setup] on it. If any exception happens then the entity will be closed
  * and an exception will be propagated.
  */
-inline fun <C : Closeable, R> SelectorManager.buildOrClose(create: SelectorProvider.() -> C, setup: C.() -> R): R {
+inline fun <C : Closeable, R> SelectorManager.buildOrClose(
+    create: SelectorProvider.() -> C,
+    setup: C.() -> R
+): R {
     while (true) {
         val result = create(provider)
 
         try {
             return setup(result)
-        } catch (t: Throwable) {
+        } catch (cause: Throwable) {
             result.close()
-            throw t
+            throw cause
         }
     }
 }

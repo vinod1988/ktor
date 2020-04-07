@@ -16,16 +16,20 @@ import java.nio.channels.*
 @OptIn(
     ObsoleteCoroutinesApi::class, ExperimentalCoroutinesApi::class
 )
-internal class DatagramSocketImpl(override val channel: DatagramChannel, selector: SelectorManager)
-    : BoundDatagramSocket, ConnectedDatagramSocket, NIOSocketImpl<DatagramChannel>(channel, selector, DefaultDatagramByteBufferPool) {
+internal class DatagramSocketImpl(
+    override val channel: DatagramChannel, selector: SelectorManager
+) : BoundDatagramSocket, ConnectedDatagramSocket,
+    NIOSocketImpl<DatagramChannel>(channel, selector, DefaultDatagramByteBufferPool) {
 
     private val socket = channel.socket()!!
 
-    override val localAddress: SocketAddress
-        get() = socket.localSocketAddress ?: throw IllegalStateException("Channel is not yet bound")
+    override val localAddress: NetworkAddress
+        get() = socket.localSocketAddress as? NetworkAddress
+            ?: throw IllegalStateException("Channel is not yet bound")
 
-    override val remoteAddress: SocketAddress
-        get() = socket.remoteSocketAddress ?: throw IllegalStateException("Channel is not yet connected")
+    override val remoteAddress: NetworkAddress
+        get() = socket.remoteSocketAddress as? NetworkAddress
+            ?: throw IllegalStateException("Channel is not yet connected")
 
     private val sender = actor<Datagram>(Dispatchers.IO) {
         consumeEach { datagram ->
@@ -62,7 +66,7 @@ internal class DatagramSocketImpl(override val channel: DatagramChannel, selecto
 
         interestOp(SelectInterest.READ, false)
         buffer.flip()
-        val datagram = Datagram(buildPacket { writeFully(buffer) }, address)
+        val datagram = Datagram(buildPacket { writeFully(buffer) }, address as NetworkAddress)
         DefaultDatagramByteBufferPool.recycle(buffer)
         return datagram
     }
@@ -73,16 +77,14 @@ internal class DatagramSocketImpl(override val channel: DatagramChannel, selecto
 
         val address = try {
             channel.receive(buffer)
-        } catch (t: Throwable) {
+        } catch (cause: Throwable) {
             DefaultDatagramByteBufferPool.recycle(buffer)
-            throw t
-        }
-
-        if (address == null) return receiveSuspend(buffer)
+            throw cause
+        } ?: return receiveSuspend(buffer)
 
         interestOp(SelectInterest.READ, false)
         buffer.flip()
-        val datagram = Datagram(buildPacket { writeFully(buffer) }, address)
+        val datagram = Datagram(buildPacket { writeFully(buffer) }, address as NetworkAddress)
         DefaultDatagramByteBufferPool.recycle(buffer)
         return datagram
     }

@@ -198,6 +198,11 @@ public final class io/ktor/network/tls/TLSConfigBuilder {
 	public final fun setTrustManager (Ljavax/net/ssl/TrustManager;)V
 }
 
+public final class io/ktor/network/tls/TLSConfigBuilderJvmKt {
+	public static final fun addCertificateChain (Lio/ktor/network/tls/TLSConfigBuilder;[Ljava/security/cert/X509Certificate;Ljava/security/PrivateKey;)V
+	public static final fun addKeyStore (Lio/ktor/network/tls/TLSConfigBuilder;Ljava/security/KeyStore;[C)V
+}
+
 public final class io/ktor/network/tls/TLSConfigBuilderKt {
 	public static final fun addCertificateChain (Lio/ktor/network/tls/TLSConfigBuilder;[Ljava/security/cert/X509Certificate;Ljava/security/PrivateKey;)V
 	public static final fun addKeyStore (Lio/ktor/network/tls/TLSConfigBuilder;Ljava/security/KeyStore;[C)V
@@ -224,11 +229,14 @@ public final class io/ktor/network/tls/TLSHandshakeType$Companion {
 	public final fun byCode (I)Lio/ktor/network/tls/TLSHandshakeType;
 }
 
+public final class io/ktor/network/tls/TLSJvmKt {
+	public static final fun tls (Lio/ktor/network/sockets/Socket;Lkotlin/coroutines/CoroutineContext;Ljavax/net/ssl/X509TrustManager;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun tls$default (Lio/ktor/network/sockets/Socket;Lkotlin/coroutines/CoroutineContext;Ljavax/net/ssl/X509TrustManager;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
 public final class io/ktor/network/tls/TLSKt {
 	public static final fun tls (Lio/ktor/network/sockets/Socket;Lkotlin/coroutines/CoroutineContext;Lio/ktor/network/tls/TLSConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun tls (Lio/ktor/network/sockets/Socket;Lkotlin/coroutines/CoroutineContext;Ljavax/net/ssl/X509TrustManager;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun tls (Lio/ktor/network/sockets/Socket;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun tls$default (Lio/ktor/network/sockets/Socket;Lkotlin/coroutines/CoroutineContext;Ljavax/net/ssl/X509TrustManager;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static synthetic fun tls$default (Lio/ktor/network/sockets/Socket;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
