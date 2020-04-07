@@ -1,11 +1,13 @@
 package io.ktor.utils.io
 
+import io.ktor.utils.io.concurrent.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.core.internal.*
 import io.ktor.utils.io.internal.*
 import io.ktor.utils.io.pool.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
+import kotlin.native.concurrent.*
 
 
 /**
@@ -59,7 +61,11 @@ internal class ByteChannelNative(
     autoFlush: Boolean,
     pool: ObjectPool<ChunkBuffer> = ChunkBuffer.Pool
 ) : ByteChannelSequentialBase(initial, autoFlush, pool) {
-    private var attachedJob: Job? = null
+    private var attachedJob: Job? by shared(null)
+
+    init {
+        freeze()
+    }
 
     @OptIn(InternalCoroutinesApi::class)
     override fun attachJob(job: Job) {
@@ -71,9 +77,8 @@ internal class ByteChannelNative(
         }
     }
 
-    override suspend fun readAvailable(dst: CPointer<ByteVar>, offset: Int, length: Int): Int {
-        return readAvailable(dst, offset.toLong(), length.toLong())
-    }
+    override suspend fun readAvailable(dst: CPointer<ByteVar>, offset: Int, length: Int): Int =
+        readAvailable(dst, offset.toLong(), length.toLong())
 
     override suspend fun readAvailable(dst: CPointer<ByteVar>, offset: Long, length: Long): Int {
         require(offset >= 0L)

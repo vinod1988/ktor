@@ -3,6 +3,7 @@
 package io.ktor.utils.io.core
 
 import io.ktor.utils.io.bits.*
+import io.ktor.utils.io.concurrent.*
 import io.ktor.utils.io.core.internal.*
 import io.ktor.utils.io.core.internal.require
 import io.ktor.utils.io.pool.*
@@ -43,9 +44,10 @@ abstract class AbstractInput(
     /**
      * Current head chunk reference
      */
-    private final var _head: ChunkBuffer = head
+    private final var __head: ChunkBuffer by shared(head)
+    private final var _head: ChunkBuffer  get() = __head
         set(newHead) {
-            field = newHead
+            __head = newHead
             headMemory = newHead.memory
             headPosition = newHead.readPosition
             headEndExclusive = newHead.writePosition
@@ -61,13 +63,13 @@ abstract class AbstractInput(
         }
 
     @PublishedApi
-    internal final var headMemory: Memory = head.memory
+    internal final var headMemory: Memory by shared(head.memory)
 
     @PublishedApi
-    internal final var headPosition = head.readPosition
+    internal final var headPosition by shared(head.readPosition)
 
     @PublishedApi
-    internal final var headEndExclusive = head.writePosition
+    internal final var headEndExclusive by shared(head.writePosition)
 
     @PublishedApi
     @Suppress("DEPRECATION_ERROR")
@@ -78,7 +80,8 @@ abstract class AbstractInput(
             updateHeadRemaining(newRemaining)
         }
 
-    private var tailRemaining: Long = remaining - headRemaining
+    private var _tailRemaining: Long by shared(remaining - headRemaining)
+    private var tailRemaining: Long get() = _tailRemaining
         set(newValue) {
             if (newValue < 0) {
                 error("tailRemaining is negative: $newValue")
@@ -94,7 +97,7 @@ abstract class AbstractInput(
                 error("tailRemaining is set to a value that is not consistent with the actual tail: $newValue != $tailSize")
             }
 
-            field = newValue
+            _tailRemaining = newValue
         }
 
     @Deprecated(

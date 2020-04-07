@@ -25,6 +25,7 @@ internal actual class Condition actual constructor(val predicate: () -> Boolean)
             block()
         }
     }
+
     actual suspend fun await() {
         if (predicate()) return
 

@@ -4,6 +4,7 @@ package io.ktor.utils.io.core
 
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.charsets.Charsets
+import io.ktor.utils.io.concurrent.*
 import io.ktor.utils.io.core.internal.*
 import io.ktor.utils.io.pool.ObjectPool
 
@@ -34,8 +35,8 @@ internal constructor(
      */
     protected abstract fun closeDestination()
 
-    private var _head: ChunkBuffer? = null
-    private var _tail: ChunkBuffer? = null
+    private var _head: ChunkBuffer? by shared(null)
+    private var _tail: ChunkBuffer? by shared(null)
 
     internal val head: ChunkBuffer
         get() = _head ?: ChunkBuffer.Empty
@@ -54,17 +55,17 @@ internal constructor(
             appendChain(newValue)
         }
 
-    internal var tailMemory: Memory = Memory.Empty
-    internal var tailPosition = 0
-    internal var tailEndExclusive = 0
+    internal var tailMemory: Memory by shared(Memory.Empty)
+    internal var tailPosition by shared(0)
+    internal var tailEndExclusive by shared(0)
         private set
 
-    private var tailInitialPosition = 0
+    private var tailInitialPosition by shared(0)
 
     /**
      * Number of bytes buffered in the chain except the tail chunk
      */
-    private var chainedSize: Int = 0
+    private var chainedSize: Int by shared(0)
 
     internal inline val tailRemaining: Int get() = tailEndExclusive - tailPosition
 
@@ -87,9 +88,8 @@ internal constructor(
             "to read primitives in little endian",
         level = DeprecationLevel.ERROR
     )
-    final override var byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN
+    final override var byteOrder: ByteOrder get() = ByteOrder.BIG_ENDIAN
         set(value) {
-            field = value
             if (value != ByteOrder.BIG_ENDIAN) {
                 throw IllegalArgumentException(
                     "Only BIG_ENDIAN is supported. Use corresponding functions to read/write" +
@@ -401,7 +401,7 @@ internal constructor(
         return idx
     }
 
-    @Deprecated("Use writeText instead", ReplaceWith("writeText(s)"))
+    @Deprecated("Use writeText instead", ReplaceWith("this.writeText(s)"))
     fun writeStringUtf8(s: String) {
         writeText(s)
     }
