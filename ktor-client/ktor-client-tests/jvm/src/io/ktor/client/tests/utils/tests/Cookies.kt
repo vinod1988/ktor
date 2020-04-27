@@ -12,7 +12,7 @@ import io.ktor.routing.*
 import kotlin.test.*
 
 
-fun Application.cookiesTest() {
+internal fun Application.cookiesTest() {
     routing {
         route("cookies") {
             get("/") {

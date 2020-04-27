@@ -6,8 +6,6 @@ package io.ktor.client.engine.okhttp
 
 import io.ktor.client.tests.*
 
-class OkHttpMultithreadedTest : MultithreadedTest(OkHttp)
-
 class OkHttpBuildersTest : BuildersTest(OkHttp)
 
 class OkHttpHttpClientTest : HttpClientTest(OkHttp)

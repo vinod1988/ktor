@@ -6,8 +6,6 @@ package io.ktor.client.engine.cio
 
 import io.ktor.client.tests.*
 
-class CIOMultithreadedTest : MultithreadedTest(CIO)
-
 class CIOBuildersTest : BuildersTest(CIO)
 
 class CIOHttpClientTest : HttpClientTest(CIO)

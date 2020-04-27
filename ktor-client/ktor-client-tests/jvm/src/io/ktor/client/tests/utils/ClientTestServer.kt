@@ -11,6 +11,9 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.websocket.*
+import java.util.concurrent.atomic.*
+
+internal val counter = AtomicInteger(0)
 
 internal fun Application.tests() {
     install(WebSockets) {
@@ -32,6 +35,7 @@ internal fun Application.tests() {
     timeoutTest()
     cookiesTest()
     jsonTest()
+    multithreadedTest()
 
     routing {
         post("/echo") {
