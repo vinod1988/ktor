@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
+ * Copyright 2014-2020 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
 
 package io.ktor.client.tests
@@ -8,7 +8,6 @@ import io.ktor.client.request.*
 import io.ktor.client.tests.utils.*
 import kotlinx.coroutines.*
 import java.util.concurrent.*
-import java.util.concurrent.atomic.*
 import kotlin.test.*
 
 
@@ -16,8 +15,6 @@ private const val TEST_SIZE = 100_000
 private const val DEFAULT_THREADS_COUNT = 32
 
 class MultithreadedTest : ClientLoader() {
-    private val counter: AtomicInteger = AtomicInteger()
-
     @Test
     fun numberTest() = clientTests {
         config {
@@ -31,7 +28,6 @@ class MultithreadedTest : ClientLoader() {
             }.toSet().size
 
             assertEquals(TEST_SIZE, result)
-            assertEquals(TEST_SIZE, counter.get())
         }
     }
 }

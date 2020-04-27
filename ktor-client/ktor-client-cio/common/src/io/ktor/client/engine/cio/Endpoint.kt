@@ -36,32 +36,6 @@ internal class Endpoint(
 
     private val maxEndpointIdleTime: Long = 2 * config.endpoint.connectTimeout
 
-//    private val postman = launch(start = CoroutineStart.LAZY) {
-//        try {
-//            while (true) {
-//                val task = withTimeout(maxEndpointIdleTime) {
-//                    tasks.receive()
-//                }
-//
-//                try {
-//                    if (!config.pipelining || task.requiresDedicatedConnection()) {
-//                        makeDedicatedRequest(task)
-//                    } else {
-//                        makePipelineRequest(task)
-//                    }
-//                } catch (cause: Throwable) {
-//                    task.response.resumeWithException(cause)
-//                    throw cause
-//                }
-//            }
-//        } catch (cause: Throwable) {
-//        } finally {
-//            deliveryPoint.close()
-//            tasks.close()
-//            onDone()
-//        }
-//    }
-
     init {
         makeShared()
     }
@@ -72,66 +46,59 @@ internal class Endpoint(
     ): HttpResponseData = if (!config.pipelining || request.requiresDedicatedConnection()) {
         makeDedicatedRequest(request, callContext).await()
     } else {
-        TODO()
-//            makePipelineRequest(TODO())
+        makePipelineRequest(request, callContext)
     }
 
-    private suspend fun makePipelineRequest(task: RequestTask) {
-        if (deliveryPoint.offer(task)) return
+    private suspend fun makePipelineRequest(request: HttpRequestData, callContext: CoroutineContext): HttpResponseData {
+        val response = CompletableDeferred<HttpResponseData>()
+        val task = RequestTask(request, response, callContext)
+
+        if (deliveryPoint.offer(task)) return response.await()
 
         val connections = connections.value
         if (connections < config.endpoint.maxConnectionsPerRoute) {
             try {
                 createPipeline()
             } catch (cause: Throwable) {
-                task.response.resumeWithException(cause)
                 throw cause
             }
         }
 
         deliveryPoint.send(task)
+
+        return response.await()
     }
 
     private fun makeDedicatedRequest(
         request: HttpRequestData, callContext: CoroutineContext
-    ): Deferred<HttpResponseData> {
-        return async(callContext + CoroutineName("DedicatedRequest")) {
-            try {
-                val connection = connect(request)
-                val input = mapEngineExceptions(connection.openReadChannel(), request)
-                val originOutput = mapEngineExceptions(connection.openWriteChannel(), request)
+    ): Deferred<HttpResponseData> = async(callContext + CoroutineName("DedicatedRequest")) {
+        try {
+            val connection = connect(request)
+            val input = mapEngineExceptions(connection.openReadChannel(), request)
+            val originOutput = mapEngineExceptions(connection.openWriteChannel(), request)
 
-                val output = originOutput.handleHalfClosed(
-                    coroutineContext, config.endpoint.allowHalfClose
-                )
+            val output = originOutput.handleHalfClosed(
+                coroutineContext, config.endpoint.allowHalfClose
+            )
 
-                callContext[Job]!!.invokeOnCompletion { cause ->
-                    try {
-                        input.cancel(cause)
-                        originOutput.close(cause)
-                        connection.close()
-                        releaseConnection()
-                    } catch (_: Throwable) {
-                    }
+            callContext[Job]!!.invokeOnCompletion { cause ->
+                try {
+                    input.cancel(cause)
+                    originOutput.close(cause)
+                    connection.close()
+                    releaseConnection()
+                } catch (_: Throwable) {
                 }
-
-                val timeout = config.requestTimeout
-
-                return@async handleTimeout(timeout) {
-                    writeRequestAndReadResponse(request, output, callContext, input, originOutput)
-                }
-            } catch (cause: Throwable) {
-                throw cause.mapToKtor(request)
             }
-        }
-    }
 
-    private suspend fun <T> CoroutineScope.handleTimeout(
-        timeout: Long, block: suspend CoroutineScope.() -> T
-    ): T = if (timeout == HttpTimeout.INFINITE_TIMEOUT_MS) {
-        block()
-    } else {
-        withTimeout(timeout, block)
+            val timeout = config.requestTimeout
+
+            return@async handleTimeout(timeout) {
+                writeRequestAndReadResponse(request, output, callContext, input, originOutput)
+            }
+        } catch (cause: Throwable) {
+            throw cause.mapToKtor(request)
+        }
     }
 
     private suspend fun writeRequestAndReadResponse(
@@ -241,12 +208,13 @@ internal class Endpoint(
     }
 }
 
-@Suppress("KDocMissingDocumentation")
-@Deprecated(
-    "Binary compatibility.",
-    level = DeprecationLevel.HIDDEN, replaceWith = ReplaceWith("FailToConnectException")
-)
-open class ConnectException : Exception("Connect timed out or retry attempts exceeded")
+private suspend fun <T> CoroutineScope.handleTimeout(
+    timeout: Long, block: suspend CoroutineScope.() -> T
+): T = if (timeout == HttpTimeout.INFINITE_TIMEOUT_MS) {
+    block()
+} else {
+    withTimeout(timeout, block)
+}
 
 @Suppress("KDocMissingDocumentation")
 @KtorExperimentalAPI

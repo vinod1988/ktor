@@ -44,7 +44,7 @@ internal class ConnectionPipeline(
                     requestLimit.acquire()
                     responseChannel.send(ConnectionResponseTask(GMTDate(), task))
                 } catch (cause: Throwable) {
-                    task.response.resumeWithException(cause)
+                    task.response.completeExceptionally(cause)
                     throw cause
                 }
 
@@ -109,7 +109,7 @@ internal class ConnectionPipeline(
                     }
 
                     val response = HttpResponseData(status, requestTime, headers, version, body, callContext)
-                    task.response.resume(response)
+                    task.response.complete(response)
 
                     if (responseChannel != null) {
                         try {
@@ -127,7 +127,7 @@ internal class ConnectionPipeline(
 
                     skipTask?.join()
                 } catch (cause: Throwable) {
-                    task.response.resumeWithException(cause)
+                    task.response.completeExceptionally(cause)
                 }
 
                 task.context[Job]?.join()

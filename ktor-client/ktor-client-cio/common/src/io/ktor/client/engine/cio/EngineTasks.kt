@@ -13,7 +13,7 @@ import kotlin.coroutines.*
 
 internal data class RequestTask(
     val request: HttpRequestData,
-    val response: CancellableContinuation<HttpResponseData>,
+    val response: CompletableDeferred<HttpResponseData>,
     val context: CoroutineContext
 )
 
