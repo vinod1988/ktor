@@ -25,11 +25,12 @@ public actual fun ByteReadChannel(content: ByteArray, offset: Int, length: Int):
  * channel.
  */
 @ExperimentalIoApi
-fun ByteChannel(autoFlush: Boolean = false, exceptionMapper: (Throwable?) -> Throwable?): ByteChannel =
-    object : ByteBufferChannel(autoFlush = autoFlush) {
+public fun ByteChannel(
+    autoFlush: Boolean = false, exceptionMapper: (Throwable?) -> Throwable?
+): ByteChannel = object : ByteBufferChannel(autoFlush = autoFlush) {
 
-        override fun close(cause: Throwable?): Boolean {
-            val mappedException = exceptionMapper(cause)
-            return super.close(mappedException)
-        }
+    override fun close(cause: Throwable?): Boolean {
+        val mappedException = exceptionMapper(cause)
+        return super.close(mappedException)
     }
+}

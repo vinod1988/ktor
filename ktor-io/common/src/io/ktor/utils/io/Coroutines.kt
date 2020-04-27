@@ -69,20 +69,20 @@ fun reader(
     }
 }
 
-fun CoroutineScope.writer(
+public fun CoroutineScope.writer(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     channel: ByteChannel,
     block: suspend WriterScope.() -> Unit
 ): WriterJob = launchChannel(coroutineContext, channel, attachJob = false, block = block)
 
-fun CoroutineScope.writer(
+public fun CoroutineScope.writer(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     autoFlush: Boolean = false,
     block: suspend WriterScope.() -> Unit
 ): WriterJob = launchChannel(coroutineContext, ByteChannel(autoFlush), attachJob = true, block = block)
 
 @Deprecated("Use scope.writer instead")
-fun writer(
+public fun writer(
     coroutineContext: CoroutineContext,
     channel: ByteChannel, parent: Job? = null,
     block: suspend WriterScope.() -> Unit
@@ -95,7 +95,7 @@ fun writer(
 
 @Suppress("DEPRECATION")
 @Deprecated("Use scope.writer instead")
-fun writer(
+public fun writer(
     coroutineContext: CoroutineContext,
     autoFlush: Boolean = false, parent: Job? = null,
     block: suspend WriterScope.() -> Unit
