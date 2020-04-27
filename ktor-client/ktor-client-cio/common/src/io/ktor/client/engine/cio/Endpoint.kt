@@ -74,11 +74,11 @@ internal class Endpoint(
     ): Deferred<HttpResponseData> = async(callContext + CoroutineName("DedicatedRequest")) {
         try {
             val connection = connect(request)
-            val input = mapEngineExceptions(connection.openReadChannel(), request)
-            val originOutput = mapEngineExceptions(connection.openWriteChannel(), request)
+            val input = this@Endpoint.mapEngineExceptions(connection.openReadChannel(), request)
+            val originOutput = this@Endpoint.mapEngineExceptions(connection.openWriteChannel(), request)
 
             val output = originOutput.handleHalfClosed(
-                coroutineContext, config.endpoint.allowHalfClose
+                callContext, config.endpoint.allowHalfClose
             )
 
             callContext[Job]!!.invokeOnCompletion { cause ->

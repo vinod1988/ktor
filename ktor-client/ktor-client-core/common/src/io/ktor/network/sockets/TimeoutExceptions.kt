@@ -49,16 +49,16 @@ public fun CoroutineScope.mapEngineExceptions(input: ByteReadChannel, request: H
  * [SocketTimeoutException].
  */
 @InternalAPI
-public fun CoroutineScope.mapEngineExceptions(input: ByteWriteChannel, request: HttpRequestData): ByteWriteChannel {
+public fun CoroutineScope.mapEngineExceptions(output: ByteWriteChannel, request: HttpRequestData): ByteWriteChannel {
     if (PlatformUtils.IS_NATIVE) {
-        return input
+        return output
     }
 
     val replacementChannel = ByteChannelWithMappedExceptions(request)
 
     writer(channel = replacementChannel) {
         try {
-            replacementChannel.joinTo(input, closeOnEnd = true)
+            replacementChannel.joinTo(output, closeOnEnd = true)
         } catch (cause: Throwable) {
             replacementChannel.close(cause)
         }

@@ -17,7 +17,7 @@ import java.util.*
  * Helper interface to test client.
  */
 @RunWith(Parameterized::class)
-actual abstract class ClientLoader {
+public actual abstract class ClientLoader {
 
     @Parameterized.Parameter
     lateinit var engine: HttpClientEngineContainer
@@ -28,7 +28,7 @@ actual abstract class ClientLoader {
     /**
      * Perform test against all clients from dependencies.
      */
-    actual fun clientTests(
+    public actual fun clientTests(
         skipEngines: List<String>,
         block: suspend TestClientBuilder<HttpClientEngineConfig>.() -> Unit
     ) {
@@ -52,7 +52,7 @@ actual abstract class ClientLoader {
         testWithEngine(engine.factory, block)
     }
 
-    actual fun dumpCoroutines() {
+    public actual fun dumpCoroutines() {
         DebugProbes.dumpCoroutines()
     }
 

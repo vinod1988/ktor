@@ -11,5 +11,5 @@ import io.ktor.util.*
  */
 @InternalAPI
 public fun debug(message: Any?) {
-//    println(message)
+    println(message)
 }
