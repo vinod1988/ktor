@@ -66,12 +66,12 @@ public actual suspend fun ByteReadChannel.joinTo(dst: ByteWriteChannel, closeOnE
 }
 
 /**
- * Reads up to [limit] bytes from receiver channel and writes them to [dst] channel.
- * Closes [dst] channel if fails to read or write with cause exception.
+ * Reads up to [limit] bytes from receiver channel and writes them to [destination] channel.
+ * Closes [destination] channel if fails to read or write with cause exception.
  * @return a number of copied bytes
  */
-public actual suspend fun ByteReadChannel.copyTo(dst: ByteWriteChannel, limit: Long): Long {
-    return (this as ByteChannelSequentialBase).copyToSequentialImpl((dst as ByteChannelSequentialBase), limit)
+public actual suspend fun ByteReadChannel.copyTo(destination: ByteWriteChannel, limit: Long): Long {
+    return (this as ByteChannelSequentialBase).copyToSequentialImpl((destination as ByteChannelSequentialBase), limit)
 }
 
 internal class ByteChannelJS(initial: IoBuffer, autoFlush: Boolean) : ByteChannelSequentialBase(initial, autoFlush) {

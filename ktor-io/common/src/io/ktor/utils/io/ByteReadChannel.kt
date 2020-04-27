@@ -203,60 +203,61 @@ public expect interface ByteReadChannel {
  * Reads the specified amount of bytes and makes a byte packet from them. Fails if channel has been closed
  * and not enough bytes available.
  */
-suspend fun ByteReadChannel.readPacket(size: Int): ByteReadPacket = readPacket(size, 0)
+public suspend fun ByteReadChannel.readPacket(size: Int): ByteReadPacket = readPacket(size, 0)
 
 /**
  * Reads up to [limit] bytes and makes a byte packet or until end of stream encountered.
  */
-suspend fun ByteReadChannel.readRemaining(limit: Long): ByteReadPacket = readRemaining(limit, 0)
+public suspend fun ByteReadChannel.readRemaining(limit: Long): ByteReadPacket = readRemaining(limit, 0)
 
 /**
  * Reads all remaining bytes and makes a byte packet
  */
-suspend fun ByteReadChannel.readRemaining(): ByteReadPacket = readRemaining(Long.MAX_VALUE, 0)
+public suspend fun ByteReadChannel.readRemaining(): ByteReadPacket = readRemaining(Long.MAX_VALUE, 0)
 
-suspend fun ByteReadChannel.readFully(dst: IoBuffer) = readFully(dst, dst.writeRemaining)
+public suspend fun ByteReadChannel.readFully(dst: IoBuffer) = readFully(dst, dst.writeRemaining)
 
-suspend fun ByteReadChannel.readUTF8LineTo(out: Appendable): Boolean {
+public suspend fun ByteReadChannel.readUTF8LineTo(out: Appendable): Boolean {
     return readUTF8LineTo(out, Int.MAX_VALUE)
 }
 
-suspend fun ByteReadChannel.readUTF8Line(): String? {
+public suspend fun ByteReadChannel.readUTF8Line(): String? {
     return readUTF8Line(Int.MAX_VALUE)
 }
 
-fun ByteReadChannel.cancel(): Boolean = cancel(null)
+public fun ByteReadChannel.cancel(): Boolean = cancel(null)
 
 /**
  * Discards all bytes in the channel and suspends until end of stream.
  */
-suspend fun ByteReadChannel.discard(): Long = discard(Long.MAX_VALUE)
+public suspend fun ByteReadChannel.discard(): Long = discard(Long.MAX_VALUE)
 
 /**
  * Discards exactly [n] bytes or fails if not enough bytes in the channel
  */
-suspend inline fun ByteReadChannel.discardExact(n: Long) {
+public suspend inline fun ByteReadChannel.discardExact(n: Long) {
     if (discard(n) != n) throw EOFException("Unable to discard $n bytes")
 }
 
-suspend fun ByteReadChannel.readAvailable(dst: ByteArray) = readAvailable(dst, 0, dst.size)
-suspend fun ByteReadChannel.readFully(dst: ByteArray) = readFully(dst, 0, dst.size)
+public suspend fun ByteReadChannel.readAvailable(dst: ByteArray): Int = readAvailable(dst, 0, dst.size)
+
+public suspend fun ByteReadChannel.readFully(dst: ByteArray) = readFully(dst, 0, dst.size)
 
 public expect suspend fun ByteReadChannel.joinTo(dst: ByteWriteChannel, closeOnEnd: Boolean)
 
 /**
- * Reads up to [limit] bytes from receiver channel and writes them to [dst] channel.
- * Closes [dst] channel if fails to read or write with cause exception.
+ * Reads up to [limit] bytes from receiver channel and writes them to [destination] channel.
+ * Closes [destination] channel if fails to read or write with cause exception.
  * @return a number of copied bytes
  */
-public expect suspend fun ByteReadChannel.copyTo(dst: ByteWriteChannel, limit: Long = Long.MAX_VALUE): Long
+public expect suspend fun ByteReadChannel.copyTo(destination: ByteWriteChannel, limit: Long = Long.MAX_VALUE): Long
 
 /**
  * Reads all the bytes from receiver channel and writes them to [dst] channel and then closes it.
  * Closes [dst] channel if fails to read or write with cause exception.
  * @return a number of copied bytes
  */
-suspend fun ByteReadChannel.copyAndClose(dst: ByteWriteChannel, limit: Long = Long.MAX_VALUE): Long {
+public suspend fun ByteReadChannel.copyAndClose(dst: ByteWriteChannel, limit: Long = Long.MAX_VALUE): Long {
     val count = copyTo(dst, limit)
     dst.close()
     return count

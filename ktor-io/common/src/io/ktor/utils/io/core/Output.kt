@@ -203,7 +203,7 @@ private fun Output.fillFallback(times: Long, value: Byte) {
  * however it is guaranteed that it is always non-empty.
  */
 @DangerousInternalIoApi
-inline fun Output.writeWhile(block: (Buffer) -> Boolean) {
+public inline fun Output.writeWhile(block: (Buffer) -> Boolean) {
     var tail: ChunkBuffer = prepareWriteHead(1, null)
     try {
         while (true) {

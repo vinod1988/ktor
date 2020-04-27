@@ -261,21 +261,23 @@ private suspend fun ByteReadChannel.joinToImplSuspend(dst: ByteWriteChannel, clo
 }
 
 /**
- * Reads up to [limit] bytes from receiver channel and writes them to [dst] channel.
- * Closes [dst] channel if fails to read or write with cause exception.
+ * Reads up to [limit] bytes from receiver channel and writes them to [destination] channel.
+ * Closes [destination] channel if fails to read or write with cause exception.
  * @return a number of copied bytes
  */
-public actual suspend fun ByteReadChannel.copyTo(dst: ByteWriteChannel, limit: Long): Long {
-    require(this !== dst)
+public actual suspend fun ByteReadChannel.copyTo(destination: ByteWriteChannel, limit: Long): Long {
+    require(this !== destination)
     require(limit >= 0L)
 
-    if (this is ByteBufferChannel && dst is ByteBufferChannel) {
-        return dst.copyDirect(this, limit, null)
-    } else if (this is ByteChannelSequentialBase && dst is ByteChannelSequentialBase) {
-        return copyToSequentialImpl(dst, Long.MAX_VALUE) // more specialized extension function
+    return when {
+        this is ByteBufferChannel && destination is ByteBufferChannel -> {
+            destination.copyDirect(this, limit, null)
+        }
+        this is ByteChannelSequentialBase && destination is ByteChannelSequentialBase -> {
+            copyToSequentialImpl(destination, Long.MAX_VALUE) // more specialized extension function
+        }
+        else -> copyToImpl(destination, limit)
     }
-
-    return copyToImpl(dst, limit)
 }
 
 private suspend fun ByteReadChannel.copyToImpl(dst: ByteWriteChannel, limit: Long): Long {
