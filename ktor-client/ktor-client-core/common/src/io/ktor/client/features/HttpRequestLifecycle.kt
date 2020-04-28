@@ -51,12 +51,11 @@ internal class HttpRequestLifecycle {
  * Attach client engine job
  */
 private fun PipelineContext<*, HttpRequestBuilder>.attachToClientEngineJob(clientEngineJob: Job) {
-    val executionContext = context.executionContext
     val handler = clientEngineJob.invokeOnCompletion { cause ->
         if (cause != null) {
-            executionContext.cancel("Engine failed", cause)
+            context.executionContext.cancel("Engine failed", cause)
         } else {
-            (executionContext[Job] as CompletableJob).complete()
+            (context.executionContext[Job] as CompletableJob).complete()
         }
     }
 
