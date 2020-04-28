@@ -11,9 +11,7 @@ import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.http.cio.*
 import io.ktor.http.content.*
-import io.ktor.util.*
 import io.ktor.util.date.*
-import io.ktor.util.debug.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.*
@@ -119,9 +117,7 @@ internal suspend fun readResponse(
     val version = HttpProtocolVersion.parse(rawResponse.version)
 
     if (status == HttpStatusCode.SwitchingProtocols) {
-        TODO()
-//        val session = RawWebSocket(input, output, masking = true, coroutineContext = callContext)
-//        return HttpResponseData(status, requestTime, headers, version, session, callContext)
+        return startWebSocketSession(status, requestTime, headers, version, callContext, input, output)
     }
 
     val body = when {
