@@ -4,7 +4,12 @@
 
 package io.ktor.utils.io
 
+import kotlinx.coroutines.*
+
 /**
  * Print exception stacktrace.
  */
-expect fun Throwable.printStack()
+public expect fun Throwable.printStack()
+
+
+

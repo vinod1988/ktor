@@ -2548,5 +2548,6 @@ internal open class ByteBufferChannel(
 }
 
 private fun rethrowClosed(cause: Throwable): Nothing {
-    throw IllegalStateException(cause)
+    throw tryCopyException(cause, cause) ?: IllegalStateException(cause.message, cause)
 }
+

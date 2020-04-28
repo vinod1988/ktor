@@ -7,6 +7,6 @@ package io.ktor.utils.io
 /**
  * Print exception stacktrace.
  */
-actual fun Throwable.printStack() {
+public actual fun Throwable.printStack() {
     printStackTrace()
 }
