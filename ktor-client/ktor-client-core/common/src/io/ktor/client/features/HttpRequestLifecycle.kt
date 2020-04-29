@@ -7,7 +7,6 @@ package io.ktor.client.features
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.util.*
-import io.ktor.util.debug.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.*
 
@@ -31,7 +30,7 @@ internal class HttpRequestLifecycle {
                     it.makeShared()
                 }
 
-                attachToClientEngineJob(executionContext)
+                attachToClientEngineJob(executionContext, scope.coroutineContext[Job]!!)
 
                 try {
                     context.executionContext = executionContext
@@ -48,18 +47,21 @@ internal class HttpRequestLifecycle {
 }
 
 /**
- * Attach client engine job
+ * Attach client engine job.
  */
-private fun PipelineContext<*, HttpRequestBuilder>.attachToClientEngineJob(clientEngineJob: Job) {
+private fun attachToClientEngineJob(
+    requestJob: CompletableJob,
+    clientEngineJob: Job
+) {
     val handler = clientEngineJob.invokeOnCompletion { cause ->
         if (cause != null) {
-            context.executionContext.cancel("Engine failed", cause)
+            requestJob.cancel("Engine failed", cause)
         } else {
-            (context.executionContext[Job] as CompletableJob).complete()
+            requestJob.complete()
         }
     }
 
-    context.executionContext[Job]!!.invokeOnCompletion {
+    requestJob.invokeOnCompletion {
         handler.dispose()
     }
 }

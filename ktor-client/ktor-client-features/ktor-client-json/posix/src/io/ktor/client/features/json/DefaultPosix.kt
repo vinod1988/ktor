@@ -10,7 +10,7 @@ import io.ktor.util.*
  * Platform default serializer.
  */
 
-actual fun defaultSerializer(): JsonSerializer = serializers.first()
+public actual fun defaultSerializer(): JsonSerializer = serializers.first()
 
 @InternalAPI
 @Suppress("KDocMissingDocumentation")
