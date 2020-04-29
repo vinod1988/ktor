@@ -9,7 +9,7 @@ package io.ktor.network.tls
  * @property code numeric TLS version code
  */
 @Suppress("KDocMissingDocumentation")
-enum class TLSVersion(val code: Int) {
+internal enum class TLSVersion(val code: Int) {
     SSL3(0x0300),
     TLS10(0x0301),
     TLS11(0x0302),

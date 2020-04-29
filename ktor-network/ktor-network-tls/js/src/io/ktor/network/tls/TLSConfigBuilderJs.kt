@@ -4,6 +4,24 @@
 
 package io.ktor.network.tls
 
+/**
+ * [TLSConfig] builder.
+ */
 public actual class TLSConfigBuilder actual constructor() {
+    /**
+     * Custom server name for TLS server name extension.
+     * See also: https://en.wikipedia.org/wiki/Server_Name_Indication
+     */
+    public actual var serverName: String? = null
+
+    /**
+     * Create [TLSConfig].
+     */
     public actual fun build(): TLSConfig = TLSConfig()
+}
+
+/**
+ * Append config from [other] builder.
+ */
+public actual fun TLSConfigBuilder.takeFrom(other: TLSConfigBuilder) {
 }

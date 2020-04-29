@@ -157,7 +157,10 @@ internal class Endpoint(
                 if (!secure) return@connect connection
 
                 try {
-                    return connection.tls(coroutineContext, config.https.build())
+                    return connection.tls(coroutineContext) {
+                        takeFrom(config.https)
+                        serverName = serverName ?: address.hostname
+                    }
                 } catch (cause: Throwable) {
                     try {
                         connection.close()

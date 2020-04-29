@@ -2513,10 +2513,14 @@ internal open class ByteBufferChannel(
         val sendException: Throwable
             get() = cause ?: ClosedWriteChannelException("The channel was closed")
 
+        override fun toString(): String = "Closed[$sendException]"
+
         companion object {
             val EmptyCause = ClosedElement(null)
         }
     }
+
+    override fun toString(): String = "ByteBufferChannel[$state, $closed]"
 
     internal class JoiningState(val delegatedTo: ByteBufferChannel, val delegateClose: Boolean) {
         private val _closeWaitJob = atomic<Job?>(null)

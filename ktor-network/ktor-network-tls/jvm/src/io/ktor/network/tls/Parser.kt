@@ -101,7 +101,7 @@ internal fun ByteReadPacket.readTLSCertificate(): List<Certificate> {
         readFully(certificate)
         certificateBase += certificateLength + 3
 
-        val x509 = factory.generateCertificate(certificate.inputStream())
+        val x509 = factory.generateCertificate(certificate.inputStream())!!
         result.add(x509)
     }
 
@@ -123,10 +123,10 @@ internal fun ByteReadPacket.readECPoint(fieldSize: Int): ECPoint {
     )
 }
 
-private suspend fun ByteReadChannel.readTLSVersion() =
+private suspend fun ByteReadChannel.readTLSVersion(): TLSVersion =
     TLSVersion.byCode(readShortCompatible() and 0xffff)
 
-private fun ByteReadPacket.readTLSVersion() =
+private fun ByteReadPacket.readTLSVersion(): TLSVersion =
     TLSVersion.byCode(readShort().toInt() and 0xffff)
 
 internal fun ByteReadPacket.readTripleByteLength(): Int = (readByte().toInt() and 0xff shl 16) or
