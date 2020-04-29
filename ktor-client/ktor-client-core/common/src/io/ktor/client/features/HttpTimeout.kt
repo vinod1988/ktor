@@ -16,7 +16,7 @@ import kotlin.native.concurrent.*
  * Client HTTP timeout feature. There are no default values, so default timeouts will be taken from engine configuration
  * or considered as infinite time if engine doesn't provide them.
  */
-class HttpTimeout(
+public class HttpTimeout(
     private val requestTimeoutMillis: Long?,
     private val connectTimeoutMillis: Long?,
     private val socketTimeoutMillis: Long?
@@ -24,12 +24,13 @@ class HttpTimeout(
     /**
      * [HttpTimeout] extension configuration that is used during installation.
      */
-    class HttpTimeoutCapabilityConfiguration {
+    public class HttpTimeoutCapabilityConfiguration {
         /**
          * Creates a new instance of [HttpTimeoutCapabilityConfiguration].
          */
+        @Suppress("ConvertSecondaryConstructorToPrimary")
         @InternalAPI
-        constructor(
+        public constructor(
             requestTimeoutMillis: Long? = null,
             connectTimeoutMillis: Long? = null,
             socketTimeoutMillis: Long? = null
@@ -42,7 +43,7 @@ class HttpTimeout(
         /**
          * Request timeout in milliseconds.
          */
-        var requestTimeoutMillis: Long?
+        public var requestTimeoutMillis: Long?
             set(value) {
                 field = checkTimeoutValue(value)
             }
@@ -50,7 +51,7 @@ class HttpTimeout(
         /**
          * Connect timeout in milliseconds.
          */
-        var connectTimeoutMillis: Long?
+        public var connectTimeoutMillis: Long?
             set(value) {
                 field = checkTimeoutValue(value)
             }
@@ -58,7 +59,7 @@ class HttpTimeout(
         /**
          * Socket timeout (read and write) in milliseconds.
          */
-        var socketTimeoutMillis: Long?
+        public var socketTimeoutMillis: Long?
             set(value) {
                 field = checkTimeoutValue(value)
             }
@@ -74,7 +75,7 @@ class HttpTimeout(
 
         public companion object {
             @SharedImmutable
-            val key = AttributeKey<HttpTimeoutCapabilityConfiguration>("TimeoutConfiguration")
+            public val key: AttributeKey<HttpTimeoutCapabilityConfiguration> = AttributeKey("TimeoutConfiguration")
         }
     }
 
@@ -95,7 +96,7 @@ class HttpTimeout(
         /**
          * Infinite timeout in milliseconds.
          */
-        public const val INFINITE_TIMEOUT_MS = Long.MAX_VALUE
+        public const val INFINITE_TIMEOUT_MS: Long = Long.MAX_VALUE
 
         override fun prepare(block: HttpTimeoutCapabilityConfiguration.() -> Unit): HttpTimeout =
             HttpTimeoutCapabilityConfiguration().apply(block).build()
@@ -134,13 +135,13 @@ class HttpTimeout(
 /**
  * Adds timeout boundaries to the request. Requires [HttpTimeout] feature to be installed.
  */
-fun HttpRequestBuilder.timeout(block: HttpTimeout.HttpTimeoutCapabilityConfiguration.() -> Unit) =
+public fun HttpRequestBuilder.timeout(block: HttpTimeout.HttpTimeoutCapabilityConfiguration.() -> Unit): Unit =
     setCapability(HttpTimeout, HttpTimeout.HttpTimeoutCapabilityConfiguration().apply(block))
 
 /**
  * This exception is thrown in case request timeout exceeded.
  */
-class HttpRequestTimeoutException(
+public class HttpRequestTimeoutException(
     request: HttpRequestBuilder
 ) : CancellationException(
     "Request timeout has been expired [url=${request.url.buildString()}, request_timeout=${request.getCapabilityOrNull(
@@ -151,7 +152,7 @@ class HttpRequestTimeoutException(
 /**
  * This exception is thrown in case connect timeout exceeded.
  */
-fun ConnectTimeoutException(
+public fun ConnectTimeoutException(
     request: HttpRequestData, cause: Throwable? = null
 ): ConnectTimeoutException = ConnectTimeoutException(
     "Connect timeout has been expired [url=${request.url}, connect_timeout=${request.getCapabilityOrNull(
@@ -163,7 +164,7 @@ fun ConnectTimeoutException(
 /**
  * This exception is thrown in case connect timeout exceeded.
  */
-fun ConnectTimeoutException(
+public fun ConnectTimeoutException(
     url: String, timeout: Long?, cause: Throwable? = null
 ): ConnectTimeoutException = ConnectTimeoutException(
     "Connect timeout has been expired [url=$url, connect_timeout=${timeout ?: "unknown"} ms]",
@@ -173,7 +174,7 @@ fun ConnectTimeoutException(
 /**
  * This exception is thrown in case socket timeout (read or write) exceeded.
  */
-fun SocketTimeoutException(
+public fun SocketTimeoutException(
     request: HttpRequestData,
     cause: Throwable? = null
 ): SocketTimeoutException = SocketTimeoutException(
@@ -188,7 +189,7 @@ fun SocketTimeoutException(
  * as zero and convert timeout value to [Int].
  */
 @InternalAPI
-fun convertLongTimeoutToIntWithInfiniteAsZero(timeout: Long): Int = when {
+public fun convertLongTimeoutToIntWithInfiniteAsZero(timeout: Long): Int = when {
     timeout == HttpTimeout.INFINITE_TIMEOUT_MS -> 0
     timeout < Int.MIN_VALUE -> Int.MIN_VALUE
     timeout > Int.MAX_VALUE -> Int.MAX_VALUE
@@ -200,7 +201,7 @@ fun convertLongTimeoutToIntWithInfiniteAsZero(timeout: Long): Int = when {
  * as zero and convert timeout value to [Int].
  */
 @InternalAPI
-fun convertLongTimeoutToLongWithInfiniteAsZero(timeout: Long): Long = when (timeout) {
+public fun convertLongTimeoutToLongWithInfiniteAsZero(timeout: Long): Long = when (timeout) {
     HttpTimeout.INFINITE_TIMEOUT_MS -> 0L
     else -> timeout
 }

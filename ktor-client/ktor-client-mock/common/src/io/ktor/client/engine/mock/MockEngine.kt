@@ -8,15 +8,14 @@ import io.ktor.client.engine.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.util.*
-import kotlinx.atomicfu.locks.*
 import kotlinx.coroutines.*
 
 /**
  * [HttpClientEngine] for writing tests without network.
  */
-class MockEngine(override val config: MockEngineConfig) : HttpClientEngineBase("ktor-mock") {
-    override val dispatcher = Dispatchers.Unconfined
-    override val supportedCapabilities = setOf(HttpTimeout)
+public class MockEngine(override val config: MockEngineConfig) : HttpClientEngineBase("ktor-mock") {
+    override val dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
+    override val supportedCapabilities: Set<HttpTimeout.Feature> = setOf(HttpTimeout)
     private var invocationCount = 0
     private val mutex = Lock()
     private val _requestsHistory: MutableList<HttpRequestData> = mutableListOf()
@@ -32,12 +31,12 @@ class MockEngine(override val config: MockEngineConfig) : HttpClientEngineBase("
     /**
      * History of executed requests.
      */
-    val requestHistory: List<HttpRequestData> get() = _requestsHistory
+    public val requestHistory: List<HttpRequestData> get() = _requestsHistory
 
     /**
      * History of sent responses.
      */
-    val responseHistory: List<HttpResponseData> get() = _responseHistory
+    public val responseHistory: List<HttpResponseData> get() = _responseHistory
 
     override suspend fun execute(data: HttpRequestData): HttpResponseData {
         val callContext = callContext()
@@ -73,16 +72,17 @@ class MockEngine(override val config: MockEngineConfig) : HttpClientEngineBase("
         }
     }
 
-    companion object : HttpClientEngineFactory<MockEngineConfig> {
+    public companion object : HttpClientEngineFactory<MockEngineConfig> {
         override fun create(block: MockEngineConfig.() -> Unit): HttpClientEngine =
             MockEngine(MockEngineConfig().apply(block))
 
         /**
          * Create [MockEngine] instance with single request handler.
          */
-        operator fun invoke(handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData): MockEngine =
-            MockEngine(MockEngineConfig().apply {
-                requestHandlers.add(handler)
-            })
+        public operator fun invoke(
+            handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData
+        ): MockEngine = MockEngine(MockEngineConfig().apply {
+            requestHandlers.add(handler)
+        })
     }
 }
