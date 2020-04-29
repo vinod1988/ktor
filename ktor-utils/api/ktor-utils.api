@@ -487,8 +487,8 @@ public class io/ktor/util/collections/ConcurrentCollection : java/util/Collectio
 
 public final class io/ktor/util/collections/ConcurrentMap : java/util/Map, kotlin/jvm/internal/markers/KMutableMap {
 	public fun <init> ()V
-	public fun <init> (Lio/ktor/util/Lock;Ljava/util/Map;)V
-	public synthetic fun <init> (Lio/ktor/util/Lock;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/ktor/util/Lock;I)V
+	public synthetic fun <init> (Lio/ktor/util/Lock;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun clear ()V
 	public final fun computeIfAbsent (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public fun containsKey (Ljava/lang/Object;)Z
@@ -497,7 +497,6 @@ public final class io/ktor/util/collections/ConcurrentMap : java/util/Map, kotli
 	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun getEntries ()Ljava/util/Set;
 	public fun getKeys ()Ljava/util/Set;
-	public final fun getOrDefault (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public fun getSize ()I
 	public fun getValues ()Ljava/util/Collection;
 	public fun isEmpty ()Z
@@ -509,10 +508,24 @@ public final class io/ktor/util/collections/ConcurrentMap : java/util/Map, kotli
 	public final fun values ()Ljava/util/Collection;
 }
 
-public final class io/ktor/util/collections/ConcurrentSet : io/ktor/util/collections/ConcurrentCollection, java/util/Set, kotlin/jvm/internal/markers/KMutableSet {
+public final class io/ktor/util/collections/ConcurrentSet : java/util/Set, kotlin/jvm/internal/markers/KMutableSet {
 	public fun <init> ()V
-	public fun <init> (Ljava/util/Set;Lio/ktor/util/Lock;)V
-	public synthetic fun <init> (Ljava/util/Set;Lio/ktor/util/Lock;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/ktor/util/Lock;Lio/ktor/util/collections/ConcurrentMap;)V
+	public synthetic fun <init> (Lio/ktor/util/Lock;Lio/ktor/util/collections/ConcurrentMap;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun add (Ljava/lang/Object;)Z
+	public fun addAll (Ljava/util/Collection;)Z
+	public fun clear ()V
+	public fun contains (Ljava/lang/Object;)Z
+	public fun containsAll (Ljava/util/Collection;)Z
+	public fun getSize ()I
+	public fun isEmpty ()Z
+	public fun iterator ()Ljava/util/Iterator;
+	public fun remove (Ljava/lang/Object;)Z
+	public fun removeAll (Ljava/util/Collection;)Z
+	public fun retainAll (Ljava/util/Collection;)Z
+	public final fun size ()I
+	public fun toArray ()[Ljava/lang/Object;
+	public fun toArray ([Ljava/lang/Object;)[Ljava/lang/Object;
 }
 
 public final class io/ktor/util/date/DateJvmKt {
@@ -624,6 +637,10 @@ public final class io/ktor/util/date/WeekDay : java/lang/Enum {
 public final class io/ktor/util/date/WeekDay$Companion {
 	public final fun from (I)Lio/ktor/util/date/WeekDay;
 	public final fun from (Ljava/lang/String;)Lio/ktor/util/date/WeekDay;
+}
+
+public final class io/ktor/util/debug/DebugToolsKt {
+	public static final fun debug (Ljava/lang/Object;)V
 }
 
 public abstract class io/ktor/util/internal/AtomicDesc {

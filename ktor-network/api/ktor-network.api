@@ -249,6 +249,9 @@ public class io/ktor/network/sockets/SocketOptions$PeerSocketOptions : io/ktor/n
 }
 
 public final class io/ktor/network/sockets/SocketOptions$TCPClientSocketOptions : io/ktor/network/sockets/SocketOptions$PeerSocketOptions {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Map;)V
+	public synthetic fun <init> (Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun copy$ktor_network ()Lio/ktor/network/sockets/SocketOptions$PeerSocketOptions;
 	public synthetic fun copy$ktor_network ()Lio/ktor/network/sockets/SocketOptions;
 	public final fun getKeepAlive ()Ljava/lang/Boolean;
@@ -275,7 +278,6 @@ public final class io/ktor/network/sockets/SocketsKt {
 }
 
 public final class io/ktor/network/sockets/TCPSocketBuilder : io/ktor/network/sockets/Configurable {
-	public static final field Companion Lio/ktor/network/sockets/TCPSocketBuilder$Companion;
 	public fun <init> (Lio/ktor/network/selector/SelectorManager;Lio/ktor/network/sockets/SocketOptions;)V
 	public final fun bind (Ljava/lang/String;ILkotlin/jvm/functions/Function1;)Lio/ktor/network/sockets/ServerSocket;
 	public final fun bind (Ljava/net/InetSocketAddress;Lkotlin/jvm/functions/Function1;)Lio/ktor/network/sockets/ServerSocket;
@@ -289,9 +291,6 @@ public final class io/ktor/network/sockets/TCPSocketBuilder : io/ktor/network/so
 	public static synthetic fun connect$default (Lio/ktor/network/sockets/TCPSocketBuilder;Ljava/net/InetSocketAddress;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public fun getOptions ()Lio/ktor/network/sockets/SocketOptions;
 	public fun setOptions (Lio/ktor/network/sockets/SocketOptions;)V
-}
-
-public final class io/ktor/network/sockets/TCPSocketBuilder$Companion {
 }
 
 public final class io/ktor/network/sockets/TCPSocketBuilderJvmKt {
@@ -366,7 +365,6 @@ public final class io/ktor/network/util/IOCoroutineDispatcher : kotlinx/coroutin
 public final class io/ktor/network/util/NetworkAddressJvmKt {
 	public static final fun getHostname (Ljava/net/InetSocketAddress;)Ljava/lang/String;
 	public static final fun getPort (Ljava/net/InetSocketAddress;)I
-	public static final fun isResolved (Ljava/net/InetSocketAddress;)Z
 }
 
 public final class io/ktor/network/util/PoolsKt {

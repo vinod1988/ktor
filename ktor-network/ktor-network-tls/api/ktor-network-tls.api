@@ -201,6 +201,7 @@ public final class io/ktor/network/tls/TLSConfigBuilder {
 public final class io/ktor/network/tls/TLSConfigBuilderJvmKt {
 	public static final fun addCertificateChain (Lio/ktor/network/tls/TLSConfigBuilder;[Ljava/security/cert/X509Certificate;Ljava/security/PrivateKey;)V
 	public static final fun addKeyStore (Lio/ktor/network/tls/TLSConfigBuilder;Ljava/security/KeyStore;[C)V
+	public static final fun takeFrom (Lio/ktor/network/tls/TLSConfigBuilder;Lio/ktor/network/tls/TLSConfigBuilder;)V
 }
 
 public final class io/ktor/network/tls/TLSConfigBuilderKt {
@@ -253,21 +254,6 @@ public final class io/ktor/network/tls/TLSRecordType : java/lang/Enum {
 
 public final class io/ktor/network/tls/TLSRecordType$Companion {
 	public final fun byCode (I)Lio/ktor/network/tls/TLSRecordType;
-}
-
-public final class io/ktor/network/tls/TLSVersion : java/lang/Enum {
-	public static final field Companion Lio/ktor/network/tls/TLSVersion$Companion;
-	public static final field SSL3 Lio/ktor/network/tls/TLSVersion;
-	public static final field TLS10 Lio/ktor/network/tls/TLSVersion;
-	public static final field TLS11 Lio/ktor/network/tls/TLSVersion;
-	public static final field TLS12 Lio/ktor/network/tls/TLSVersion;
-	public final fun getCode ()I
-	public static fun valueOf (Ljava/lang/String;)Lio/ktor/network/tls/TLSVersion;
-	public static fun values ()[Lio/ktor/network/tls/TLSVersion;
-}
-
-public final class io/ktor/network/tls/TLSVersion$Companion {
-	public final fun byCode (I)Lio/ktor/network/tls/TLSVersion;
 }
 
 public final class io/ktor/network/tls/extensions/HashAlgorithm : java/lang/Enum {

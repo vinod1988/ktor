@@ -287,6 +287,11 @@ public final class io/ktor/utils/io/DelimitedKt {
 	public static final fun skipDelimiter (Lio/ktor/utils/io/ByteReadChannel;Ljava/nio/ByteBuffer;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class io/ktor/utils/io/ExceptionUtilsJvmKt {
+	public static final fun printStack (Ljava/lang/Throwable;)V
+	public static final fun tryCopyException (Ljava/lang/Throwable;Ljava/lang/Throwable;)Ljava/lang/Throwable;
+}
+
 public abstract interface class io/ktor/utils/io/LookAheadSession {
 	public abstract fun consumed (I)V
 	public abstract fun request (II)Ljava/nio/ByteBuffer;
@@ -625,6 +630,10 @@ public final class io/ktor/utils/io/charsets/UTFKt {
 	public static synthetic fun decodeUTF8Line$default (Ljava/nio/ByteBuffer;[CIIILjava/lang/Object;)J
 	public static final fun decodeUtf8Result (II)J
 	public static final fun decodeUtf8ResultCombine (JJ)J
+}
+
+public final class io/ktor/utils/io/concurrent/SharedJvmKt {
+	public static final fun shared (Ljava/lang/Object;)Lkotlin/properties/ReadWriteProperty;
 }
 
 public abstract class io/ktor/utils/io/core/AbstractInput : io/ktor/utils/io/core/Input {
