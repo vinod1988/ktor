@@ -2,7 +2,7 @@ package io.ktor.utils.io.pool
 
 import kotlin.native.concurrent.ensureNeverFrozen
 
-actual abstract class DefaultPool<T : Any> actual constructor(actual override final val capacity: Int) : ObjectPool<T> {
+public actual abstract class DefaultPool<T : Any> actual constructor(actual override final val capacity: Int) : ObjectPool<T> {
     private val instances = arrayOfNulls<Any?>(capacity)
     private var size = 0
 
