@@ -7,6 +7,6 @@ package io.ktor.client.tests.utils
 import io.ktor.util.*
 
 @InternalAPI
-actual val isKotlinJsIr: Boolean =
+public actual val isKotlinJsIr: Boolean =
     // Hack to detect JS IR backend. Legacy runtime has `Kotlin.kotlin` defined.
     js("(typeof Kotlin == \"undefined\" || typeof Kotlin.kotlin == \"undefined\")").unsafeCast<Boolean>()

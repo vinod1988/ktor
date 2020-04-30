@@ -7,7 +7,6 @@ package io.ktor.client.features
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.util.*
-import io.ktor.util.pipeline.*
 import kotlinx.coroutines.*
 
 /**

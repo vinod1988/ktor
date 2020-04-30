@@ -25,10 +25,10 @@ public class LockFreeMPSCQueue<E : Any> {
     private val closed = AtomicInt(0)
 
     // Note: it is not atomic w.r.t. remove operation (remove can transiently fail when isEmpty is false)
-    val isEmpty: Boolean get() = _cur.value.isEmpty
-    val isClosed: Boolean get() = closed.value == 1
+    public val isEmpty: Boolean get() = _cur.value.isEmpty
+    public val isClosed: Boolean get() = closed.value == 1
 
-    fun close() {
+    public fun close() {
         try {
             _cur.loop { cur ->
                 if (cur.close()) return // closed this copy
@@ -39,7 +39,7 @@ public class LockFreeMPSCQueue<E : Any> {
         }
     }
 
-    fun addLast(element: E): Boolean {
+    public fun addLast(element: E): Boolean {
         _cur.loop { cur ->
             when (cur.addLast(element)) {
                 Core.ADD_SUCCESS -> return true
@@ -50,7 +50,7 @@ public class LockFreeMPSCQueue<E : Any> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun removeFirstOrNull(): E? {
+    public fun removeFirstOrNull(): E? {
         _cur.loop { cur ->
             val result = cur.removeFirstOrNull()
             if (result !== Core.REMOVE_FROZEN) return result as E?

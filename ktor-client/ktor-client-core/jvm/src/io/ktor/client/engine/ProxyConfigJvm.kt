@@ -9,21 +9,21 @@ import java.net.*
  *
  * See [ProxyBuilder] to create proxy.
  */
-actual typealias ProxyConfig = Proxy
+public actual typealias ProxyConfig = Proxy
 
 /**
  * [ProxyConfig] factory.
  */
-actual object ProxyBuilder {
+public actual object ProxyBuilder {
     /**
      * Create http proxy from [url].
      */
-    actual fun http(url: Url): ProxyConfig = Proxy(Proxy.Type.HTTP, InetSocketAddress(url.host, url.port))
+    public actual fun http(url: Url): ProxyConfig = Proxy(Proxy.Type.HTTP, InetSocketAddress(url.host, url.port))
 
     /**
      * Create socks proxy from [host] and [port].
      */
-    actual fun socks(host: String, port: Int): ProxyConfig = Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port))
+    public actual fun socks(host: String, port: Int): ProxyConfig = Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port))
 }
 
 /**
@@ -31,14 +31,14 @@ actual object ProxyBuilder {
  *
  * This operations can block.
  */
-actual fun ProxyConfig.resolveAddress(): NetworkAddress {
+public actual fun ProxyConfig.resolveAddress(): NetworkAddress {
     return address() as NetworkAddress
 }
 
 /**
  * Type of configured proxy.
  */
-actual val ProxyConfig.type: ProxyType
+public actual val ProxyConfig.type: ProxyType
     get() = when (type()) {
         Proxy.Type.DIRECT -> ProxyType.SOCKS
         Proxy.Type.HTTP -> ProxyType.HTTP

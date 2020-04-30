@@ -4,12 +4,12 @@
 package io.ktor.network.selector
 
 import io.ktor.util.*
-import io.ktor.util.debug.*
 import io.ktor.util.collections.*
+import io.ktor.util.debug.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 
-public class WorkerSelectorManager : SelectorManager {
+internal class WorkerSelectorManager : SelectorManager {
     private val selectorContext = newSingleThreadContext("WorkerSelectorManager")
     override val coroutineContext: CoroutineContext = selectorContext
     override fun notifyClosed(selectable: Selectable) {}
@@ -20,14 +20,7 @@ public class WorkerSelectorManager : SelectorManager {
         makeShared()
 
         launch {
-            try {
-                debug("Starting select helper")
-                selectHelper(events)
-            } catch (cause: Throwable) {
-                debug("Select helper error: $cause")
-            } finally {
-                debug("Finish select helper")
-            }
+            selectHelper(events)
         }
     }
 
@@ -50,7 +43,6 @@ public class WorkerSelectorManager : SelectorManager {
     }
 
     override fun close() {
-        debug("Stop selecting")
         events.close()
         selectorContext.worker.requestTermination(processScheduledJobs = true)
     }

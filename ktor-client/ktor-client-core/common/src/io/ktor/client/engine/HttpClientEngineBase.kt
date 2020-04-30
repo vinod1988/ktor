@@ -33,7 +33,7 @@ public abstract class HttpClientEngineBase(private val engineName: String) : Htt
 /**
  * Exception that indicates that client engine is already closed.
  */
-class ClientEngineClosedException(
+public class ClientEngineClosedException(
     override val cause: Throwable? = null
 ) : IllegalStateException("Client already closed")
 

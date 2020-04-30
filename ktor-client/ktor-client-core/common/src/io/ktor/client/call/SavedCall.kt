@@ -43,7 +43,7 @@ internal class SavedHttpResponse(
  * Fetch data for [HttpClientCall] and close the origin.
  */
 @KtorExperimentalAPI
-suspend fun HttpClientCall.save(): HttpClientCall = SavedHttpCall(client).also { result ->
+public suspend fun HttpClientCall.save(): HttpClientCall = SavedHttpCall(client).also { result ->
     val content = response.content.readRemaining()
     result.request = SavedHttpRequest(result, request)
     result.response = SavedHttpResponse(result, content.readBytes(), response)

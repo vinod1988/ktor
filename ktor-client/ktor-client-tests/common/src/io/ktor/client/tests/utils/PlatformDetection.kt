@@ -7,4 +7,4 @@ package io.ktor.client.tests.utils
 import io.ktor.util.*
 
 @InternalAPI
-expect val isKotlinJsIr: Boolean
+public expect val isKotlinJsIr: Boolean

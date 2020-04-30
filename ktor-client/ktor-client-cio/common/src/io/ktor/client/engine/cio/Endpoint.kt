@@ -221,6 +221,6 @@ private suspend fun <T> CoroutineScope.handleTimeout(
 
 @Suppress("KDocMissingDocumentation")
 @KtorExperimentalAPI
-class FailToConnectException : Exception("Connect timed out or retry attempts exceeded")
+public class FailToConnectException : Exception("Connect timed out or retry attempts exceeded")
 
 internal expect fun Throwable.mapToKtor(request: HttpRequestData): Throwable

@@ -5,9 +5,9 @@
 package io.ktor.util
 
 @InternalAPI
-actual fun Any.preventFreeze() {
+public actual fun Any.preventFreeze() {
 }
 
 @InternalAPI
-actual fun Any.makeShared() {
+public actual fun Any.makeShared() {
 }

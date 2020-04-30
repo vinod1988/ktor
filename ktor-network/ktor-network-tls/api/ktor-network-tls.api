@@ -204,11 +204,6 @@ public final class io/ktor/network/tls/TLSConfigBuilderJvmKt {
 	public static final fun takeFrom (Lio/ktor/network/tls/TLSConfigBuilder;Lio/ktor/network/tls/TLSConfigBuilder;)V
 }
 
-public final class io/ktor/network/tls/TLSConfigBuilderKt {
-	public static final fun addCertificateChain (Lio/ktor/network/tls/TLSConfigBuilder;[Ljava/security/cert/X509Certificate;Ljava/security/PrivateKey;)V
-	public static final fun addKeyStore (Lio/ktor/network/tls/TLSConfigBuilder;Ljava/security/KeyStore;[C)V
-}
-
 public final class io/ktor/network/tls/TLSHandshakeType : java/lang/Enum {
 	public static final field Certificate Lio/ktor/network/tls/TLSHandshakeType;
 	public static final field CertificateRequest Lio/ktor/network/tls/TLSHandshakeType;

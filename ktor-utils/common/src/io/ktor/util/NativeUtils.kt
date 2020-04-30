@@ -5,7 +5,7 @@
 package io.ktor.util
 
 @InternalAPI
-expect fun Any.preventFreeze()
+public expect fun Any.preventFreeze()
 
 @InternalAPI
-expect fun Any.makeShared()
+public expect fun Any.makeShared()

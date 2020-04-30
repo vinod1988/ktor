@@ -11,17 +11,14 @@ import io.ktor.http.content.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.*
-import kotlinx.serialization.builtins.*
 import kotlinx.serialization.json.*
-import kotlinx.serialization.list
-import kotlinx.serialization.set
 import kotlin.reflect.*
 
 /**
  * A [JsonSerializer] implemented for kotlinx [Serializable] classes.
  */
 @OptIn(ImplicitReflectionSerializer::class, UnstableDefault::class)
-class KotlinxSerializer(
+public class KotlinxSerializer(
     private val json: Json = Json.plain
 ) : JsonSerializer {
 
@@ -29,26 +26,26 @@ class KotlinxSerializer(
      * Set mapping from [type] to generated [KSerializer].
      */
     @Deprecated("[setMapper] is obsolete with 1.3.50 `typeOf` feature", level = DeprecationLevel.WARNING)
-    fun <T : Any> setMapper(type: KClass<T>, serializer: KSerializer<T>) {
+    public fun <T : Any> setMapper(type: KClass<T>, serializer: KSerializer<T>) {
     }
 
     /**
      * Set mapping from [type] to generated [KSerializer].
      */
     @Deprecated("[setListMapper] is obsolete with 1.3.50 `typeOf` feature", level = DeprecationLevel.WARNING)
-    fun <T : Any> setListMapper(type: KClass<T>, serializer: KSerializer<T>) {
+    public fun <T : Any> setListMapper(type: KClass<T>, serializer: KSerializer<T>) {
     }
 
     /** Set the mapping from [T] to [mapper]. */
     @Suppress("UNUSED_PARAMETER", "unused")
     @Deprecated("[register] is obsolete with 1.3.50 `typeOf` feature", level = DeprecationLevel.WARNING)
-    inline fun <reified T : Any> register(mapper: KSerializer<T>) {
+    public inline fun <reified T : Any> register(mapper: KSerializer<T>) {
     }
 
     /** Set the mapping from [List<T>] to [mapper]. */
     @Suppress("UNUSED_PARAMETER", "unused")
     @Deprecated("[register] is obsolete with 1.3.50 `typeOf` feature", level = DeprecationLevel.WARNING)
-    inline fun <reified T : Any> registerList(mapper: KSerializer<T>) {
+    public inline fun <reified T : Any> registerList(mapper: KSerializer<T>) {
     }
 
     /**
@@ -56,7 +53,7 @@ class KotlinxSerializer(
      */
     @Suppress("unused")
     @Deprecated("[register] is obsolete with 1.3.50 `typeOf` feature", level = DeprecationLevel.WARNING)
-    inline fun <reified T : Any> register() {
+    public inline fun <reified T : Any> register() {
     }
 
     /**
@@ -64,7 +61,7 @@ class KotlinxSerializer(
      */
     @Deprecated("[register] is obsolete with 1.3.50 `typeOf` feature", level = DeprecationLevel.WARNING)
     @Suppress("unused")
-    inline fun <reified T : Any> registerList() {
+    public inline fun <reified T : Any> registerList() {
     }
 
     override fun write(data: Any, contentType: ContentType): OutgoingContent {

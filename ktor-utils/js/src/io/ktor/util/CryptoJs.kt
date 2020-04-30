@@ -14,7 +14,7 @@ private const val NONCE_SIZE_IN_BYTES = 8
  * Generates a nonce string.
  */
 @InternalAPI
-actual fun generateNonce(): String {
+public actual fun generateNonce(): String {
     val buffer = ByteArray(NONCE_SIZE_IN_BYTES)
     if (PlatformUtils.IS_NODE) {
         _crypto.randomFillSync(buffer)
@@ -28,7 +28,7 @@ actual fun generateNonce(): String {
  * Create [Digest] from specified hash [name].
  */
 @InternalAPI
-actual fun Digest(name: String): Digest = object : Digest {
+public actual fun Digest(name: String): Digest = object : Digest {
     private val state = mutableListOf<ByteArray>()
     override fun plusAssign(bytes: ByteArray) {
         state += bytes
@@ -66,4 +66,4 @@ private external class SubtleCrypto {
  * Compute SHA-1 hash for the specified [bytes]
  */
 @KtorExperimentalAPI
-actual fun sha1(bytes: ByteArray): ByteArray = error("sha1 currently is not supported in ktor-js")
+public actual fun sha1(bytes: ByteArray): ByteArray = error("sha1 currently is not supported in ktor-js")

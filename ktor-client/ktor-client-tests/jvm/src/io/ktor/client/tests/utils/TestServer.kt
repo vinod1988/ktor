@@ -36,6 +36,6 @@ internal fun startServer(): Closeable {
 /**
  * Start server for tests.
  */
-fun main() {
+internal fun main() {
     startServer()
 }

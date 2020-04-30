@@ -115,13 +115,13 @@ data class GMTDate internal constructor(
  * @param timestamp is a number of epoch milliseconds (it is `now` by default).
  */
 @Suppress("FunctionName")
-expect fun GMTDate(timestamp: Long? = null): GMTDate
+public expect fun GMTDate(timestamp: Long? = null): GMTDate
 
 /**
  * Create an instance of [GMTDate] from the specified date/time components
  */
 @Suppress("FunctionName")
-expect fun GMTDate(seconds: Int, minutes: Int, hours: Int, dayOfMonth: Int, month: Month, year: Int): GMTDate
+public expect fun GMTDate(seconds: Int, minutes: Int, hours: Int, dayOfMonth: Int, month: Month, year: Int): GMTDate
 
 /**
  * Adds the specified number of [milliseconds]

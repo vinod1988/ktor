@@ -41,13 +41,11 @@ internal class TCPSocketNative(
             while (!channel.isClosedForWrite) {
                 tryAwait(1)
                 val buffer = request(1) ?: error("Internal error. Buffer unavailable")
-                debug("Prepared buffer for reading: ${buffer.writeRemaining}")
 
                 val count: Int = buffer.writeDirect {
                     val count = buffer.writeRemaining.convert<size_t>()
                     val result = recv(descriptor, it, count, 0).toInt()
 
-                    debug("Recv finished with $result")
                     if (result == 0) {
                         channel.close()
                     }
@@ -63,12 +61,12 @@ internal class TCPSocketNative(
                     result.convert()
                 }
 
-                debug("Received: $count bytes")
+                println("Read count: $count")
 
                 if (count == 0 && !channel.isClosedForWrite) {
-                    debug("Select $descriptor for READ")
+                    println("Select read: $selectable")
                     selector.select(selectable, SelectInterest.READ)
-                    debug("Selected for READ")
+                    println("Selected")
                 }
 
                 written(count)
@@ -77,7 +75,7 @@ internal class TCPSocketNative(
         }
     }.apply {
         invokeOnCompletion {
-            debug("Finish read: $it ")
+            println("Shutdown read $descriptor")
             shutdown(descriptor, SHUT_RD)
         }
     }
@@ -105,18 +103,14 @@ internal class TCPSocketNative(
                     result.convert()
                 }
 
-                debug("Sent $count bytes.")
-
                 if (buffer.canRead()) {
-                    debug("Select $descriptor for WRITE")
                     selector.select(selectable, SelectInterest.WRITE)
-                    debug("Selected for WRITE")
                 }
             }
         }
     }.apply {
         invokeOnCompletion {
-            debug("Finish write: $it ")
+            println("Shutdown write $descriptor")
             shutdown(descriptor, SHUT_WR)
         }
     }
@@ -124,6 +118,7 @@ internal class TCPSocketNative(
     override fun close() {
         _context.complete()
         _context.invokeOnCompletion {
+            println("Close $descriptor")
             shutdown(descriptor, SHUT_RDWR)
             close(descriptor)
         }

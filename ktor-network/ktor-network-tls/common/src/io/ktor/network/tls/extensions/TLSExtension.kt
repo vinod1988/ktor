@@ -2,12 +2,15 @@
  * Copyright 2014-2019 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:Suppress("unused")
+
 package io.ktor.network.tls.extensions
 
 import io.ktor.network.tls.*
 import io.ktor.utils.io.core.*
 
-enum class TLSExtensionType(val code: Short) {
+@Suppress("NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING", "KDocMissingDocumentation")
+public enum class TLSExtensionType(public val code: Short) {
     SERVER_NAME(0),
     MAX_FRAGMENT_LENGTH(1),
     CLIENT_CERTIFICATE_URL(2),
@@ -19,9 +22,9 @@ enum class TLSExtensionType(val code: Short) {
     EC_POINT_FORMAT(11),
     SIGNATURE_ALGORITHMS(13);
 
-    companion object {
-        fun byCode(code: Int): TLSExtensionType =
-            values().find { it.code == code.toShort() } ?: throw TLSException("Unknown server hello extension type: $code")
+    public companion object {
+        public fun byCode(code: Int): TLSExtensionType = values().find { it.code == code.toShort() }
+            ?: throw TLSException("Unknown server hello extension type: $code")
     }
 }
 

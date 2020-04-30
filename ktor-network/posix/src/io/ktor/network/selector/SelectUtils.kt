@@ -25,7 +25,7 @@ internal data class EventInfo(
     }
 }
 
-internal fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>) = memScoped {
+internal fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>): Unit = memScoped {
     val readSet = alloc<fd_set>()
     val writeSet = alloc<fd_set>()
     val errorSet = alloc<fd_set>()
@@ -109,13 +109,14 @@ internal fun processSelectedEvents(
         }
 
         if (select_fd_isset(event.descriptor, errorSet.ptr) != 0) {
+            println("error ${event.descriptor}")
             completed.add(event)
             event.continuation.resumeWithException(SocketError())
             continue
         }
         if (select_fd_isset(event.descriptor, set.ptr) != 0) {
+            println("resume ${event.descriptor}")
             completed.add(event)
-            debug("Event completed: ${event.interest}")
             event.continuation.resume(Unit)
             continue
         }

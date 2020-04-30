@@ -10,7 +10,7 @@ import io.ktor.network.util.*
  *
  * @param url: proxy url address.
  */
-actual class ProxyConfig(val url: Url) {
+public actual class ProxyConfig(public val url: Url) {
     override fun toString(): String = buildString {
         url.apply {
             append(protocol.name)
@@ -34,18 +34,18 @@ actual class ProxyConfig(val url: Url) {
  *
  * This operations can block.
  */
-actual fun ProxyConfig.resolveAddress(): NetworkAddress {
+public actual fun ProxyConfig.resolveAddress(): NetworkAddress {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 }
 
 /**
  * [ProxyConfig] factory.
  */
-actual object ProxyBuilder {
+public actual object ProxyBuilder {
     /**
      * Create http proxy from [url].
      */
-    actual fun http(url: Url): ProxyConfig {
+    public actual fun http(url: Url): ProxyConfig {
         require(url.protocol.name.equals(URLProtocol.HTTP.name, ignoreCase = true))
 
         return ProxyConfig(url)
@@ -54,7 +54,7 @@ actual object ProxyBuilder {
     /**
      * Create socks proxy from [host] and [port].
      */
-    actual fun socks(host: String, port: Int): ProxyConfig = ProxyConfig(URLBuilder().apply {
+    public actual fun socks(host: String, port: Int): ProxyConfig = ProxyConfig(URLBuilder().apply {
         protocol = URLProtocol.SOCKS
 
         this.host = host
@@ -65,7 +65,7 @@ actual object ProxyBuilder {
 /**
  * Type of configured proxy.
  */
-actual val ProxyConfig.type: ProxyType
+public actual val ProxyConfig.type: ProxyType
     get() = when (url.protocol) {
         URLProtocol.HTTP,
         URLProtocol.HTTPS -> ProxyType.HTTP

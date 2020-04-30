@@ -13,7 +13,7 @@ import kotlinx.coroutines.scheduling.*
  */
 @OptIn(InternalCoroutinesApi::class)
 @InternalAPI
-actual fun Dispatchers.clientDispatcher(
+public actual fun Dispatchers.clientDispatcher(
     threadCount: Int, dispatcherName: String
 ): CoroutineDispatcher = ExperimentalCoroutineDispatcher(threadCount, threadCount, dispatcherName)
 

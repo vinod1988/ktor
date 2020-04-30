@@ -106,10 +106,8 @@ class CacheTest : ClientLoader() {
 
     @Test
     fun testVary() = clientTests(listOf("Js")) {
-        var storage: HttpCache.Config? = null
         config {
             install(HttpCache) {
-                storage = this
             }
         }
 
