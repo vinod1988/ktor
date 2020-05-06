@@ -96,11 +96,9 @@ public class HttpCallValidator(
 
             scope.responsePipeline.intercept(BeforeReceive) { container ->
                 try {
-                    println("Validator with $container")
                     feature.validateResponse(context.response)
                     proceedWith(container)
                 } catch (cause: Throwable) {
-                    println("Validator with cause: $cause")
                     val unwrappedCause = cause.unwrapCancellationException()
                     feature.processException(unwrappedCause)
                     throw unwrappedCause

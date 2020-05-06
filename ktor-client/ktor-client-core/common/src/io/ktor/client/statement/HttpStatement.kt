@@ -72,7 +72,6 @@ public class HttpStatement(
         else -> {
             val response = executeUnsafe()
             try {
-                println("Start receive")
                 response.receive<T>()
             } finally {
                 response.complete()

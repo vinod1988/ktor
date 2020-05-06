@@ -44,6 +44,6 @@ internal class WorkerSelectorManager : SelectorManager {
 
     override fun close() {
         events.close()
-        selectorContext.worker.requestTermination(processScheduledJobs = true)
+        selectorContext.close()
     }
 }

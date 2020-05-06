@@ -22,27 +22,27 @@ public class HttpResponsePipeline : Pipeline<HttpResponseContainer, HttpClientCa
         /**
          * The earliest phase that happens before any other
          */
-        public val Receive = PipelinePhase("Receive")
+        public val Receive: PipelinePhase = PipelinePhase("Receive")
 
         /**
          * Decode response body
          */
-        public val Parse = PipelinePhase("Parse")
+        public val Parse: PipelinePhase = PipelinePhase("Parse")
 
         /**
          * Transform response body to expected format
          */
-        public val Transform = PipelinePhase("Transform")
+        public val Transform: PipelinePhase = PipelinePhase("Transform")
 
         /**
          * Use this phase to store request shared state
          */
-        public val State = PipelinePhase("State")
+        public val State: PipelinePhase = PipelinePhase("State")
 
         /**
          * Latest response pipeline phase
          */
-        public val After = PipelinePhase("After")
+        public val After: PipelinePhase = PipelinePhase("After")
     }
 }
 
@@ -58,17 +58,17 @@ public class HttpReceivePipeline : Pipeline<HttpResponse, HttpClientCall>(
         /**
          * The earliest phase that happens before any other
          */
-        public val Before = PipelinePhase("Before")
+        public val Before: PipelinePhase = PipelinePhase("Before")
 
         /**
          * Use this phase to store request shared state
          */
-        public val State = PipelinePhase("State")
+        public val State: PipelinePhase = PipelinePhase("State")
 
         /**
          * Latest response pipeline phase
          */
-        public val After = PipelinePhase("After")
+        public val After: PipelinePhase = PipelinePhase("After")
     }
 }
 

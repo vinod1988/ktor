@@ -5,25 +5,12 @@ package io.ktor.network.selector
 
 import io.ktor.network.interop.*
 import io.ktor.network.util.*
-import io.ktor.util.*
 import io.ktor.util.collections.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import platform.posix.*
-import kotlin.coroutines.*
 import kotlin.math.*
 import kotlin.native.concurrent.*
-import io.ktor.util.debug.*
-
-internal data class EventInfo(
-    val descriptor: Int,
-    val interest: SelectInterest,
-    val continuation: Continuation<Unit>
-) {
-    init {
-        makeShared()
-    }
-}
 
 internal fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>): Unit = memScoped {
     val readSet = alloc<fd_set>()
@@ -39,7 +26,7 @@ internal fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>): Unit = memS
             continue
         }
 
-        pselect(maxDescriptor + 1, readSet.ptr, writeSet.ptr, errorSet.ptr, cValue { tv_nsec = 100000 }, null)
+        val count = pselect(maxDescriptor + 1, readSet.ptr, writeSet.ptr, errorSet.ptr, null, /*cValue { tv_nsec = 100000 }*/ null)
             .check()
 
         processSelectedEvents(watchSet, completed, readSet, writeSet, errorSet)
@@ -47,12 +34,11 @@ internal fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>): Unit = memS
 
     val exception = CancellationException("Selector closed").freeze()
     while (!eventQueue.isEmpty) {
-        val continuation = eventQueue.removeFirstOrNull()?.continuation
-        continuation?.resumeWithException(exception)
+        eventQueue.removeFirstOrNull()?.fail(exception)
     }
 
     for (item in watchSet) {
-        item.continuation.resumeWithException(exception)
+        item.fail(exception)
     }
 }
 
@@ -87,6 +73,9 @@ internal fun fillHandlers(
 
         select_fd_add(event.descriptor, set.ptr)
         select_fd_add(event.descriptor, errorSet.ptr)
+
+        check(select_fd_isset(event.descriptor, set.ptr) != 0)
+        check(select_fd_isset(event.descriptor, errorSet.ptr) != 0)
         maxDescriptor = max(maxDescriptor, event.descriptor)
     }
 
@@ -109,15 +98,13 @@ internal fun processSelectedEvents(
         }
 
         if (select_fd_isset(event.descriptor, errorSet.ptr) != 0) {
-            println("error ${event.descriptor}")
             completed.add(event)
-            event.continuation.resumeWithException(SocketError())
+            event.fail(SocketError())
             continue
         }
         if (select_fd_isset(event.descriptor, set.ptr) != 0) {
-            println("resume ${event.descriptor}")
             completed.add(event)
-            event.continuation.resume(Unit)
+            event.complete()
             continue
         }
     }

@@ -9,8 +9,8 @@ package io.ktor.network.tls.extensions
  * @property code curve numeric code
  * @property fieldSize curve size in bits, affects key and signature size, performance and security strength
  */
-@Suppress("KDocMissingDocumentation", "EnumEntryName")
-enum class NamedCurve(val code: Short, val fieldSize: Int) {
+@Suppress("KDocMissingDocumentation", "EnumEntryName", "NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING")
+public enum class NamedCurve(public val code: Short, public val fieldSize: Int) {
     sect163k1(1, fieldSize = 163),
     sect163r1(2, fieldSize = 163),
     sect163r2(3, fieldSize = 163),
@@ -49,7 +49,7 @@ enum class NamedCurve(val code: Short, val fieldSize: Int) {
 /**
  * List of supported named curves
  */
-val SupportedNamedCurves: List<NamedCurve> = listOf(
+public val SupportedNamedCurves: List<NamedCurve> = listOf(
     NamedCurve.secp256r1,
     NamedCurve.secp384r1
 )

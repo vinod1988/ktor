@@ -15,13 +15,13 @@ import io.ktor.utils.io.core.*
  * @property data - a frame content or fragment content
  * @property disposableHandle could be invoked when the frame is processed
  */
-expect sealed class Frame private constructor(
+public expect sealed class Frame private constructor(
     fin: Boolean,
     frameType: FrameType,
     data: ByteArray,
     disposableHandle: DisposableHandle = NonDisposableHandle
 ) {
-    val fin: Boolean
+    public val fin: Boolean
     val frameType: FrameType
     val data: ByteArray
     val disposableHandle: DisposableHandle

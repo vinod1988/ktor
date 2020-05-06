@@ -61,12 +61,8 @@ internal class TCPSocketNative(
                     result.convert()
                 }
 
-                println("Read count: $count")
-
                 if (count == 0 && !channel.isClosedForWrite) {
-                    println("Select read: $selectable")
                     selector.select(selectable, SelectInterest.READ)
-                    println("Selected")
                 }
 
                 written(count)
@@ -75,7 +71,6 @@ internal class TCPSocketNative(
         }
     }.apply {
         invokeOnCompletion {
-            println("Shutdown read $descriptor")
             shutdown(descriptor, SHUT_RD)
         }
     }
@@ -89,7 +84,7 @@ internal class TCPSocketNative(
                     buffer = request() ?: error("Internal error; Can't request buffer.")
                 }
 
-                val count = buffer.readDirect {
+                buffer.readDirect {
                     val result = send(descriptor, it, buffer.readRemaining.convert(), 0).toInt()
 
                     if (result == -1) {
@@ -110,7 +105,6 @@ internal class TCPSocketNative(
         }
     }.apply {
         invokeOnCompletion {
-            println("Shutdown write $descriptor")
             shutdown(descriptor, SHUT_WR)
         }
     }
@@ -118,7 +112,6 @@ internal class TCPSocketNative(
     override fun close() {
         _context.complete()
         _context.invokeOnCompletion {
-            println("Close $descriptor")
             shutdown(descriptor, SHUT_RDWR)
             close(descriptor)
         }

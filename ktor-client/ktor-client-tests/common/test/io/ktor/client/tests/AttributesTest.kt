@@ -21,22 +21,18 @@ class AttributesTest : ClientLoader() {
                     val attr = it.call.request.attributes[attrKey]
 
                     assertEquals("test-data", attr)
-                    println("After")
                 }
             }
         }
 
         test { client ->
-            println("Start")
             val response = client.get<String>("$TEST_SERVER/content/hello") {
-                println("Set attributes")
                 setAttributes {
                     put(attrKey, "test-data")
                 }
             }
 
             assertEquals("hello", response)
-            println("DONE")
         }
     }
 }

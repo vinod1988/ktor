@@ -139,13 +139,11 @@ public class HttpPlainText internal constructor(
             }
 
             scope.responsePipeline.intercept(HttpResponsePipeline.Parse) { (info, body) ->
-                println("Plain text for response")
                 if (info.type != String::class || body !is ByteReadChannel) return@intercept
 
-                println("Read string")
-                val bodyBytes = body.readRemaining()
+                val contentLength = context.response.contentLength() ?: Long.MAX_VALUE
+                val bodyBytes = body.readRemaining(contentLength)
                 val content = feature.read(context, bodyBytes)
-                println("Read string done: $content")
                 proceedWith(HttpResponseContainer(info, content))
             }
         }
@@ -158,10 +156,7 @@ public class HttpPlainText internal constructor(
 
     internal fun read(call: HttpClientCall, body: Input): String {
         val actualCharset = call.response.charset() ?: responseCharsetFallback
-        println("Reading text")
-        return body.readText(charset = actualCharset).apply {
-            println("read done: $this")
-        }
+        return body.readText(charset = actualCharset)
     }
 
     internal fun addCharsetHeaders(context: HttpRequestBuilder) {

@@ -45,13 +45,7 @@ class HttpTimeoutTest : ClientLoader() {
             }
 
             val job = requestBuilder.executionContext
-            job.invokeOnCompletion {
-                println("Here")
-            }
 
-            job.invokeOnCompletion(onCancelling = true) {
-                println("Here")
-            }
             assertTrue { job.isActive }
 
             assertFails { client.request<String>(requestBuilder) }
