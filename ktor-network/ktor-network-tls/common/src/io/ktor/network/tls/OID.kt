@@ -38,7 +38,7 @@ public data class OID(public val identifier: String) {
         /**
          * EC curves
          */
-        public val secp256r1 = OID("1.2.840.10045.3.1.7")
+        public val secp256r1: OID = OID("1.2.840.10045.3.1.7")
 
         public fun fromAlgorithm(algorithm: String): OID = when (algorithm) {
             "SHA1withRSA" -> RSAwithSHA1Encryption

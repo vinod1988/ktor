@@ -11,6 +11,10 @@ import kotlin.jvm.*
  * Represents an execution pipeline for asynchronous extensible computations
  */
 public open class Pipeline<TSubject : Any, TContext : Any>(vararg phases: PipelinePhase) {
+
+    init {
+        preventFreeze()
+    }
     /**
      * Provides common place to store pipeline attributes
      */

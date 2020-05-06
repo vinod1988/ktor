@@ -70,6 +70,10 @@ private class SuspendFunctionGun<TSubject : Any, TContext : Any>(
     private val blocks: List<PipelineInterceptor<TSubject, TContext>>
 ) : PipelineContext<TSubject, TContext>, @Suppress("DEPRECATION") PipelineExecutor<TSubject>, CoroutineScope {
 
+    init {
+        preventFreeze()
+    }
+
     override val coroutineContext: CoroutineContext get() = continuation.context
 
     // Stack-walking state

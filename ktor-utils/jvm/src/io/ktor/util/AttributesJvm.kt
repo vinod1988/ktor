@@ -9,7 +9,7 @@ import java.util.concurrent.*
 /**
  * Create JVM specific attributes instance.
  */
-actual fun Attributes(concurrent: Boolean): Attributes =
+public actual fun Attributes(concurrent: Boolean): Attributes =
     if (concurrent) ConcurrentSafeAttributes() else HashMapAttributes()
 
 private abstract class AttributesJvmBase : Attributes {

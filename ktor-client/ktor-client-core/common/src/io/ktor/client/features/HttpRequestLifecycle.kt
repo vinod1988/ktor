@@ -52,6 +52,8 @@ private fun attachToClientEngineJob(
     requestJob: CompletableJob,
     clientEngineJob: Job
 ) {
+    clientEngineJob.makeShared()
+
     val handler = clientEngineJob.invokeOnCompletion { cause ->
         if (cause != null) {
             requestJob.cancel("Engine failed", cause)

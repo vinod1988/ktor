@@ -8,6 +8,7 @@ import io.ktor.client.engine.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.util.*
+import io.ktor.utils.io.concurrent.*
 import kotlinx.coroutines.*
 
 /**
@@ -16,16 +17,20 @@ import kotlinx.coroutines.*
 public class MockEngine(override val config: MockEngineConfig) : HttpClientEngineBase("ktor-mock") {
     override val dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
     override val supportedCapabilities: Set<HttpTimeout.Feature> = setOf(HttpTimeout)
-    private var invocationCount = 0
     private val mutex = Lock()
+    private val contextState: CompletableJob = Job()
+
     private val _requestsHistory: MutableList<HttpRequestData> = mutableListOf()
     private val _responseHistory: MutableList<HttpResponseData> = mutableListOf()
-    private val contextState: CompletableJob = Job()
+
+    private var invocationCount: Int by shared(0)
 
     init {
         check(config.requestHandlers.size > 0) {
             "No request handler provided in [MockEngineConfig], please provide at least one."
         }
+
+        makeShared()
     }
 
     /**

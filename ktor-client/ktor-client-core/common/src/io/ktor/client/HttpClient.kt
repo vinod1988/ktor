@@ -10,7 +10,6 @@ import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.util.*
-import io.ktor.util.debug.*
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.*
 import kotlinx.coroutines.*
@@ -23,7 +22,7 @@ import kotlin.coroutines.*
  * https://ktor.io/clients/http-client/engines.html
  */
 @HttpClientDsl
-expect fun HttpClient(
+public expect fun HttpClient(
     block: HttpClientConfig<*>.() -> Unit = {}
 ): HttpClient
 
@@ -32,7 +31,7 @@ expect fun HttpClient(
  * and an optional [block] for configuring this client.
  */
 @HttpClientDsl
-fun <T : HttpClientEngineConfig> HttpClient(
+public fun <T : HttpClientEngineConfig> HttpClient(
     engineFactory: HttpClientEngineFactory<T>,
     block: HttpClientConfig<T>.() -> Unit = {}
 ): HttpClient {
@@ -54,7 +53,7 @@ fun <T : HttpClientEngineConfig> HttpClient(
  * and a [block] for configuring this client.
  */
 @HttpClientDsl
-fun HttpClient(
+public fun HttpClient(
     engine: HttpClientEngine,
     block: HttpClientConfig<*>.() -> Unit
 ): HttpClient = HttpClient(engine, HttpClientConfig<HttpClientEngineConfig>().apply(block), manageEngine = false)
@@ -66,8 +65,8 @@ fun HttpClient(
  * @property engine: [HttpClientEngine] for executing requests.
  */
 @OptIn(InternalCoroutinesApi::class)
-class HttpClient(
-    val engine: HttpClientEngine,
+public class HttpClient(
+    public val engine: HttpClientEngine,
     private val userConfig: HttpClientConfig<out HttpClientEngineConfig> = HttpClientConfig()
 ) : CoroutineScope, Closeable {
     private var manageEngine: Boolean = false
@@ -89,43 +88,32 @@ class HttpClient(
     /**
      * Pipeline used for processing all the requests sent by this client.
      */
-    val requestPipeline: HttpRequestPipeline = HttpRequestPipeline()
+    public val requestPipeline: HttpRequestPipeline = HttpRequestPipeline()
 
     /**
      * Pipeline used for processing all the responses sent by the server.
      */
-    val responsePipeline: HttpResponsePipeline = HttpResponsePipeline()
+    public val responsePipeline: HttpResponsePipeline = HttpResponsePipeline()
 
     /**
      * Pipeline used for sending the request.
      */
-    val sendPipeline: HttpSendPipeline = HttpSendPipeline()
+    public val sendPipeline: HttpSendPipeline = HttpSendPipeline()
 
     /**
      * Pipeline used for receiving request.
      */
-    val receivePipeline: HttpReceivePipeline = HttpReceivePipeline()
+    public val receivePipeline: HttpReceivePipeline = HttpReceivePipeline()
 
     /**
      * Typed attributes used as a lightweight container for this client.
      */
-    val attributes: Attributes = Attributes(concurrent = true)
-
-    /**
-     * Dispatcher handles io operations.
-     */
-    @Deprecated(
-        "[dispatcher] is deprecated. Use coroutineContext instead.",
-        replaceWith = ReplaceWith("coroutineContext"),
-        level = DeprecationLevel.ERROR
-    )
-    val dispatcher: CoroutineDispatcher
-        get() = engine.dispatcher
+    public val attributes: Attributes = Attributes(concurrent = true)
 
     /**
      * Client engine config.
      */
-    val engineConfig: HttpClientEngineConfig = engine.config
+    public val engineConfig: HttpClientEngineConfig = engine.config
 
     internal val config = HttpClientConfig<HttpClientEngineConfig>()
 
@@ -163,36 +151,28 @@ class HttpClient(
             config += this
             config.install(this@HttpClient)
         }
+
+        coroutineContext.makeShared()
+        preventFreeze()
     }
 
     /**
      * Creates a new [HttpRequest] from a request [data] and a specific client [call].
      */
-
-    @Deprecated(
-        "Unbound [HttpClientCall] is deprecated. Consider using [request<HttpResponse>(builder)] instead.",
-        level = DeprecationLevel.ERROR,
-        replaceWith = ReplaceWith(
-            "this.request<HttpResponse>(builder)",
-            "io.ktor.client.statement.*"
-        )
-    )
-    @InternalAPI
-    suspend fun execute(builder: HttpRequestBuilder): HttpClientCall =
+    internal suspend fun execute(builder: HttpRequestBuilder): HttpClientCall =
         requestPipeline.execute(builder, builder.body) as HttpClientCall
 
     /**
      * Check if the specified [capability] is supported by this client.
      */
-    fun isSupported(capability: HttpClientEngineCapability<*>): Boolean {
-        return engine.supportedCapabilities.contains(capability)
-    }
+    public fun isSupported(capability: HttpClientEngineCapability<*>): Boolean =
+        engine.supportedCapabilities.contains(capability)
 
     /**
      * Returns a new [HttpClient] copying this client configuration,
      * and additionally configured by the [block] parameter.
      */
-    fun config(block: HttpClientConfig<*>.() -> Unit): HttpClient = HttpClient(
+    public fun config(block: HttpClientConfig<*>.() -> Unit): HttpClient = HttpClient(
         engine,
         HttpClientConfig<HttpClientEngineConfig>().apply {
             plusAssign(userConfig)

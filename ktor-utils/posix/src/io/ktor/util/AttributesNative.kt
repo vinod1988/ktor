@@ -9,7 +9,7 @@ import kotlin.native.concurrent.*
 /**
  * Create native specific attributes instance.
  */
-actual fun Attributes(concurrent: Boolean): Attributes = AttributesNative()
+public actual fun Attributes(concurrent: Boolean): Attributes = AttributesNative()
 
 private class AttributesNative : Attributes {
     private val map = mutableMapOf<AttributeKey<*>, Any?>()

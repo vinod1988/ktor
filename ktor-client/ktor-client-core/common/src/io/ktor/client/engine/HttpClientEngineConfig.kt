@@ -31,14 +31,4 @@ public open class HttpClientEngineConfig {
      */
     @KtorExperimentalAPI
     public var proxy: ProxyConfig? = null
-
-    @Deprecated(
-        "Response config is deprecated. See [HttpPlainText] feature for charset configuration",
-        level = DeprecationLevel.ERROR,
-        replaceWith = ReplaceWith("")
-    )
-    public val response: Nothing
-        get() = error(
-            "Unbound [HttpClientCall] is deprecated. Consider using [request<HttpResponse>(block)] in instead."
-        )
 }
