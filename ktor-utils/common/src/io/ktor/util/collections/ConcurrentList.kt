@@ -5,15 +5,15 @@
 package io.ktor.util.collections
 
 import io.ktor.util.*
+import io.ktor.util.collections.internal.*
 import io.ktor.utils.io.concurrent.*
-import kotlinx.atomicfu.*
 import kotlinx.atomicfu.locks.*
 
 private const val INITIAL_CAPACITY = 32
 
+@KtorExperimentalAPI
 public class ConcurrentList<T> : MutableList<T> {
-    private var capacity by shared(INITIAL_CAPACITY)
-    private var data: AtomicArray<T?> = atomicArrayOfNulls<T>(capacity)
+    private var data = SharedList<T>(INITIAL_CAPACITY)
 
     override var size: Int by shared(0)
         private set
@@ -33,12 +33,12 @@ public class ConcurrentList<T> : MutableList<T> {
             throw NoSuchElementException()
         }
 
-        return data[index].value!!
+        return data[index]!!
     }
 
     override fun indexOf(element: T): Int = synchronized(lock) {
         for (index in 0 until size) {
-            if (data[index].value == element) {
+            if (data[index] == element) {
                 return index
             }
         }
@@ -48,13 +48,10 @@ public class ConcurrentList<T> : MutableList<T> {
 
     override fun isEmpty(): Boolean = size == 0
 
-    override fun iterator(): MutableIterator<T> {
-        TODO("Not yet implemented")
-    }
 
     override fun lastIndexOf(element: T): Int = synchronized(lock) {
         for (index in size - 1 downTo 0) {
-            if (data[index].value == element) {
+            if (data[index] == element) {
                 return index
             }
         }
@@ -63,22 +60,29 @@ public class ConcurrentList<T> : MutableList<T> {
     }
 
     override fun add(element: T): Boolean = synchronized(lock) {
-        if (size >= capacity) {
+        if (size >= data.size) {
             increaseCapacity()
         }
 
-        data[size].value = element
+        data[size] = element
         size += 1
         return true
     }
 
-
     override fun add(index: Int, element: T) {
-        TODO("Not yet implemented")
+        reserve(index, 1)
+        data[index] = element
     }
 
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
-        // reserve(index, elements.size)
+        reserve(index, elements.size)
+
+        var current = index
+        for (item in elements) {
+            data[current] = item
+            current += 1
+        }
+
         return elements.isNotEmpty()
     }
 
@@ -88,9 +92,12 @@ public class ConcurrentList<T> : MutableList<T> {
     }
 
     override fun clear(): Unit = synchronized(lock) {
-        data = atomicArrayOfNulls(INITIAL_CAPACITY)
-        capacity = INITIAL_CAPACITY
+        data = SharedList(INITIAL_CAPACITY)
         size = 0
+    }
+
+    override fun iterator(): MutableIterator<T> {
+        TODO("Not yet implemented")
     }
 
     override fun listIterator(): MutableListIterator<T> {
@@ -98,6 +105,10 @@ public class ConcurrentList<T> : MutableList<T> {
     }
 
     override fun listIterator(index: Int): MutableListIterator<T> {
+        TODO("Not yet implemented")
+    }
+
+    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
         TODO("Not yet implemented")
     }
 
@@ -120,7 +131,9 @@ public class ConcurrentList<T> : MutableList<T> {
     override fun removeAt(index: Int): T = synchronized(lock) {
         checkIndex(index)
 
-        val old = data[index].getAndSet(null)
+        val old = data[index]
+        data[index] = null
+
         sweep(index)
         return old!!
     }
@@ -129,11 +142,11 @@ public class ConcurrentList<T> : MutableList<T> {
         var changed = false
         var firstNull = -1
         for (index in 0 until size) {
-            val item = data[index].value!!
+            val item = data[index]!!
 
             if (item !in elements) {
                 changed = true
-                data[index].value = null
+                data[index] = null
 
                 if (firstNull < 0) {
                     firstNull = index
@@ -150,45 +163,59 @@ public class ConcurrentList<T> : MutableList<T> {
 
     override fun set(index: Int, element: T): T = synchronized(lock) {
         checkIndex(index)
-        val old = data[index].getAndSet(element)
-        return old ?: element
-    }
+        val old = data[index]
+        data[index] = element
 
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
-        TODO("Not yet implemented")
+        return old ?: element
     }
 
     private fun checkIndex(index: Int) {
         if (index >= size || index < 0) throw IndexOutOfBoundsException()
     }
 
-    private fun increaseCapacity(targetCapacity: Int = capacity * 2) {
-        val newData = atomicArrayOfNulls<T>(targetCapacity)
+    private fun increaseCapacity(targetCapacity: Int = data.size * 2) {
+        val newData = SharedList<T>(targetCapacity)
         for (index in 0 until targetCapacity) {
-            newData[index].value = data[index].value
+            newData[index] = data[index]
         }
 
         data = newData
-        capacity = targetCapacity
     }
 
     private fun sweep(firstNull: Int) {
         var writePosition = firstNull
 
         for (index in writePosition + 1 until size) {
-            if (data[index].value == null) {
+            if (data[index] == null) {
                 continue
             }
 
-            data[writePosition].value = data[index].value
+            data[writePosition]= data[index]
             writePosition += 1
         }
 
         for (index in writePosition until size) {
-            data[index].value = null
+            data[index] = null
         }
 
         size = writePosition
+    }
+
+    private fun reserve(index: Int, gapSize: Int) {
+        if (gapSize + size >= data.size) {
+            increaseCapacity(gapSize + size)
+        }
+
+        var readPosition = size
+
+        while (readPosition >= index) {
+            data[readPosition + gapSize] = data[readPosition]
+            readPosition -= 1
+        }
+
+        for (current in index until index + gapSize) {
+            data[current] = null
+        }
     }
 }
 
