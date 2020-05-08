@@ -19,6 +19,7 @@ public expect val ProxyConfig.type: ProxyType
 /**
  * Types of proxy
  */
+@Suppress("NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING", "KDocMissingDocumentation")
 public enum class ProxyType {
     SOCKS,
     HTTP,

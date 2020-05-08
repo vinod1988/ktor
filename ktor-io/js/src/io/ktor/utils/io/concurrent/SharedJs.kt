@@ -29,3 +29,13 @@ public actual inline fun <T> shared(value: T): ReadWriteProperty<Any, T> = objec
         this.value = value
     }
 }
+
+/**
+ * Allow to create unsafe reference that will never freeze.
+ *
+ * This reference is allowed to use only from creation thread. Otherwise it will return null.
+ */
+@DangerousInternalIoApi
+public actual fun <T : Any> opaque(response: T): ReadOnlyProperty<Any, T?> = object : ReadOnlyProperty<Any, T?> {
+    override fun getValue(thisRef: Any, property: KProperty<*>): T? = response
+}

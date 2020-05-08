@@ -49,6 +49,10 @@ public abstract class HttpResponse : HttpMessage, CoroutineScope {
      */
     public abstract val content: ByteReadChannel
 
+    init {
+        preventFreeze()
+    }
+
     override fun toString(): String = "HttpResponse[${request.url}, $status]"
 }
 

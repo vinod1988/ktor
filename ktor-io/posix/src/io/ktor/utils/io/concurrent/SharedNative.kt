@@ -4,7 +4,10 @@
 
 package io.ktor.utils.io.concurrent
 
+import io.ktor.utils.io.core.internal.*
 import kotlinx.atomicfu.*
+import kotlinx.cinterop.*
+import kotlin.native.ThreadLocal
 import kotlin.native.concurrent.*
 import kotlin.properties.*
 import kotlin.reflect.*
@@ -18,7 +21,7 @@ import kotlin.reflect.*
  * ```
  */
 @Suppress("NOTHING_TO_INLINE")
-public actual inline fun <T> shared(value: T): ReadWriteProperty<Any, T> = object : ReadWriteProperty<Any, T> {
+actual inline fun <T> shared(value: T): ReadWriteProperty<Any, T> = object : ReadWriteProperty<Any, T> {
     private var reference = atomic(value)
 
     init {
@@ -32,4 +35,16 @@ public actual inline fun <T> shared(value: T): ReadWriteProperty<Any, T> = objec
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
         reference.value = value
     }
+}
+
+
+/**
+ * Allow to create unsafe reference that will never freeze.
+ *
+ * This reference is allowed to use only from creation thread. Otherwise it will return null.
+ */
+@DangerousInternalIoApi
+public actual fun <T : Any> opaque(response: T): ReadOnlyProperty<Any, T?> = object : ReadOnlyProperty<Any, T?> {
+    // TODO
+    override fun getValue(thisRef: Any, property: KProperty<*>): T? = null
 }

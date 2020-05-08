@@ -19,7 +19,7 @@ internal suspend fun ByteChannelSequentialBase.copyToSequentialImpl(dst: ByteCha
 
     var remainingLimit = limit
 
-    while (true) {
+    while (remainingLimit > 0) {
         if (!awaitInternalAtLeast1()) break
         val transferred = transferTo(dst, remainingLimit)
 

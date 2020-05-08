@@ -37,7 +37,7 @@ private val KnownPosixErrors = mapOf<Int, String>(
  * @property message error text
  */
 @ExperimentalIoApi
-public sealed class PosixException(val errno: Int, message: String) : Exception(message) {
+public sealed class PosixException(public val errno: Int, message: String) : Exception(message) {
     @ExperimentalIoApi
     public class BadFileDescriptorException(message: String) : PosixException(EBADF, message)
 

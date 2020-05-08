@@ -18,7 +18,7 @@ public open class Pipeline<TSubject : Any, TContext : Any>(vararg phases: Pipeli
     /**
      * Provides common place to store pipeline attributes
      */
-    public val attributes = Attributes(concurrent = true)
+    public val attributes: Attributes = Attributes(concurrent = true)
 
     public constructor(
         phase: PipelinePhase,

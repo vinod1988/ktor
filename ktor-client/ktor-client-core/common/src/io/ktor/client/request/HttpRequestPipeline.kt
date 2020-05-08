@@ -20,27 +20,27 @@ public class HttpRequestPipeline : Pipeline<Any, HttpRequestBuilder>(Before, Sta
         /**
          * The earliest phase that happens before any other
          */
-        public val Before = PipelinePhase("Before")
+        public val Before: PipelinePhase = PipelinePhase("Before")
 
         /**
          * Use this phase to modify request with shared state
          */
-        public val State = PipelinePhase("State")
+        public val State: PipelinePhase = PipelinePhase("State")
 
         /**
          * Transform request body to supported render format
          */
-        public val Transform = PipelinePhase("Transform")
+        public val Transform: PipelinePhase = PipelinePhase("Transform")
 
         /**
          * Encode request body to [OutgoingContent]
          */
-        public val Render = PipelinePhase("Render")
+        public val Render: PipelinePhase = PipelinePhase("Render")
 
         /**
          * Phase for [HttpSend] feature
          */
-        public val Send = PipelinePhase("Send")
+        public val Send: PipelinePhase = PipelinePhase("Send")
     }
 }
 
@@ -53,26 +53,26 @@ public class HttpSendPipeline : Pipeline<Any, HttpRequestBuilder>(Before, State,
         /**
          * The earliest phase that happens before any other.
          */
-        public val Before = PipelinePhase("Before")
+        public val Before: PipelinePhase = PipelinePhase("Before")
 
         /**
          * Use this phase to modify request with shared state.
          */
-        public val State = PipelinePhase("State")
+        public val State: PipelinePhase = PipelinePhase("State")
 
         /**
          * Use this phase for logging and other actions that don't modify request or shared data.
          */
-        public val Monitoring = PipelinePhase("Monitoring")
+        public val Monitoring: PipelinePhase = PipelinePhase("Monitoring")
 
         /**
          * Send request to remote server.
          */
-        public val Engine = PipelinePhase("Engine")
+        public val Engine: PipelinePhase = PipelinePhase("Engine")
 
         /**
          * Receive pipeline execution phase.
          */
-        public val Receive = PipelinePhase("Receive")
+        public val Receive: PipelinePhase = PipelinePhase("Receive")
     }
 }

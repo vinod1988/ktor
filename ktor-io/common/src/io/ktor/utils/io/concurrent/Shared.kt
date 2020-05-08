@@ -17,3 +17,13 @@ import kotlin.properties.*
  */
 @DangerousInternalIoApi
 public expect inline fun <T> shared(value: T): ReadWriteProperty<Any, T>
+
+
+/**
+ * Allow to create unsafe reference that will never freeze.
+ *
+ * This reference is allowed to use only from creation thread. Otherwise it will return null.
+ */
+@DangerousInternalIoApi
+public expect fun <T : Any> opaque(response: T): ReadOnlyProperty<Any, T?>
+

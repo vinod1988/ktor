@@ -8,6 +8,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.util.*
 import io.ktor.client.statement.*
+import io.ktor.utils.io.concurrent.*
 import kotlin.jvm.*
 import kotlin.native.concurrent.*
 
@@ -42,11 +43,13 @@ public fun HttpClientConfig<*>.addDefaultResponseValidation() {
 
 /**
  * Base for default response exceptions.
- * @param response: origin response
+ * @param [response]: origin response
  */
 public open class ResponseException(
-    @Transient public val response: HttpResponse
-) : IllegalStateException("Bad response: $response")
+    response: HttpResponse
+) : IllegalStateException("Bad response: $response") {
+    public val response: HttpResponse? by opaque(response)
+}
 
 /**
  * Unhandled redirect exception.

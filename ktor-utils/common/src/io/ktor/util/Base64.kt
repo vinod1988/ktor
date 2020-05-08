@@ -76,7 +76,7 @@ public fun String.decodeBase64Bytes(): ByteArray = buildPacket {
  * Decode [ByteReadPacket] from base64 format
  */
 @InternalAPI
-fun ByteReadPacket.decodeBase64Bytes(): Input = buildPacket {
+public fun ByteReadPacket.decodeBase64Bytes(): Input = buildPacket {
     val data = ByteArray(4)
 
     while (remaining > 0) {

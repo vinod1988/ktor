@@ -11,7 +11,7 @@ import utils.*
 import kotlin.native.concurrent.*
 
 @InternalAPI
-actual class Lock {
+public actual class Lock {
     private val mutex = nativeHeap.alloc<ktor_mutex_t>()
 
     init {
@@ -19,15 +19,15 @@ actual class Lock {
         ktor_mutex_create(mutex.ptr).checkResult { "Failed to create mutex." }
     }
 
-    actual fun lock() {
+    public actual fun lock() {
         ktor_mutex_lock(mutex.ptr).checkResult { "Failed to lock mutex." }
     }
 
-    actual fun unlock() {
+    public actual fun unlock() {
         ktor_mutex_unlock(mutex.ptr).checkResult { "Failed to unlock mutex." }
     }
 
-    actual fun close() {
+    public actual fun close() {
         ktor_mutex_destroy(mutex.ptr)
         nativeHeap.free(mutex)
     }
