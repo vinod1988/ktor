@@ -113,7 +113,7 @@ fun Output.append(csq: CharArray, start: Int = 0, end: Int = csq.size): Appendab
 }
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-fun Output.writeFully(src: ByteArray, offset: Int = 0, length: Int = src.size - offset) {
+public fun Output.writeFully(src: ByteArray, offset: Int = 0, length: Int = src.size - offset) {
     writeFullyBytesTemplate(offset, length) { buffer, currentOffset, count ->
         buffer.writeFully(src, currentOffset, count)
     }

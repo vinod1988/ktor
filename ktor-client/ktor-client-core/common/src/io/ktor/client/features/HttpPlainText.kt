@@ -141,8 +141,7 @@ public class HttpPlainText internal constructor(
             scope.responsePipeline.intercept(HttpResponsePipeline.Parse) { (info, body) ->
                 if (info.type != String::class || body !is ByteReadChannel) return@intercept
 
-                val contentLength = context.response.contentLength() ?: Long.MAX_VALUE
-                val bodyBytes = body.readRemaining(contentLength)
+                val bodyBytes = body.readRemaining()
                 val content = feature.read(context, bodyBytes)
                 proceedWith(HttpResponseContainer(info, content))
             }

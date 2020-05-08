@@ -128,9 +128,7 @@ internal suspend fun readResponse(
         }
         else -> {
             val httpBodyParser = GlobalScope.writer(Dispatchers.Unconfined, autoFlush = true) {
-                println("Start parsing $contentLength")
                 parseHttpBody(contentLength, transferEncoding, connectionType, input, channel)
-                println("Parser done")
             }
 
             httpBodyParser.channel

@@ -5,7 +5,6 @@ package io.ktor.network.selector
 
 import io.ktor.util.*
 import io.ktor.util.collections.*
-import io.ktor.util.debug.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 
