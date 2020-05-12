@@ -207,4 +207,6 @@ private class MapItem<Key, Value>(override val key: Key, value: Value) : Mutable
         value = newValue
         return result
     }
+
+    override fun toString(): String = "MapItem[$key, $value]"
 }

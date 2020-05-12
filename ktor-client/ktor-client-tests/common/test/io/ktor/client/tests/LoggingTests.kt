@@ -40,7 +40,7 @@ class LoggingTest : ClientLoader() {
     }
 
     @Test
-    fun testLoggingLevelBody() = clientTests {
+    fun testLoggingLevelBody() = clientTests(listOf("Curl", "CIO")) {
         val logger = TestLogger(
             "REQUEST: http://localhost:8080/logging/",
             "METHOD: HttpMethod(value=GET)",
@@ -60,7 +60,7 @@ class LoggingTest : ClientLoader() {
     }
 
     @Test
-    fun testLogLevelAll() = clientTests {
+    fun testLogLevelAll() = clientTests(listOf("Curl", "CIO")) {
         val logger = TestLogger(
             "REQUEST: http://localhost:8080/logging/",
             "METHOD: HttpMethod(value=GET)",
@@ -182,7 +182,7 @@ class LoggingTest : ClientLoader() {
     }
 
     @Test
-    fun logRedirectTest() = clientTests(listOf("js")) {
+    fun logRedirectTest() = clientTests(listOf("js", "Curl", "CIO")) {
         val testLogger = TestLogger(
             "REQUEST: http://127.0.0.1:8080/logging/301",
             "METHOD: HttpMethod(value=GET)",

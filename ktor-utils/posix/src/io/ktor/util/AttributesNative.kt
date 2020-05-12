@@ -4,8 +4,6 @@
 
 package io.ktor.util
 
-import kotlin.native.concurrent.*
-
 /**
  * Create native specific attributes instance.
  */
@@ -13,6 +11,10 @@ public actual fun Attributes(concurrent: Boolean): Attributes = AttributesNative
 
 private class AttributesNative : Attributes {
     private val map = mutableMapOf<AttributeKey<*>, Any?>()
+
+    init {
+        preventFreeze()
+    }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> getOrNull(key: AttributeKey<T>): T? = map[key] as T?

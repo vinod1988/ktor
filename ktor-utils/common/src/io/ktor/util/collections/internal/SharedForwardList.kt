@@ -9,7 +9,7 @@ import io.ktor.utils.io.concurrent.*
 import kotlinx.atomicfu.*
 
 internal class SharedForwardList<T : Any> : MutableIterable<T> {
-    private val head: AtomicRef<ListItem?> = atomic(null)
+    private val head: AtomicRef<ListItem<T>?> = atomic(null)
 
     init {
         makeShared()
@@ -27,8 +27,8 @@ internal class SharedForwardList<T : Any> : MutableIterable<T> {
         ForwardListIterator(head.value)
 }
 
-private class ForwardListIterator<T>(value: ListItem?) : MutableIterator<T> {
-    var last by shared<ListItem?>(null)
+private class ForwardListIterator<T>(value: ListItem<T>?) : MutableIterator<T> {
+    var last by shared<ListItem<T>?>(null)
     var current by shared(value)
 
     init {
@@ -42,7 +42,7 @@ private class ForwardListIterator<T>(value: ListItem?) : MutableIterator<T> {
         current = current?.next
         skipRemoved()
 
-        return last!!.item as T
+        return last?.item!!
     }
 
     override fun remove() {
@@ -57,9 +57,9 @@ private class ForwardListIterator<T>(value: ListItem?) : MutableIterator<T> {
     }
 }
 
-private class ListItem(
-    val next: ListItem?,
-    val item: Any?
+private class ListItem<T>(
+    val next: ListItem<T>?,
+    val item: T?
 ) {
     var removed by shared(false)
 

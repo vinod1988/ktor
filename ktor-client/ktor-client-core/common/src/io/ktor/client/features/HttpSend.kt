@@ -9,6 +9,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.content.*
 import io.ktor.util.*
+import io.ktor.util.collections.*
 import kotlinx.coroutines.*
 
 /**
@@ -41,6 +42,10 @@ public class HttpSend(
     public var maxSendCount: Int = 20
 ) {
     private val interceptors: MutableList<HttpSendInterceptor> = mutableListOf()
+
+    init {
+        preventFreeze()
+    }
 
     /**
      * Install send pipeline starter interceptor

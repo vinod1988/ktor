@@ -41,7 +41,7 @@ class FeaturesTest : ClientLoader() {
     }
 
     @Test
-    fun testBodyObserver() = clientTests {
+    fun testBodyObserver() = clientTests(listOf("CIO")) {
         val body = "Hello, world"
         val task = Job()
         config {

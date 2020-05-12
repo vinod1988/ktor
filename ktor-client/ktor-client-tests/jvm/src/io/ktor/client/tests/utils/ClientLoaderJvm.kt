@@ -20,10 +20,10 @@ import java.util.*
 public actual abstract class ClientLoader {
 
     @Parameterized.Parameter
-    lateinit var engine: HttpClientEngineContainer
+    public lateinit var engine: HttpClientEngineContainer
 
     @get:Rule
-    open val timeout = CoroutinesTimeout.seconds(60)
+    public open val timeout: CoroutinesTimeout = CoroutinesTimeout.seconds(60)
 
     /**
      * Perform test against all clients from dependencies.
