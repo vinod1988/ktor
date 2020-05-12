@@ -66,4 +66,21 @@ class WebSocketTest : ClientLoader() {
             }
         }
     }
+
+    @Test
+    fun testEchoWSS() = clientTests(listOf("Apache", "Android", "Js", "iOS")) {
+        config {
+            install(WebSockets)
+        }
+
+        test { client ->
+            client.webSocket("wss://echo.websocket.org") {
+                outgoing.send(Frame.Text("PING"))
+                val frame = incoming.receive()
+                if (frame is Frame.Text) {
+                    assertEquals("PING", frame.readText())
+                }
+            }
+        }
+    }
 }
