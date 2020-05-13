@@ -13,6 +13,7 @@ import io.ktor.http.*
 import kotlin.test.*
 
 class CallValidatorTest {
+
     @Test
     fun testAllExceptionHandlers() = testWithEngine(MockEngine) {
         var firstHandler = 0

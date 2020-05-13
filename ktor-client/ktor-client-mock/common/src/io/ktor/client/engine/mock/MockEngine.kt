@@ -30,8 +30,6 @@ public class MockEngine(override val config: MockEngineConfig) : HttpClientEngin
         check(config.requestHandlers.size > 0) {
             "No request handler provided in [MockEngineConfig], please provide at least one."
         }
-
-        makeShared()
     }
 
     /**
