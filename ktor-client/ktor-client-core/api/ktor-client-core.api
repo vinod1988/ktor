@@ -3,10 +3,8 @@ public final class io/ktor/client/HttpClient : java/io/Closeable, kotlinx/corout
 	public synthetic fun <init> (Lio/ktor/client/engine/HttpClientEngine;Lio/ktor/client/HttpClientConfig;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun close ()V
 	public final fun config (Lkotlin/jvm/functions/Function1;)Lio/ktor/client/HttpClient;
-	public final fun execute (Lio/ktor/client/request/HttpRequestBuilder;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAttributes ()Lio/ktor/util/Attributes;
 	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
-	public final fun getDispatcher ()Lkotlinx/coroutines/CoroutineDispatcher;
 	public final fun getEngine ()Lio/ktor/client/engine/HttpClientEngine;
 	public final fun getEngineConfig ()Lio/ktor/client/engine/HttpClientEngineConfig;
 	public final fun getReceivePipeline ()Lio/ktor/client/statement/HttpReceivePipeline;
@@ -201,7 +199,6 @@ public class io/ktor/client/engine/HttpClientEngineConfig {
 	public fun <init> ()V
 	public final fun getPipelining ()Z
 	public final fun getProxy ()Ljava/net/Proxy;
-	public final fun getResponse ()Ljava/lang/Void;
 	public final fun getThreadsCount ()I
 	public final fun setPipelining (Z)V
 	public final fun setProxy (Ljava/net/Proxy;)V

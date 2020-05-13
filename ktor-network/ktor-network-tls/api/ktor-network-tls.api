@@ -107,7 +107,6 @@ public final class io/ktor/network/tls/OIDKt {
 public final class io/ktor/network/tls/SecretExchangeType : java/lang/Enum {
 	public static final field ECDHE Lio/ktor/network/tls/SecretExchangeType;
 	public static final field RSA Lio/ktor/network/tls/SecretExchangeType;
-	public final fun getJvmName ()Ljava/lang/String;
 	public static fun valueOf (Ljava/lang/String;)Lio/ktor/network/tls/SecretExchangeType;
 	public static fun values ()[Lio/ktor/network/tls/SecretExchangeType;
 }
