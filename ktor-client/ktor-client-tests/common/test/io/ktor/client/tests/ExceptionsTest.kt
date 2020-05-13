@@ -28,6 +28,7 @@ class ExceptionsTest {
         try {
             client.get<String>("www.google.com")
         } catch (exception: ResponseException) {
+            println("Exception: $exception")
             val text = exception.response?.readText()
             assertEquals(HttpStatusCode.BadRequest.description, text)
         }

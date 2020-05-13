@@ -20,10 +20,9 @@ public expect inline fun <T> shared(value: T): ReadWriteProperty<Any, T>
 
 
 /**
- * Allow to create unsafe reference that will never freeze.
+ * Allow to create thread local reference without freezing.
  *
- * This reference is allowed to use only from creation thread. Otherwise it will return null.
+ * It will have value in creation thread and null otherwise.
  */
 @DangerousInternalIoApi
-public expect fun <T : Any> opaque(response: T): ReadOnlyProperty<Any, T?>
-
+public expect fun <T : Any> threadLocal(value: T): ReadOnlyProperty<Any, T?>

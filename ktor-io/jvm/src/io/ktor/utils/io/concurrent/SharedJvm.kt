@@ -36,6 +36,6 @@ public actual inline fun <T> shared(value: T): ReadWriteProperty<Any, T> = objec
  * This reference is allowed to use only from creation thread. Otherwise it will return null.
  */
 @DangerousInternalIoApi
-public actual fun <T : Any> opaque(response: T): ReadOnlyProperty<Any, T?> = object : ReadOnlyProperty<Any, T?> {
-    override fun getValue(thisRef: Any, property: KProperty<*>): T? = response
+public actual fun <T : Any> threadLocal(value: T): ReadOnlyProperty<Any, T?> = object : ReadOnlyProperty<Any, T?> {
+    override fun getValue(thisRef: Any, property: KProperty<*>): T? = value
 }

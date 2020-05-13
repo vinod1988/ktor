@@ -9,7 +9,6 @@ import io.ktor.client.call.*
 import io.ktor.util.*
 import io.ktor.client.statement.*
 import io.ktor.utils.io.concurrent.*
-import kotlin.jvm.*
 import kotlin.native.concurrent.*
 
 @SharedImmutable
@@ -48,7 +47,7 @@ public fun HttpClientConfig<*>.addDefaultResponseValidation() {
 public open class ResponseException(
     response: HttpResponse
 ) : IllegalStateException("Bad response: $response") {
-    public val response: HttpResponse? by opaque(response)
+    public val response: HttpResponse? by threadLocal(response)
 }
 
 /**

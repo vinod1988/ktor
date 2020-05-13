@@ -13,7 +13,6 @@ import kotlin.test.*
 
 class JsonTest : ClientLoader() {
 
-
     @Serializable
     data class User(val name: String)
 

@@ -6,8 +6,6 @@ package io.ktor.utils.io.concurrent
 
 import io.ktor.utils.io.core.internal.*
 import kotlinx.atomicfu.*
-import kotlinx.cinterop.*
-import kotlin.native.ThreadLocal
 import kotlin.native.concurrent.*
 import kotlin.properties.*
 import kotlin.reflect.*
@@ -21,7 +19,7 @@ import kotlin.reflect.*
  * ```
  */
 @Suppress("NOTHING_TO_INLINE")
-actual inline fun <T> shared(value: T): ReadWriteProperty<Any, T> = object : ReadWriteProperty<Any, T> {
+public actual inline fun <T> shared(value: T): ReadWriteProperty<Any, T> = object : ReadWriteProperty<Any, T> {
     private var reference = atomic(value)
 
     init {
@@ -44,7 +42,14 @@ actual inline fun <T> shared(value: T): ReadWriteProperty<Any, T> = object : Rea
  * This reference is allowed to use only from creation thread. Otherwise it will return null.
  */
 @DangerousInternalIoApi
-public actual fun <T : Any> opaque(response: T): ReadOnlyProperty<Any, T?> = object : ReadOnlyProperty<Any, T?> {
-    // TODO
-    override fun getValue(thisRef: Any, property: KProperty<*>): T? = null
+public actual fun <T : Any> threadLocal(value: T): ReadOnlyProperty<Any, T?> {
+    val threadLocal = ThreadLocalValue(value)
+
+    return object : ReadOnlyProperty<Any, T?> {
+        init {
+            freeze()
+        }
+
+        override fun getValue(thisRef: Any, property: KProperty<*>): T? = threadLocal.value
+    }
 }

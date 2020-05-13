@@ -8,7 +8,6 @@ import io.ktor.client.engine.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.util.*
-import io.ktor.util.collections.*
 import io.ktor.utils.io.concurrent.*
 import kotlinx.coroutines.*
 
@@ -21,8 +20,8 @@ public class MockEngine(override val config: MockEngineConfig) : HttpClientEngin
     private val mutex = Lock()
     private val contextState: CompletableJob = Job()
 
-    private val _requestsHistory: MutableList<HttpRequestData> = ConcurrentList()
-    private val _responseHistory: MutableList<HttpResponseData> = ConcurrentList()
+//    private val _requestsHistory: MutableList<HttpRequestData> = ConcurrentList()
+    // private val _responseHistory: MutableList<HttpResponseData> = mutableListOf()
 
     private var invocationCount: Int by shared(0)
 
@@ -35,12 +34,14 @@ public class MockEngine(override val config: MockEngineConfig) : HttpClientEngin
     /**
      * History of executed requests.
      */
-    public val requestHistory: List<HttpRequestData> get() = _requestsHistory
+//    public val requestHistory: List<HttpRequestData> get() = _requestsHistory
 
     /**
      * History of sent responses.
      */
-    public val responseHistory: List<HttpResponseData> get() = _responseHistory
+    /**
+     * public val responseHistory: List<HttpResponseData> get() = _responseHistory
+     */
 
     override suspend fun execute(data: HttpRequestData): HttpResponseData {
         val callContext = callContext()
@@ -60,8 +61,8 @@ public class MockEngine(override val config: MockEngineConfig) : HttpClientEngin
         val response = handler(MockRequestHandleScope(callContext), data)
 
         mutex.withLock {
-            _requestsHistory.add(data)
-            _responseHistory.add(response)
+//            _requestsHistory.add(data)
+//            _responseHistory.add(response)
         }
 
         return response
