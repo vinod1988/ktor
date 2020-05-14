@@ -460,13 +460,6 @@ public final class io/ktor/util/cio/ReadersKt {
 	public static final fun use (Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;)V
 }
 
-public final class io/ktor/util/cio/Semaphore {
-	public fun <init> (I)V
-	public final fun enter (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getLimit ()I
-	public final fun leave ()V
-}
-
 public final class io/ktor/util/collections/ConcurrentList : java/util/List, kotlin/jvm/internal/markers/KMutableList {
 	public fun <init> ()V
 	public fun add (ILjava/lang/Object;)V
