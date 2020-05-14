@@ -34,9 +34,7 @@ public actual class ProxyConfig(public val url: Url) {
  *
  * This operations can block.
  */
-public actual fun ProxyConfig.resolveAddress(): NetworkAddress {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
+public actual fun ProxyConfig.resolveAddress(): NetworkAddress = NetworkAddress(url.host, url.port)
 
 /**
  * [ProxyConfig] factory.
