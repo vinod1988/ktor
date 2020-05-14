@@ -36,6 +36,7 @@ private val VALID_PATH_PART = listOf(
     '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=',
     '-', '.', '_', '~'
 )
+
 /**
  * Oauth specific percent encoding
  * https://tools.ietf.org/html/rfc5849#section-3.6
@@ -113,7 +114,7 @@ fun String.encodeURLParameter(
     val content = Charsets.UTF_8.newEncoder().encode(this@encodeURLParameter)
     content.forEach {
         when {
-            it in URL_ALPHABET || it in OAUTH_SYMBOLS -> append(it.toChar())
+            it in URL_ALPHABET || it in OAUTH_SYMBOLS || it == '?'.toByte() -> append(it.toChar())
             spaceToPlus && it == ' '.toByte() -> append('+')
             else -> append(it.percentEncode())
         }
@@ -222,7 +223,7 @@ private fun CharSequence.decodeImpl(
  */
 class URLDecodeException(message: String) : Exception(message)
 
-private fun Byte.percentEncode(): String= buildString(3) {
+private fun Byte.percentEncode(): String = buildString(3) {
     val code = toInt() and 0xff
     append('%')
     append(hexDigitToChar(code shr 4))

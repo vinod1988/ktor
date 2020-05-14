@@ -44,8 +44,7 @@ fun List<Pair<String, String?>>.formUrlEncodeTo(out: Appendable) {
         val key = it.first.encodeURLParameter(spaceToPlus = true)
         if (it.second == null) {
             key
-        }
-        else {
+        } else {
             val value = it.second.toString().encodeURLParameter(spaceToPlus = true)
             "$key=$value"
         }

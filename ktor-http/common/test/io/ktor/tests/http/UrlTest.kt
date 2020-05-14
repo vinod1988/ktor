@@ -143,7 +143,13 @@ class UrlTest {
     @Test
     fun testPortRange() {
         fun testPort(n: Int) {
-            assertEquals(n, Url(URLProtocol.HTTP, "localhost", n, "/", parametersOf(), "", null, null, false).specifiedPort)
+            val url = Url(
+                URLProtocol.HTTP, "localhost", n,
+                "/", parametersOf(), "",
+                null, null, false
+            )
+
+            assertEquals(n, url.specifiedPort)
         }
 
         // smallest port value
@@ -175,5 +181,13 @@ class UrlTest {
             assertEquals(null, user)
             assertEquals(null, password)
         }
+    }
+
+    @Test
+    fun testQuestionMarkInQueryName() {
+        val urlString = "http://kotlinlang.org/page?PartOf?Name=Value"
+        val url = Url(urlString)
+
+        assertEquals(urlString, url.toString())
     }
 }
