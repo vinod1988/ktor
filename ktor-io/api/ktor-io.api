@@ -633,8 +633,8 @@ public final class io/ktor/utils/io/charsets/UTFKt {
 }
 
 public final class io/ktor/utils/io/concurrent/SharedJvmKt {
-	public static final fun opaque (Ljava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
 	public static final fun shared (Ljava/lang/Object;)Lkotlin/properties/ReadWriteProperty;
+	public static final fun threadLocal (Ljava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
 }
 
 public abstract class io/ktor/utils/io/core/AbstractInput : io/ktor/utils/io/core/Input {
