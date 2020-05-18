@@ -99,7 +99,7 @@ internal class ByteChannelNative(
     }
 
     override suspend fun writeFully(src: CPointer<ByteVar>, offset: Long, length: Long) {
-        if (notFull.check()) {
+        if (availableForWrite > 0) {
             val size = tryWriteCPointer(src, offset, length).toLong()
 
             if (length == size) {
@@ -134,7 +134,7 @@ internal class ByteChannelNative(
     }
 
     override suspend fun writeAvailable(src: CPointer<ByteVar>, offset: Long, length: Long): Int {
-        if (notFull.check()) {
+        if (availableForWrite > 0) {
             val size = tryWriteCPointer(src, offset, length)
             afterWrite()
             return size

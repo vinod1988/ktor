@@ -4,7 +4,7 @@
 
 package io.ktor.util.collections.internal
 
-import io.ktor.util.*
+import io.ktor.utils.io.*
 import io.ktor.utils.io.concurrent.*
 import kotlinx.atomicfu.*
 

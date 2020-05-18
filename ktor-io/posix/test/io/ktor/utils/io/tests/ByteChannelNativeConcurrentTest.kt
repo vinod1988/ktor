@@ -10,7 +10,7 @@ import kotlinx.coroutines.*
 import kotlin.test.*
 
 class ByteChannelNativeConcurrentTest {
-    private val TEST_SIZE = 1 * 1024 * 1024
+    private val TEST_SIZE = 10 * 1024
 
     @Test
     fun testReadWriteByte() {
@@ -19,6 +19,8 @@ class ByteChannelNativeConcurrentTest {
             repeat(TEST_SIZE) {
                 channel.writeByte(it.toByte())
             }
+
+            channel.flush()
         }
 
         runBlocking {
@@ -34,17 +36,17 @@ class ByteChannelNativeConcurrentTest {
         val BLOCK_SIZE = 1024
         val block = createBlock(BLOCK_SIZE)
         GlobalScope.launch {
-
             repeat(TEST_SIZE) {
                 channel.writeFully(block)
             }
+
+            channel.flush()
         }
 
         runBlocking {
             repeat(TEST_SIZE) {
                 val result = channel.readRemaining(BLOCK_SIZE.toLong())
 
-                println(it)
                 assertTrue {
                     block.contentEquals(result.readBytes())
                 }

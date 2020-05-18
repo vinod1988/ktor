@@ -4,7 +4,7 @@
 
 package io.ktor.network.selector
 
-import io.ktor.util.*
+import io.ktor.utils.io.*
 import kotlin.coroutines.*
 
 internal data class EventInfo(

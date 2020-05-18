@@ -5,6 +5,7 @@
 package io.ktor.util.pipeline
 
 import io.ktor.util.*
+import io.ktor.utils.io.*
 import kotlin.jvm.*
 
 /**

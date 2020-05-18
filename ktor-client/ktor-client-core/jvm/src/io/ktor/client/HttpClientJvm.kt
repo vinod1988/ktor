@@ -28,8 +28,8 @@ public actual fun HttpClient(
  *
  * @property factory that produces HTTP client instances
  */
-interface HttpClientEngineContainer {
-    val factory: HttpClientEngineFactory<*>
+public interface HttpClientEngineContainer {
+    public val factory: HttpClientEngineFactory<*>
 }
 
 /**

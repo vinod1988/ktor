@@ -257,12 +257,12 @@ internal constructor(
     }
 
     /**
-     * Writes another packet to the end. Please note that the instance [p] gets consumed so you don't need to release it
+     * Writes another packet to the end. Please note that the instance [packet] gets consumed so you don't need to release it
      */
-    fun writePacket(p: ByteReadPacket) {
-        val foreignStolen = p.stealAll()
+    public fun writePacket(packet: ByteReadPacket) {
+        val foreignStolen = packet.stealAll()
         if (foreignStolen == null) {
-            p.release()
+            packet.release()
             return
         }
 
@@ -272,10 +272,23 @@ internal constructor(
             return
         }
 
-        writePacketMerging(_tail, foreignStolen, p)
+        writePacketMerging(_tail, foreignStolen, packet.pool)
     }
 
-    private fun writePacketMerging(tail: ChunkBuffer, foreignStolen: ChunkBuffer, p: ByteReadPacket) {
+    /**
+     * Write chunk buffer to current [Output]. Assuming that chunk buffer is from current pool.
+     */
+    internal fun writeChunkBuffer(chunkBuffer: ChunkBuffer) {
+        val _tail = _tail
+        if (_tail == null) {
+            appendChain(chunkBuffer)
+            return
+        }
+
+        writePacketMerging(_tail, chunkBuffer, pool)
+    }
+
+    private fun writePacketMerging(tail: ChunkBuffer, foreignStolen: ChunkBuffer, pool: ObjectPool<ChunkBuffer>) {
         tail.commitWrittenUntilIndex(tailPosition)
 
         val lastSize = tail.readRemaining
@@ -303,7 +316,7 @@ internal constructor(
                 appendChain(next)
             }
 
-            foreignStolen.release(p.pool)
+            foreignStolen.release(pool)
         } else if (appendSize == -1 || prependSize < appendSize) {
             writePacketSlowPrepend(foreignStolen, tail)
         } else {

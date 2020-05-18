@@ -29,7 +29,7 @@ internal suspend fun ByteChannelSequentialBase.copyToSequentialImpl(dst: ByteCha
             tail
         } else {
             if (dst.availableForWrite == 0) {
-                dst.notFull.await()
+                dst.awaitAtLeastNBytesAvailableForWrite(1)
             }
             transferred
         }

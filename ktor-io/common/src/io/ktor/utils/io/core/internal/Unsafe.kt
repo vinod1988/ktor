@@ -17,16 +17,17 @@ import kotlin.native.concurrent.*
 public annotation class DangerousInternalIoApi
 
 @DangerousInternalIoApi
-public fun ByteReadPacket.`$unsafeAppend$`(builder: BytePacketBuilder) {
-    val builderHead = builder.stealAll() ?: return
+internal fun ByteReadPacket.unsafeAppend(builder: BytePacketBuilder): Int {
     val builderSize = builder.size
+    val builderHead = builder.stealAll() ?: return 0
 
     if (builderSize <= PACKET_MAX_COPY_SIZE && builderHead.next == null && tryWriteAppend(builderHead)) {
         builder.afterBytesStolen()
-        return
+        return builderSize
     }
 
     append(builderHead)
+    return builderSize
 }
 
 @Suppress("DEPRECATION", "UNUSED")

@@ -3,9 +3,10 @@
  */
 package io.ktor.network.selector
 
-import io.ktor.util.*
 import io.ktor.util.collections.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
 import kotlin.coroutines.*
 
 internal class WorkerSelectorManager : SelectorManager {

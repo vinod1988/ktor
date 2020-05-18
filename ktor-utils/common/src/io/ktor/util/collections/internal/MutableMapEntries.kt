@@ -4,8 +4,8 @@
 
 package io.ktor.util.collections.internal
 
-import io.ktor.util.*
 import io.ktor.util.collections.*
+import io.ktor.utils.io.*
 
 internal class MutableMapEntries<Key : Any, Value : Any>(
     private val delegate: ConcurrentMap<Key, Value>

@@ -127,9 +127,9 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
         var invokedWithLast = false
 
         while (true) {
-            readable.readDirect(1) { bb: ByteBuffer ->
-                val last = closed && bb.remaining() == availableForRead
-                visitor(bb, last)
+            readable.readDirect(1) { buffer: ByteBuffer ->
+                val last = closed && buffer.remaining() == availableForRead
+                visitor(buffer, last)
                 if (last) {
                     invokedWithLast = true
                 }

@@ -6,6 +6,7 @@ import io.ktor.utils.io.core.*
 import io.ktor.utils.io.core.internal.*
 import io.ktor.utils.io.internal.*
 import io.ktor.utils.io.pool.*
+import kotlinx.atomicfu.locks.*
 
 @Deprecated("This is going to become internal. Use ByteReadChannel receiver instead.", level = DeprecationLevel.ERROR)
 public suspend fun ByteChannelSequentialBase.joinTo(dst: ByteChannelSequentialBase, closeOnEnd: Boolean) {
@@ -19,6 +20,8 @@ public suspend fun ByteChannelSequentialBase.copyTo(
 ): Long {
     return copyToSequentialImpl(dst, limit)
 }
+
+private const val EXPECTED_CAPACITY: Long = 4088L
 
 /**
  * Sequential (non-concurrent) byte channel implementation
@@ -39,22 +42,18 @@ public abstract class ByteChannelSequentialBase(
     protected val writable: BytePacketBuilder = BytePacketBuilder(0, pool)
     protected val readable: ByteReadPacket = ByteReadPacket(initial, pool)
 
-    internal val notFull = Condition { totalPending() <= 4088L }
-
-    private var waitingForSize by shared(1)
-    private val atLeastNBytesAvailableForWrite = Condition { availableForWrite >= waitingForSize || closed }
+    private val slot = AwaitingSlot()
 
     private var waitingForRead by shared(1)
-    private val atLeastNBytesAvailableForRead = Condition { availableForRead >= waitingForRead || closed }
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun totalPending() = readable.remaining.toInt() + writable.size
+    private inline fun totalPending() = readable.remaining.toInt() + writable.size + flushBuffer.size
 
     override val availableForRead: Int
         get() = readable.remaining.toInt()
 
     override val availableForWrite: Int
-        get() = maxOf(0, 4088 - totalPending())
+        get() = maxOf(0, EXPECTED_CAPACITY.toInt() - totalPending())
 
     override var readByteOrder: ByteOrder by shared(ByteOrder.BIG_ENDIAN)
 
@@ -75,10 +74,52 @@ public abstract class ByteChannelSequentialBase(
     final override var closedCause: Throwable? by shared(null)
         private set
 
+    private val flushMutex = SynchronizedObject()
+    private val flushBuffer: BytePacketBuilder = BytePacketBuilder()
+
+    internal suspend fun awaitAtLeastNBytesAvailableForWrite(count: Int) {
+        val predicate = { availableForWrite >= count }
+
+        while (!predicate()) {
+            slot.sleep()
+        }
+    }
+
+    internal suspend fun awaitAtLeastNBytesAvailableForRead(count: Int) {
+        val predicate = { flushBuffer.size + availableForRead >= count }
+
+        while (!predicate()) {
+            slot.sleep()
+        }
+    }
+
     override fun flush() {
         if (writable.isNotEmpty) {
-            readable.`$unsafeAppend$`(writable)
-            atLeastNBytesAvailableForRead.signal()
+            flushWrittenBytes()
+            slot.resume()
+        }
+    }
+
+    /**
+     * Send bytes to thread-safe storage.
+     *
+     * This method is writer-only safe.
+     */
+    private fun flushWrittenBytes() {
+        synchronized(flushMutex) {
+            val buffer = writable.stealAll()!!
+            flushBuffer.writeChunkBuffer(buffer)
+        }
+    }
+
+    /**
+     * Take flushed bytes before read.
+     *
+     * This method is reader-only safe.
+     */
+    private fun prepareFlushedBytes() {
+        synchronized(flushMutex) {
+            readable.unsafeAppend(flushBuffer)
         }
     }
 
@@ -208,8 +249,7 @@ public abstract class ByteChannelSequentialBase(
 
             override suspend fun tryAwait(n: Int) {
                 if (availableForWrite < n) {
-                    waitingForSize = n
-                    atLeastNBytesAvailableForWrite.await()
+                    awaitAtLeastNBytesAvailableForRead(n)
                 }
             }
         }
@@ -260,8 +300,7 @@ public abstract class ByteChannelSequentialBase(
     }
 
     protected fun afterRead() {
-        atLeastNBytesAvailableForWrite.signal()
-        notFull.signal()
+        slot.resume()
     }
 
     @Suppress("NOTHING_TO_INLINE", "DEPRECATION_ERROR")
@@ -520,7 +559,7 @@ public abstract class ByteChannelSequentialBase(
 
     override suspend fun await(atLeast: Int): Boolean {
         require(atLeast >= 0) { "atLeast parameter shouldn't be negative: $atLeast" }
-        require(atLeast <= 4088) { "atLeast parameter shouldn't be larger than max buffer size of 4088: $atLeast" }
+        require(atLeast <= EXPECTED_CAPACITY) { "atLeast parameter shouldn't be larger than max buffer size of $EXPECTED_CAPACITY: $atLeast" }
 
         completeReading()
 
@@ -538,8 +577,10 @@ public abstract class ByteChannelSequentialBase(
 
     protected suspend fun awaitSuspend(atLeast: Int): Boolean {
         require(atLeast >= 0)
-        waitingForRead = atLeast
-        atLeastNBytesAvailableForRead.await { afterRead() }
+
+        awaitAtLeastNBytesAvailableForRead(atLeast)
+        prepareFlushedBytes()
+
         closedCause?.let { throw it }
         return !isClosedForRead && availableForRead >= atLeast
     }
@@ -668,10 +709,7 @@ public abstract class ByteChannelSequentialBase(
             flush()
         }
 
-        atLeastNBytesAvailableForRead.signal()
-        atLeastNBytesAvailableForWrite.signal()
-        notFull.signal()
-
+        slot.cancel(cause)
         return true
     }
 
@@ -719,9 +757,8 @@ public abstract class ByteChannelSequentialBase(
 
     protected suspend fun awaitFreeSpace() {
         afterWrite()
-        notFull.await {
-            flush()
-        }
+        flush()
+        awaitAtLeastNBytesAvailableForWrite(1)
         ensureNotClosed()
     }
 
@@ -736,7 +773,7 @@ public abstract class ByteChannelSequentialBase(
 
         @Suppress("DEPRECATION")
         readSuspendableSession {
-            val desiredSize = (min + offset).coerceAtMost(4088L).toInt()
+            val desiredSize = (min + offset).coerceAtMost(EXPECTED_CAPACITY).toInt()
 
             await(desiredSize)
 
@@ -744,7 +781,7 @@ public abstract class ByteChannelSequentialBase(
             if (buffer.readRemaining > offset) {
                 buffer.discardExact(offset)
                 bytesCopied = minOf(buffer.readRemaining.toLong(), max)
-                buffer.memory.copyTo(destination, buffer.readPosition.toLong(), bytesCopied.toLong(), destinationOffset)
+                buffer.memory.copyTo(destination, buffer.readPosition.toLong(), bytesCopied, destinationOffset)
             }
         }
 

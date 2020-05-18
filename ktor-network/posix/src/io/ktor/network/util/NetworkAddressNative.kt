@@ -4,18 +4,18 @@
 
 package io.ktor.network.util
 
-import io.ktor.util.*
+import io.ktor.utils.io.*
 
-public actual class NetworkAddress constructor(
-    public val hostname: String,
-    public val port: Int,
+actual class NetworkAddress constructor(
+    val hostname: String,
+    val port: Int,
     address: SocketAddress? = null
 ) {
-    public actual constructor(
+    actual constructor(
         hostname: String, port: Int
     ) : this(hostname, port, null)
 
-    public val address: SocketAddress
+    val address: SocketAddress
 
     init {
         this.address = address ?: resolve().first()
@@ -25,11 +25,11 @@ public actual class NetworkAddress constructor(
     /**
      * Resolve current socket address.
      */
-    public fun resolve(): List<SocketAddress> = getAddressInfo(hostname, port)
+    fun resolve(): List<SocketAddress> = getAddressInfo(hostname, port)
 }
 
-public actual val NetworkAddress.hostname: String get() = hostname
+actual val NetworkAddress.hostname: String get() = hostname
 
-public actual val NetworkAddress.port: Int get() = port
+actual val NetworkAddress.port: Int get() = port
 
-public actual class UnresolvedAddressException : IllegalArgumentException()
+actual class UnresolvedAddressException : IllegalArgumentException()
