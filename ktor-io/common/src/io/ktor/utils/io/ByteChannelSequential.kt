@@ -47,10 +47,10 @@ public abstract class ByteChannelSequentialBase(
     private var waitingForRead by shared(1)
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun totalPending() = readable.remaining.toInt() + writable.size + flushBuffer.size
+    private inline fun totalPending(): Int = readable.remaining.toInt() + writable.size + flushBuffer.size
 
     override val availableForRead: Int
-        get() = readable.remaining.toInt()
+        get() = readable.remaining.toInt() + flushBuffer.size
 
     override val availableForWrite: Int
         get() = maxOf(0, EXPECTED_CAPACITY.toInt() - totalPending())
@@ -60,7 +60,7 @@ public abstract class ByteChannelSequentialBase(
     override var writeByteOrder: ByteOrder by shared(ByteOrder.BIG_ENDIAN)
 
     override val isClosedForRead: Boolean
-        get() = closed && readable.isEmpty
+        get() = closed && readable.isEmpty && flushBuffer.isEmpty
 
     override val isClosedForWrite: Boolean
         get() = closed
@@ -78,17 +78,13 @@ public abstract class ByteChannelSequentialBase(
     private val flushBuffer: BytePacketBuilder = BytePacketBuilder()
 
     internal suspend fun awaitAtLeastNBytesAvailableForWrite(count: Int) {
-        val predicate = { availableForWrite >= count }
-
-        while (!predicate()) {
+        while (availableForWrite < count && !closed) {
             slot.sleep()
         }
     }
 
     internal suspend fun awaitAtLeastNBytesAvailableForRead(count: Int) {
-        val predicate = { flushBuffer.size + availableForRead >= count }
-
-        while (!predicate()) {
+        while (availableForRead < count && !closed) {
             slot.sleep()
         }
     }
@@ -141,8 +137,9 @@ public abstract class ByteChannelSequentialBase(
     }
 
     override suspend fun writeByte(b: Byte) {
+        awaitAtLeastNBytesAvailableForWrite(1)
         writable.writeByte(b)
-        return awaitFreeSpace()
+        afterWrite()
     }
 
     private inline fun <T : Any> reverseWrite(value: () -> T, reversed: () -> T): T {
@@ -155,47 +152,54 @@ public abstract class ByteChannelSequentialBase(
     }
 
     override suspend fun writeShort(s: Short) {
+        awaitAtLeastNBytesAvailableForWrite(2)
         writable.writeShort(reverseWrite({ s }, { s.reverseByteOrder() }))
-        return awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writeInt(i: Int) {
+        awaitAtLeastNBytesAvailableForWrite(4)
         writable.writeInt(reverseWrite({ i }, { i.reverseByteOrder() }))
-        return awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writeLong(l: Long) {
+        awaitAtLeastNBytesAvailableForWrite(8)
         writable.writeLong(reverseWrite({ l }, { l.reverseByteOrder() }))
-        return awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writeFloat(f: Float) {
+        awaitAtLeastNBytesAvailableForWrite(4)
         writable.writeFloat(reverseWrite({ f }, { f.reverseByteOrder() }))
-        return awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writeDouble(d: Double) {
+        awaitAtLeastNBytesAvailableForWrite(8)
         writable.writeDouble(reverseWrite({ d }, { d.reverseByteOrder() }))
-        return awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writePacket(packet: ByteReadPacket) {
+        awaitAtLeastNBytesAvailableForWrite(1)
         writable.writePacket(packet)
-        return awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writeFully(src: IoBuffer) {
-        return writeFully(src as Buffer)
+        writeFully(src as Buffer)
     }
 
     internal suspend fun writeFully(src: Buffer) {
+        awaitAtLeastNBytesAvailableForWrite(1)
         writable.writeFully(src)
-        return awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writeFully(src: ByteArray, offset: Int, length: Int) {
         writable.writeFully(src, offset, length)
-        awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writeAvailable(src: IoBuffer): Int {
@@ -206,7 +210,7 @@ public abstract class ByteChannelSequentialBase(
         return if (size == 0) writeAvailableSuspend(src)
         else {
             writable.writeFully(src, size)
-            awaitFreeSpace()
+            afterWrite()
             size
         }
     }
@@ -218,7 +222,7 @@ public abstract class ByteChannelSequentialBase(
         return if (size == 0) writeAvailableSuspend(src, offset, length)
         else {
             writable.writeFully(src, offset, size)
-            awaitFreeSpace()
+            afterWrite()
             size
         }
     }
@@ -249,7 +253,7 @@ public abstract class ByteChannelSequentialBase(
 
             override suspend fun tryAwait(n: Int) {
                 if (availableForWrite < n) {
-                    awaitAtLeastNBytesAvailableForRead(n)
+                    awaitAtLeastNBytesAvailableForWrite(n)
                 }
             }
         }
@@ -564,7 +568,7 @@ public abstract class ByteChannelSequentialBase(
         completeReading()
 
         if (atLeast == 0) return !isClosedForRead
-        if (availableForRead >= atLeast) return true
+        if (readable.remaining >= atLeast) return true
 
         return awaitSuspend(atLeast)
     }
@@ -607,6 +611,10 @@ public abstract class ByteChannelSequentialBase(
     }
 
     private fun requestNextView(atLeast: Int): IoBuffer? {
+        if (readable.isEmpty) {
+            prepareFlushedBytes()
+        }
+
         val view = readable.prepareReadHead(atLeast) as IoBuffer?
 
         if (view == null) {
@@ -705,6 +713,7 @@ public abstract class ByteChannelSequentialBase(
         if (cause != null) {
             readable.release()
             writable.release()
+            flushBuffer.release()
         } else {
             flush()
         }
@@ -736,12 +745,12 @@ public abstract class ByteChannelSequentialBase(
 
     @Suppress("DEPRECATION")
     private suspend fun writeAvailableSuspend(src: IoBuffer): Int {
-        awaitFreeSpace()
+        awaitAtLeastNBytesAvailableForWrite(1)
         return writeAvailable(src)
     }
 
     private suspend fun writeAvailableSuspend(src: ByteArray, offset: Int, length: Int): Int {
-        awaitFreeSpace()
+        awaitAtLeastNBytesAvailableForWrite(1)
         return writeAvailable(src, offset, length)
     }
 
@@ -753,13 +762,6 @@ public abstract class ByteChannelSequentialBase(
         if (autoFlush || availableForWrite == 0) {
             flush()
         }
-    }
-
-    protected suspend fun awaitFreeSpace() {
-        afterWrite()
-        flush()
-        awaitAtLeastNBytesAvailableForWrite(1)
-        ensureNotClosed()
     }
 
     final override suspend fun peekTo(

@@ -139,8 +139,11 @@ expect interface ByteWriteChannel {
 }
 
 
-public suspend fun ByteWriteChannel.writeAvailable(src: ByteArray) = writeAvailable(src, 0, src.size)
-public suspend fun ByteWriteChannel.writeFully(src: ByteArray) = writeFully(src, 0, src.size)
+public suspend fun ByteWriteChannel.writeAvailable(src: ByteArray): Int = writeAvailable(src, 0, src.size)
+
+public suspend fun ByteWriteChannel.writeFully(src: ByteArray) {
+    writeFully(src, 0, src.size)
+}
 
 public suspend fun ByteWriteChannel.writeShort(s: Int) {
     writeShort((s and 0xffff).toShort())
@@ -172,7 +175,7 @@ public suspend fun ByteWriteChannel.writeStringUtf8(s: CharSequence) {
         writeText(s)
     }
 
-    return writePacket(packet)
+    writePacket(packet)
 }
 
 /*
@@ -190,26 +193,26 @@ public suspend fun ByteWriteChannel.writeStringUtf8(s: String) {
         writeText(s)
     }
 
-    return writePacket(packet)
+    writePacket(packet)
 }
 
 public suspend fun ByteWriteChannel.writeBoolean(b: Boolean) {
-    return writeByte(if (b) 1 else 0)
+    writeByte(if (b) 1 else 0)
 }
 
 /**
  * Writes UTF16 character
  */
 public suspend fun ByteWriteChannel.writeChar(ch: Char) {
-    return writeShort(ch.toInt())
+    writeShort(ch.toInt())
 }
 
 public suspend inline fun ByteWriteChannel.writePacket(headerSizeHint: Int = 0, builder: BytePacketBuilder.() -> Unit) {
-    return writePacket(buildPacket(headerSizeHint, builder))
+    writePacket(buildPacket(headerSizeHint, builder))
 }
 
 public suspend fun ByteWriteChannel.writePacketSuspend(builder: suspend BytePacketBuilder.() -> Unit) {
-    return writePacket(buildPacket { builder() })
+    writePacket(buildPacket { builder() })
 }
 
 /**

@@ -35,7 +35,7 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
     }
 
     private suspend fun writeAvailableSuspend(src: ByteBuffer): Int {
-        awaitFreeSpace()
+        awaitAtLeastNBytesAvailableForWrite(1)
         return writeAvailable(src)
     }
 
@@ -48,8 +48,9 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
 
     private suspend fun writeFullySuspend(src: ByteBuffer) {
         while (src.hasRemaining()) {
-            awaitFreeSpace()
+            awaitAtLeastNBytesAvailableForWrite(1)
             tryWriteAvailable(src)
+            afterWrite()
         }
     }
 
@@ -164,8 +165,10 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
         if (closed) {
             throw closedCause ?: ClosedSendChannelException("Channel closed for write")
         }
+
+        awaitAtLeastNBytesAvailableForWrite(min)
         writable.writeDirect(min) { block(it) }
-        awaitFreeSpace()
+        afterWrite()
     }
 
     override suspend fun writeWhile(block: (ByteBuffer) -> Boolean) {
@@ -175,12 +178,12 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
             }
 
             var cont = false
+            awaitAtLeastNBytesAvailableForWrite(1)
             writable.writeDirect(1) {
                 cont = block(it)
             }
 
-            awaitFreeSpace()
-
+            afterWrite()
             if (!cont) break
         }
     }

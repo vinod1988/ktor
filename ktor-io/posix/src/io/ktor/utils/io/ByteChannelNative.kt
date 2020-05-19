@@ -120,7 +120,7 @@ internal class ByteChannelNative(
         var position = offset
 
         while (rem > 0) {
-            awaitFreeSpace()
+            awaitAtLeastNBytesAvailableForWrite(1)
             val size = tryWriteCPointer(src, position, rem).toLong()
             rem -= size
             position += size
@@ -163,7 +163,7 @@ internal class ByteChannelNative(
     }
 
     private suspend fun writeAvailableSuspend(src: CPointer<ByteVar>, offset: Long, length: Long): Int {
-        awaitFreeSpace()
+        awaitAtLeastNBytesAvailableForWrite(1)
         return writeAvailable(src, offset, length)
     }
 
