@@ -60,7 +60,7 @@ public abstract class ByteChannelSequentialBase(
     override var writeByteOrder: ByteOrder by shared(ByteOrder.BIG_ENDIAN)
 
     override val isClosedForRead: Boolean
-        get() = closed && readable.isEmpty && flushBuffer.isEmpty
+        get() = closed && readable.isEmpty && flushBuffer.isEmpty && writable.isEmpty
 
     override val isClosedForWrite: Boolean
         get() = closed
@@ -398,7 +398,7 @@ public abstract class ByteChannelSequentialBase(
         builder.writePacket(readable, size)
         val remaining = limit - builder.size
 
-        return if (remaining == 0L || (readable.isEmpty && closed)) {
+        return if (remaining == 0L || isClosedForRead) {
             afterRead()
             ensureNotFailed(builder)
             builder.build()
@@ -414,7 +414,7 @@ public abstract class ByteChannelSequentialBase(
             afterRead()
             ensureNotFailed(builder)
 
-            if (readable.remaining == 0L && writable.size == 0 && closed) {
+            if (isClosedForRead) {
                 break
             }
 
