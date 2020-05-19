@@ -102,22 +102,10 @@ publishing {
                 }
             }
 
-            def publishMetadata = ['native', 'js']
-            if (!publishMetadata.contains(platformName)) {
-                publication.moduleDescriptorGenerator = null
-            }
-
             if (platformName == 'native') {
                 publication.artifact emptyJar
             }
         }
-    }
-
-    // Disable gradle metadata in root jvm modules
-    def hasNative = project.ext.has("hasNative") && project.ext.hasNative
-    if (!hasNative) {
-        def rootPublication = publishing.publications.findByName('kotlinMultiplatform')
-        rootPublication.moduleDescriptorGenerator = null
     }
 }
 
