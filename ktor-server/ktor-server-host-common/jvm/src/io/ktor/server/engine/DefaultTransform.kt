@@ -40,7 +40,7 @@ fun ApplicationSendPipeline.installDefaultTransformations() {
  */
 @EngineAPI
 fun ApplicationReceivePipeline.installDefaultTransformations() {
-    intercept(ApplicationReceivePipeline.Transform) { query ->
+    intercept(ApplicationReceivePipeline.Transform) { query: ApplicationReceiveRequest ->
         val channel = query.value as? ByteReadChannel ?: return@intercept
 
         val transformed: Any? = when (query.type) {
@@ -91,14 +91,14 @@ private inline fun <R> withContentType(call: ApplicationCall, block: () -> R): R
     )
 }
 
-private fun PipelineContext<*, ApplicationCall>.multiPartData(rc: ByteReadChannel): MultiPartData {
+private fun PipelineContext<*, ApplicationCall>.multiPartData(channel: ByteReadChannel): MultiPartData {
     val contentType = call.request.header(HttpHeaders.ContentType)
         ?: throw IllegalStateException("Content-Type header is required for multipart processing")
 
     val contentLength = call.request.header(HttpHeaders.ContentLength)?.toLong()
     return CIOMultipartDataBase(
         coroutineContext + Dispatchers.Unconfined,
-        rc,
+        channel,
         contentType,
         contentLength
     )

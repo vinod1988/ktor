@@ -35,26 +35,40 @@ internal class RequestBodyHandler(
 
         try {
             while (true) {
-                val event = queue.poll()
-                    ?: run { current?.flush(); @Suppress("DEPRECATION") queue.receiveOrNull() }
-                    ?: break
+                var event = queue.poll()
 
-                if (event is ByteBufHolder) {
-                    val channel = current ?: throw IllegalStateException("No current channel but received a byte buf")
-                    processContent(channel, event)
+                if (event == null) {
+                    current?.flush()
+                    context.flush()
+                    event = queue.receiveOrNull()
+                    event ?: break
+                }
 
-                    if (!upgraded && event is LastHttpContent) {
-                        current.close()
-                        current = null
+                when (event) {
+                    is ByteBufHolder -> {
+                        val channel = current
+                            ?: throw IllegalStateException("No current channel but received a byte buf")
+
+                        processContent(channel, event)
+
+                        if (!upgraded && event is LastHttpContent) {
+                            current.close()
+                            current = null
+                        }
                     }
-                } else if (event is ByteBuf) {
-                    val channel = current ?: throw IllegalStateException("No current channel but received a byte buf")
-                    processContent(channel, event)
-                } else if (event is ByteWriteChannel) {
-                    current?.close()
-                    current = event
-                } else if (event is Upgrade) {
-                    upgraded = true
+                    is ByteBuf -> {
+                        val channel =
+                            current ?: throw IllegalStateException("No current channel but received a byte buf")
+                        processContent(channel, event)
+                    }
+                    is ByteWriteChannel -> {
+                        current?.close()
+                        current = event
+                    }
+                    is Upgrade -> {
+                        upgraded = true
+                    }
+                    else -> error("Unsupported event type: $event")
                 }
             }
         } catch (t: Throwable) {
@@ -74,9 +88,9 @@ internal class RequestBodyHandler(
     }
 
     fun newChannel(): ByteReadChannel {
-        val bc = ByteChannel()
-        tryOfferChannelOrToken(bc)
-        return bc
+        val channel = ByteChannel()
+        tryOfferChannelOrToken(channel)
+        return channel
     }
 
     private fun tryOfferChannelOrToken(token: Any) {
@@ -94,31 +108,29 @@ internal class RequestBodyHandler(
     }
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any?) {
-        if (msg is ByteBufHolder) {
-            handleBytesRead(msg)
-        } else if (msg is ByteBuf) {
-            handleBytesRead(msg)
-        } else {
-            ctx.fireChannelRead(msg)
+        when (msg) {
+            is ByteBufHolder -> handleBytesRead(msg)
+            is ByteBuf -> handleBytesRead(msg)
+            else -> ctx.fireChannelRead(msg)
         }
     }
 
     private suspend fun processContent(current: ByteWriteChannel, event: ByteBufHolder) {
         try {
             requestMoreEvents()
-            val buf = event.content()
-            copy(buf, current)
+            val buffer = event.content()
+            copy(buffer, current)
         } finally {
             event.release()
         }
     }
 
-    private suspend fun processContent(current: ByteWriteChannel, buf: ByteBuf) {
+    private suspend fun processContent(current: ByteWriteChannel, buffer: ByteBuf) {
         try {
             requestMoreEvents()
-            copy(buf, current)
+            copy(buffer, current)
         } finally {
-            buf.release()
+            buffer.release()
         }
     }
 
@@ -146,11 +158,11 @@ internal class RequestBodyHandler(
         }
     }
 
-    private suspend fun copy(buf: ByteBuf, dst: ByteWriteChannel) {
-        val length = buf.readableBytes()
+    private suspend fun copy(source: ByteBuf, destination: ByteWriteChannel) {
+        val length = source.readableBytes()
         if (length > 0) {
-            val buffer = buf.internalNioBuffer(buf.readerIndex(), length)
-            dst.writeFully(buffer)
+            val buffer = source.internalNioBuffer(source.readerIndex(), length)
+            destination.writeFully(buffer)
         }
     }
 

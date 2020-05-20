@@ -19,12 +19,12 @@ import io.ktor.utils.io.core.internal.*
 @ExperimentalIoApi
 public suspend inline fun ByteReadChannel.read(
     desiredSize: Int = 1,
-    block: (source: Memory, start: Long, endExclusive: Long) -> Int
+    block: (source: Memory, start: Int, endExclusive: Int) -> Int
 ): Int {
     val buffer = requestBuffer(desiredSize) ?: Buffer.Empty
 
     try {
-        val bytesRead = block(buffer.memory, buffer.readPosition.toLong(), buffer.writePosition.toLong())
+        val bytesRead = block(buffer.memory, buffer.readPosition, buffer.writePosition)
         completeReadingFromBuffer(buffer, bytesRead)
         return bytesRead
     } catch (cause: Throwable) {

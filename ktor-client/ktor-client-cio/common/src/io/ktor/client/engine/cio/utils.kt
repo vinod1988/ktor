@@ -141,14 +141,6 @@ internal suspend fun readResponse(
 internal fun HttpStatusCode.isInformational(): Boolean = (value / 100) == 1
 
 /**
- * Wrap channel using [withoutClosePropagation] if [propagateClose] is false otherwise return the same channel.
- */
-internal fun ByteWriteChannel.handleHalfClosed(
-    coroutineContext: CoroutineContext,
-    propagateClose: Boolean
-): ByteWriteChannel = if (propagateClose) this else withoutClosePropagation(coroutineContext)
-
-/**
  * Wrap channel so that [ByteWriteChannel.close] of the resulting channel doesn't lead to closing of the base channel.
  */
 internal fun ByteWriteChannel.withoutClosePropagation(
@@ -168,3 +160,11 @@ internal fun ByteWriteChannel.withoutClosePropagation(
         this@withoutClosePropagation.flush()
     }.channel
 }
+
+/**
+ * Wrap channel using [withoutClosePropagation] if [propagateClose] is false otherwise return the same channel.
+ */
+internal fun ByteWriteChannel.handleHalfClosed(
+    coroutineContext: CoroutineContext,
+    propagateClose: Boolean
+): ByteWriteChannel = if (propagateClose) this else withoutClosePropagation(coroutineContext)

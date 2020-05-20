@@ -7,14 +7,15 @@ package io.ktor.network.sockets
 import io.ktor.network.selector.*
 import io.ktor.network.util.*
 import io.ktor.util.*
-import io.ktor.util.debug.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.core.*
+import io.ktor.utils.io.concurrent.*
 import io.ktor.utils.io.errors.*
+import kotlinx.atomicfu.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import platform.posix.*
 import kotlin.coroutines.*
+import kotlin.math.*
 
 internal class TCPSocketNative(
     private val descriptor: Int,
@@ -77,32 +78,41 @@ internal class TCPSocketNative(
 
     @KtorExperimentalAPI
     override fun attachForWriting(userChannel: ByteChannel): ReaderJob = reader(Dispatchers.Unconfined, userChannel) {
-        channel.readSuspendableSession {
-            var buffer: Buffer? = null
-            while (await()) {
-                if (buffer == null || !buffer.canRead()) {
-                    buffer = request() ?: error("Internal error; Can't request buffer.")
-                }
+        var sockedClosed = false
+        var needSelect = false
+        var total = 0
+        while (!sockedClosed && !channel.isClosedForRead) {
+            val count = channel.read { memory, start, stop ->
+                val bufferStart = memory.pointer + start
+                val remaining = stop - start
+                val result = send(descriptor, bufferStart, remaining.convert(), 0).toInt()
 
-                buffer.readDirect {
-                    val result = send(descriptor, it, buffer.readRemaining.convert(), 0).toInt()
-
-                    if (result == -1) {
+                when (result) {
+                    0 -> sockedClosed = true
+                    -1 -> {
                         if (errno == EAGAIN) {
-                            return@readDirect 0
+                            needSelect = true
+                        } else {
+                            throw PosixException.forErrno()
                         }
-
-                        error("Send error: $errno")
                     }
-
-                    result.convert()
                 }
 
-                if (buffer.canRead()) {
-                    selector.select(selectable, SelectInterest.WRITE)
-                }
+                max(0, result)
+            }
+
+            total += count
+            if (!sockedClosed && needSelect) {
+                selector.select(selectable, SelectInterest.WRITE)
+                needSelect = false
             }
         }
+
+        if (!channel.isClosedForRead) {
+            val cause = IOException("Failed writing to closed socket. Some bytes remaining: ${channel.availableForRead}")
+            channel.cancel(cause)
+        }
+
     }.apply {
         invokeOnCompletion {
             shutdown(descriptor, SHUT_WR)

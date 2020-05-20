@@ -173,15 +173,18 @@ private suspend fun parsePartBodyImpl(
     input: ByteReadChannel, output: ByteWriteChannel,
     headers: HttpHeadersMap, limit: Long = Long.MAX_VALUE
 ): Long {
-    val cl = headers["Content-Length"]?.parseDecLong()
-    val size = if (cl != null) {
-        if (cl > limit) throw IOException("Multipart part content length limit of $limit exceeded (actual size is $cl)")
-        input.copyTo(output, cl)
+    val length = headers["Content-Length"]?.parseDecLong()
+    val size = if (length != null) {
+        if (length > limit) {
+            throw IOException("Multipart part content length limit of $limit exceeded (actual size is $length)")
+        }
+
+        input.copyTo(output, length)
     } else {
         copyUntilBoundary("part", boundaryPrefixed, input, { output.writeFully(it) }, limit)
     }
-    output.flush()
 
+    output.flush()
     return size
 }
 
@@ -273,7 +276,7 @@ fun parseMultipart(
  * Starts a multipart parser coroutine producing multipart events
  */
 @KtorExperimentalAPI
-fun CoroutineScope.parseMultipart(
+public fun CoroutineScope.parseMultipart(
     input: ByteReadChannel,
     contentType: CharSequence,
     contentLength: Long?
@@ -306,7 +309,7 @@ fun parseMultipart(
  * Starts a multipart parser coroutine producing multipart events
  */
 @Deprecated("This is going to be removed. Use parseMultipart(contentType) instead.")
-fun CoroutineScope.parseMultipart(
+public fun CoroutineScope.parseMultipart(
     boundaryPrefixed: ByteBuffer, input: ByteReadChannel, totalLength: Long?
 ): ReceiveChannel<MultipartEvent> = produce {
     @Suppress("DEPRECATION")
@@ -342,20 +345,20 @@ fun CoroutineScope.parseMultipart(
         val part = MultipartEvent.MultipartPart(headers, body)
         send(part)
 
-        var hh: HttpHeadersMap? = null
+        var headersMap: HttpHeadersMap? = null
         try {
-            hh = parsePartHeadersImpl(input)
-            if (!headers.complete(hh)) {
-                hh.release()
+            headersMap = parsePartHeadersImpl(input)
+            if (!headers.complete(headersMap)) {
+                headersMap.release()
                 throw CancellationException("Multipart processing has been cancelled")
             }
-            parsePartBodyImpl(boundaryPrefixed, input, body, hh)
-        } catch (t: Throwable) {
-            if (headers.completeExceptionally(t)) {
-                hh?.release()
+            parsePartBodyImpl(boundaryPrefixed, input, body, headersMap)
+        } catch (cause: Throwable) {
+            if (headers.completeExceptionally(cause)) {
+                headersMap?.release()
             }
-            body.close(t)
-            throw t
+            body.close(cause)
+            throw cause
         }
 
         body.close()
@@ -393,11 +396,14 @@ private suspend fun copyUntilBoundary(
     try {
         while (true) {
             buffer.clear()
-            val rc = input.readUntilDelimiter(boundaryPrefixed, buffer)
-            if (rc <= 0) break // got boundary or eof
+            val count = input.readUntilDelimiter(boundaryPrefixed, buffer)
+
+            if (count <= 0) break // got boundary or eof
             buffer.flip()
             writeFully(buffer)
-            copied += rc
+
+            copied += count
+
             if (copied > limit) {
                 throw IOException("Multipart $name limit of $limit bytes exceeded")
             }

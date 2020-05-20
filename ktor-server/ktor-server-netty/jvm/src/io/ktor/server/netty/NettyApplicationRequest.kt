@@ -9,23 +9,24 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.server.engine.*
 import io.ktor.util.*
+import io.ktor.utils.io.*
 import io.netty.channel.*
 import io.netty.handler.codec.http.*
 import io.netty.handler.codec.http.multipart.*
 import kotlinx.coroutines.*
-import io.ktor.utils.io.*
 import java.io.*
 import kotlin.coroutines.*
 
 @Suppress("KDocMissingDocumentation")
 @InternalAPI
-abstract class NettyApplicationRequest(
+public abstract class NettyApplicationRequest(
     call: ApplicationCall,
     override val coroutineContext: CoroutineContext,
-    val context: ChannelHandlerContext,
+    public val context: ChannelHandlerContext,
     private val requestBodyChannel: ByteReadChannel,
     protected val uri: String,
-    internal val keepAlive: Boolean) : BaseApplicationRequest(call), CoroutineScope {
+    internal val keepAlive: Boolean
+) : BaseApplicationRequest(call), CoroutineScope {
 
     final override val queryParameters: Parameters = object : Parameters {
         private val decoder = QueryStringDecoder(uri)
@@ -49,7 +50,7 @@ abstract class NettyApplicationRequest(
 
     protected abstract fun newDecoder(): HttpPostMultipartRequestDecoder
 
-    fun close() {
+    public fun close() {
         if (contentMultipart.isInitialized()) {
             contentMultipart.value.destroy()
         }
