@@ -32,34 +32,34 @@ public expect class IoBuffer : Input, Output, ChunkBuffer {
     fun release(pool: ObjectPool<IoBuffer>)
 
     @Suppress("DEPRECATION")
-    companion object {
+    public companion object {
         /**
          * Number of bytes usually reserved in the end of chunk
          * when several instances of [ChunkBuffer] are connected into a chain (usually inside of [ByteReadPacket]
          * or [BytePacketBuilder])
          */
         @DangerousInternalIoApi
-        val ReservedSize: Int
+        public val ReservedSize: Int
 
         /**
          * The empty buffer singleton: it has zero capacity for read and write.
          */
-        val Empty: IoBuffer
+        public val Empty: IoBuffer
 
         /**
          * The default buffer pool
          */
-        val Pool: ObjectPool<IoBuffer>
+        public val Pool: ObjectPool<IoBuffer>
 
         /**
          * Pool that always instantiates new buffers instead of reusing it
          */
-        val NoPool: ObjectPool<IoBuffer>
+        public val NoPool: ObjectPool<IoBuffer>
 
         /**
          * A pool that always returns [IoBuffer.Empty]
          */
-        val EmptyPool: ObjectPool<IoBuffer>
+        public val EmptyPool: ObjectPool<IoBuffer>
     }
 }
 

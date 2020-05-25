@@ -1231,6 +1231,19 @@ internal open class ByteBufferChannel(
         return writeFullySuspend(src)
     }
 
+    override suspend fun writeFully(src: Buffer) {
+        while (src.readRemaining > 0) {
+            write { buffer ->
+                src.readAvailable(buffer)
+            }
+        }
+    }
+
+    override suspend fun writeFully(memory: Memory, startIndex: Int, endIndex: Int) {
+        val slice = memory.slice(startIndex, endIndex - startIndex)
+        writeFully(slice.buffer)
+    }
+
     override suspend fun writeFully(src: IoBuffer) {
         writeAsMuchAsPossible(src)
         if (!src.canRead()) return

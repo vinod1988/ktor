@@ -138,7 +138,7 @@ actual fun Memory.copyTo(
  * Copies bytes from this memory range from the specified [offset]
  * to the [destination] buffer.
  */
-fun Memory.copyTo(
+public fun Memory.copyTo(
     destination: ByteBuffer,
     offset: Int
 ) {

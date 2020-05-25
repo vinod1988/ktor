@@ -54,12 +54,12 @@ private tailrec fun ByteReadPacket.readAsMuchAsPossible(bb: ByteBuffer, copied: 
  */
 @Suppress("DEPRECATION")
 @Deprecated("Use write {} instead.")
-inline fun BytePacketBuilder.writeDirect(size: Int, block: (ByteBuffer) -> Unit) {
+inline fun BytePacketBuilder.writeDirect(size: Int, block: (ByteBuffer) -> Unit): Int {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    write(size) { buffer: Buffer ->
+    return write(size) { buffer: Buffer ->
         buffer.writeDirect(size, block)
     }
 }

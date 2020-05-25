@@ -21,7 +21,7 @@ public actual interface SelectorManager : CoroutineScope, Closeable {
      * NIO selector provider
      */
     @KtorExperimentalAPI
-    val provider: SelectorProvider
+    public val provider: SelectorProvider
 
     /**
      * Notifies the selector that selectable has been closed.
@@ -49,7 +49,7 @@ public actual interface SelectorManager : CoroutineScope, Closeable {
  * Creates a NIO entity via [create] and calls [setup] on it. If any exception happens then the entity will be closed
  * and an exception will be propagated.
  */
-inline fun <C : Closeable, R> SelectorManager.buildOrClose(
+public inline fun <C : Closeable, R> SelectorManager.buildOrClose(
     create: SelectorProvider.() -> C,
     setup: C.() -> R
 ): R {

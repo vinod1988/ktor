@@ -4,7 +4,7 @@ import io.ktor.util.*
 import java.nio.channels.*
 
 @InternalAPI
-val SelectInterest.flag: Int
+public val SelectInterest.flag: Int
     get() = when (this) {
         SelectInterest.READ -> SelectionKey.OP_READ
         SelectInterest.WRITE -> SelectionKey.OP_WRITE
@@ -13,9 +13,9 @@ val SelectInterest.flag: Int
     }
 
 @InternalAPI
-val SelectInterest.Companion.flags: IntArray
+public val SelectInterest.Companion.flags: IntArray
     get() = SelectInterest.values().map { it.flag }.toIntArray()
 
 @InternalAPI
-val SelectInterest.Companion.size: Int
+public val SelectInterest.Companion.size: Int
     get() = SelectInterest.values().size

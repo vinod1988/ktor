@@ -25,7 +25,7 @@ import kotlin.coroutines.*
  * A [ChannelInitializer] implementation that does setup the default ktor channel pipeline
  */
 @EngineAPI
-class NettyChannelInitializer(
+public class NettyChannelInitializer(
     private val enginePipeline: EnginePipeline,
     private val environment: ApplicationEngineEnvironment,
     private val callEventGroup: EventExecutorGroup,
@@ -56,7 +56,8 @@ class NettyChannelInitializer(
             password.fill('\u0000')
 
             sslContext = SslContextBuilder.forServer(pk, *certs).apply {
-                if (alpnProvider != null) {
+                    if (alpnProvider == null) return@apply
+
                     sslProvider(alpnProvider)
                     ciphers(Http2SecurityUtil.CIPHERS, SupportedCipherSuiteFilter.INSTANCE)
                     applicationProtocolConfig(
@@ -69,7 +70,6 @@ class NettyChannelInitializer(
                         )
                     )
                 }
-            }
                 .build()
         }
     }
@@ -113,7 +113,7 @@ class NettyChannelInitializer(
 
                 with(pipeline) {
                     //                    addLast(LoggingHandler(LogLevel.WARN))
-                    if(requestReadTimeout > 0) {
+                    if (requestReadTimeout > 0) {
                         addLast("readTimeout", ReadTimeoutHandler(requestReadTimeout))
                     }
                     addLast("codec", httpServerCodec())
@@ -148,7 +148,7 @@ class NettyChannelInitializer(
     }
 
     @EngineAPI
-    companion object {
+    public companion object {
         internal val alpnProvider by lazy { findAlpnProvider() }
 
         private fun findAlpnProvider(): SslProvider? {

@@ -49,8 +49,8 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
     private suspend fun writeFullySuspend(src: ByteBuffer) {
         while (src.hasRemaining()) {
             awaitAtLeastNBytesAvailableForWrite(1)
-            tryWriteAvailable(src)
-            afterWrite()
+            val count = tryWriteAvailable(src)
+            afterWrite(count)
         }
     }
 
@@ -116,9 +116,16 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
         return when {
             closedCause != null -> throw closedCause
             closed -> {
-                readable.readAvailable(dst).takeIf { it != 0 }.also { afterRead() } ?: -1
+                val count = readable.readAvailable(dst)
+
+                if (count != 0) {
+                    afterRead(count)
+                    count
+                } else {
+                    -1
+                }
             }
-            else -> readable.readAvailable(dst).also { afterRead() }
+            else -> readable.readAvailable(dst).also { afterRead(it) }
         }
     }
 
@@ -167,8 +174,8 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
         }
 
         awaitAtLeastNBytesAvailableForWrite(min)
-        writable.writeDirect(min) { block(it) }
-        afterWrite()
+        val count = writable.writeDirect(min) { block(it) }
+        afterWrite(count)
     }
 
     override suspend fun writeWhile(block: (ByteBuffer) -> Boolean) {
@@ -177,14 +184,14 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
                 throw closedCause ?: ClosedSendChannelException("Channel closed for write")
             }
 
-            var cont = false
+            var shouldContinue: Boolean = false
             awaitAtLeastNBytesAvailableForWrite(1)
-            writable.writeDirect(1) {
-                cont = block(it)
+            val result = writable.writeDirect(1) {
+                shouldContinue = block(it)
             }
 
-            afterWrite()
-            if (!cont) break
+            afterWrite(result)
+            if (!shouldContinue) break
         }
     }
 }

@@ -42,7 +42,7 @@ public expect interface SelectorManager : CoroutineScope, Closeable {
  * Select interest kind
  * @property [flag] to be set in NIO selector
  */
-@Suppress("KDocMissingDocumentation")
+@Suppress("KDocMissingDocumentation", "NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING")
 @KtorExperimentalAPI
 @InternalAPI
 public enum class SelectInterest {

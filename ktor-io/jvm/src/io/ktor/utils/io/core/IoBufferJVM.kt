@@ -9,7 +9,6 @@ import io.ktor.utils.io.pool.*
 import io.ktor.utils.io.utils.*
 import java.nio.*
 import java.nio.charset.*
-import io.ktor.utils.io.core.internal.require
 import kotlin.contracts.*
 
 /**
@@ -448,25 +447,26 @@ public actual class IoBuffer actual constructor(
     override fun toString(): String =
         "Buffer[readable = $readRemaining, writable = $writeRemaining, startGap = $startGap, endGap = $endGap]"
 
-    actual companion object {
+    public actual companion object {
         /**
          * Number of bytes usually reserved in the end of chunk
          * when several instances of [IoBuffer] are connected into a chain (usually inside of [ByteReadPacket]
          * or [BytePacketBuilder])
          */
         @DangerousInternalIoApi
-        actual val ReservedSize: Int get() = Buffer.ReservedSize
+        public actual val ReservedSize: Int
+            get() = Buffer.ReservedSize
 
         private val DEFAULT_BUFFER_SIZE = getIOIntProperty("buffer.size", 4096)
         private val DEFAULT_BUFFER_POOL_SIZE = getIOIntProperty("buffer.pool.size", 100)
         private val DEFAULT_BUFFER_POOL_DIRECT = getIOIntProperty("buffer.pool.direct", 0)
 
-        actual val Empty = IoBuffer(Memory.Empty, null)
+        public actual val Empty: IoBuffer = IoBuffer(Memory.Empty, null)
 
         /**
          * The default buffer pool
          */
-        actual val Pool: ObjectPool<IoBuffer> = object : DefaultPool<IoBuffer>(DEFAULT_BUFFER_POOL_SIZE) {
+        public actual val Pool: ObjectPool<IoBuffer> = object : DefaultPool<IoBuffer>(DEFAULT_BUFFER_POOL_SIZE) {
             override fun produceInstance(): IoBuffer {
                 val buffer = when (DEFAULT_BUFFER_POOL_DIRECT) {
                     0 -> ByteBuffer.allocate(DEFAULT_BUFFER_SIZE)
@@ -492,7 +492,7 @@ public actual class IoBuffer actual constructor(
             }
         }
 
-        actual val NoPool: ObjectPool<IoBuffer> = object : NoPoolImpl<IoBuffer>() {
+        public actual val NoPool: ObjectPool<IoBuffer> = object : NoPoolImpl<IoBuffer>() {
             override fun borrow(): IoBuffer {
                 val buffer = when (DEFAULT_BUFFER_POOL_DIRECT) {
                     0 -> ByteBuffer.allocate(DEFAULT_BUFFER_SIZE)
@@ -502,11 +502,11 @@ public actual class IoBuffer actual constructor(
             }
         }
 
-        actual val EmptyPool: ObjectPool<IoBuffer> = EmptyBufferPoolImpl
+        public actual val EmptyPool: ObjectPool<IoBuffer> = EmptyBufferPoolImpl
     }
 }
 
-fun Buffer.readFully(dst: ByteBuffer, length: Int) {
+public fun Buffer.readFully(dst: ByteBuffer, length: Int) {
     readExact(length, "buffer content") { memory, offset ->
         val limit = dst.limit()
         try {
@@ -518,7 +518,7 @@ fun Buffer.readFully(dst: ByteBuffer, length: Int) {
     }
 }
 
-fun Buffer.readAvailable(dst: ByteBuffer, length: Int = dst.remaining()): Int {
+public fun Buffer.readAvailable(dst: ByteBuffer, length: Int = dst.remaining()): Int {
     if (!canRead()) return -1
     val size = minOf(readRemaining, length)
     readFully(dst, size)
@@ -526,7 +526,7 @@ fun Buffer.readAvailable(dst: ByteBuffer, length: Int = dst.remaining()): Int {
 }
 
 @Deprecated("Work with Memory instead.")
-inline fun Buffer.readDirect(block: (ByteBuffer) -> Unit): Int {
+public inline fun Buffer.readDirect(block: (ByteBuffer) -> Unit): Int {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -541,7 +541,7 @@ inline fun Buffer.readDirect(block: (ByteBuffer) -> Unit): Int {
 }
 
 @Deprecated("Work with Memory instead.")
-inline fun Buffer.writeDirect(size: Int = 1, block: (ByteBuffer) -> Unit): Int {
+public inline fun Buffer.writeDirect(size: Int = 1, block: (ByteBuffer) -> Unit): Int {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

@@ -1,6 +1,6 @@
 package io.ktor.utils.io
 
-import io.ktor.utils.io.bits.Memory
+import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.core.internal.*
 
@@ -19,7 +19,7 @@ import io.ktor.utils.io.core.internal.*
 @ExperimentalIoApi
 public suspend inline fun ByteReadChannel.read(
     desiredSize: Int = 1,
-    block: (source: Memory, start: Int, endExclusive: Int) -> Int
+    block: (source: Memory, startIndex: Int, endIndex: Int) -> Int
 ): Int {
     val buffer = requestBuffer(desiredSize) ?: Buffer.Empty
 
@@ -36,18 +36,18 @@ public suspend inline fun ByteReadChannel.read(
 }
 
 @Deprecated("Use read { } instead.")
-interface ReadSession {
+public interface ReadSession {
     /**
      * Number of bytes available for read. However it doesn't necessarily means that all available bytes could be
      * requested at once
      */
-    val availableForRead: Int
+    public val availableForRead: Int
 
     /**
      * Discard at most [n] available bytes or 0 if no bytes available yet
      * @return number of bytes actually discarded, could be 0
      */
-    fun discard(n: Int): Int
+    public fun discard(n: Int): Int
 
     /**
      * Request buffer range [atLeast] bytes length
@@ -61,7 +61,7 @@ interface ReadSession {
      * @throws Throwable if the channel has been closed with an exception or cancelled
      */
     @Suppress("DEPRECATION")
-    fun request(atLeast: Int = 1): IoBuffer?
+    public fun request(atLeast: Int = 1): IoBuffer?
 }
 
 @Suppress("DEPRECATION")
@@ -127,10 +127,11 @@ private suspend fun SuspendableReadSession.requestBufferSuspend(desiredSize: Int
 
 private suspend fun ByteReadChannel.requestBufferFallback(desiredSize: Int): ChunkBuffer {
     val chunk = ChunkBuffer.Pool.borrow()
-    val copied =
-        peekTo(chunk.memory, chunk.writePosition.toLong(), 0L, desiredSize.toLong(), chunk.writeRemaining.toLong())
-    chunk.commitWritten(copied.toInt())
+    val copied = peekTo(
+        chunk.memory, chunk.writePosition.toLong(), 0L, desiredSize.toLong(), chunk.writeRemaining.toLong()
+    )
 
+    chunk.commitWritten(copied.toInt())
     return chunk
 }
 

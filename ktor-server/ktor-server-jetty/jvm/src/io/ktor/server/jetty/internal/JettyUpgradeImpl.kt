@@ -17,7 +17,7 @@ import kotlin.coroutines.*
 
 @Suppress("KDocMissingDocumentation")
 @InternalAPI
-object JettyUpgradeImpl : ServletUpgrade {
+public object JettyUpgradeImpl : ServletUpgrade {
     override suspend fun performUpgrade(
         upgrade: OutgoingContent.ProtocolUpgrade,
         servletRequest: HttpServletRequest, servletResponse: HttpServletResponse,
@@ -32,7 +32,7 @@ object JettyUpgradeImpl : ServletUpgrade {
         endPoint.idleTimeout = TimeUnit.MINUTES.toMillis(60L)
 
         withContext(engineContext + CoroutineName("upgrade-scope")) {
-            try {
+            connection.use {
                 coroutineScope {
                     val inputChannel = ByteChannel(autoFlush = true)
                     val reader = EndPointReader(endPoint, coroutineContext, inputChannel)
@@ -54,8 +54,6 @@ object JettyUpgradeImpl : ServletUpgrade {
                         cancel()
                     }
                 }
-            } finally {
-                connection.close()
             }
         }
     }

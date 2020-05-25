@@ -8,9 +8,7 @@ import io.ktor.network.selector.*
 import io.ktor.network.util.*
 import io.ktor.util.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.concurrent.*
 import io.ktor.utils.io.errors.*
-import kotlinx.atomicfu.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import platform.posix.*
@@ -38,37 +36,31 @@ internal class TCPSocketNative(
 
     @KtorExperimentalAPI
     override fun attachForReading(userChannel: ByteChannel): WriterJob = writer(Dispatchers.Unconfined, userChannel) {
-        channel.writeSuspendSession {
-            while (!channel.isClosedForWrite) {
-                tryAwait(1)
-                val buffer = request(1) ?: error("Internal error. Buffer unavailable")
+        while (!channel.isClosedForWrite) {
+            val count = channel.write { memory, startIndex, endIndex ->
+                val bufferStart = memory.pointer + startIndex
+                val size = endIndex - startIndex
+                val result = recv(descriptor, bufferStart, size.convert(), 0).toInt()
 
-                val count: Int = buffer.writeDirect {
-                    val count = buffer.writeRemaining.convert<size_t>()
-                    val result = recv(descriptor, it, count, 0).toInt()
-
-                    if (result == 0) {
-                        channel.close()
-                    }
-                    if (result == -1) {
-                        if (errno == EAGAIN) {
-                            return@writeDirect 0
-                        }
-
-                        throw PosixException.forErrno()
+                if (result == 0) {
+                    channel.close()
+                }
+                if (result == -1) {
+                    if (errno == EAGAIN) {
+                        return@write 0
                     }
 
-
-                    result.convert()
+                    throw PosixException.forErrno()
                 }
 
-                if (count == 0 && !channel.isClosedForWrite) {
-                    selector.select(selectable, SelectInterest.READ)
-                }
-
-                written(count)
-                flush()
+                result.convert()
             }
+
+            if (count == 0 && !channel.isClosedForWrite) {
+                selector.select(selectable, SelectInterest.READ)
+            }
+
+            channel.flush()
         }
     }.apply {
         invokeOnCompletion {
@@ -109,7 +101,8 @@ internal class TCPSocketNative(
         }
 
         if (!channel.isClosedForRead) {
-            val cause = IOException("Failed writing to closed socket. Some bytes remaining: ${channel.availableForRead}")
+            val availableForRead = channel.availableForRead
+            val cause = IOException("Failed writing to closed socket. Some bytes remaining: $availableForRead")
             channel.cancel(cause)
         }
 

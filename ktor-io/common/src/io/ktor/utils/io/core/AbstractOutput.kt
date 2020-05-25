@@ -471,10 +471,13 @@ internal constructor(
     }
 
     @PublishedApi
-    internal inline fun write(size: Int, block: (Buffer) -> Int) {
+    internal inline fun write(size: Int, block: (Buffer) -> Int): Int {
         val buffer = prepareWriteHead(size)
         try {
-            check(block(buffer) >= 0) { "The returned value shouldn't be negative" }
+            val result = block(buffer)
+            check(result >= 0) { "The returned value shouldn't be negative" }
+
+            return result
         } finally {
             afterHeadWrite()
         }

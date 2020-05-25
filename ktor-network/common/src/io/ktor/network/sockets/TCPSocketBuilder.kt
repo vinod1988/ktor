@@ -7,14 +7,14 @@ import io.ktor.network.util.*
  * TCP socket builder
  */
 @Suppress("PublicApiImplicitType")
-class TCPSocketBuilder(
+public class TCPSocketBuilder(
     private val selector: SelectorManager,
     override var options: SocketOptions
 ) : Configurable<TCPSocketBuilder, SocketOptions> {
     /**
      * Connect to [hostname] and [port].
      */
-    suspend fun connect(
+    public suspend fun connect(
         hostname: String,
         port: Int,
         configure: SocketOptions.TCPClientSocketOptions.() -> Unit = {}
@@ -23,7 +23,7 @@ class TCPSocketBuilder(
     /**
      * Bind server socket at [port] to listen to [hostname].
      */
-    fun bind(
+    public fun bind(
         hostname: String = "0.0.0.0",
         port: Int = 0,
         configure: SocketOptions.AcceptorOptions.() -> Unit = {}
@@ -32,7 +32,7 @@ class TCPSocketBuilder(
     /**
      * Connect to [remoteAddress].
      */
-    suspend fun connect(
+    public suspend fun connect(
         remoteAddress: NetworkAddress,
         configure: SocketOptions.TCPClientSocketOptions.() -> Unit = {}
     ): Socket = connect(selector, remoteAddress, options.peer().tcp().apply(configure))
@@ -40,7 +40,7 @@ class TCPSocketBuilder(
     /**
      * Bind server socket to listen to [localAddress].
      */
-    fun bind(
+    public fun bind(
         localAddress: NetworkAddress? = null,
         configure: SocketOptions.AcceptorOptions.() -> Unit = {}
     ): ServerSocket = bind(selector, localAddress, options.peer().acceptor().apply(configure))

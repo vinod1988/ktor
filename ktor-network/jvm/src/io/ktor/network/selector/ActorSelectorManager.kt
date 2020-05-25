@@ -18,7 +18,7 @@ import kotlin.coroutines.intrinsics.*
  */
 @Suppress("BlockingMethodInNonBlockingContext")
 @KtorExperimentalAPI
-class ActorSelectorManager(context: CoroutineContext) : SelectorManagerSupport(), Closeable, CoroutineScope {
+public class ActorSelectorManager(context: CoroutineContext) : SelectorManagerSupport(), Closeable, CoroutineScope {
     @Volatile
     private var selectorRef: Selector? = null
 
@@ -40,26 +40,24 @@ class ActorSelectorManager(context: CoroutineContext) : SelectorManagerSupport()
         launch {
             val selector = provider.openSelector() ?: error("openSelector() = null")
             selectorRef = selector
-            try {
+            selector.use {
                 try {
-                    process(mb, selector)
+                    process(mb, it)
                 } catch (t: Throwable) {
                     closed = true
                     mb.close()
-                    cancelAllSuspensions(selector, t)
+                    cancelAllSuspensions(it, t)
                 } finally {
                     closed = true
                     mb.close()
                     selectorRef = null
-                    cancelAllSuspensions(selector, null)
+                    cancelAllSuspensions(it, null)
                 }
 
                 while (true) {
                     val m = mb.removeFirstOrNull() ?: break
-                    cancelAllSuspensions(m, ClosedSendChannelException("Failed to apply interest: selector closed"))
+                    cancelAllSuspensions(m, ClosedSendChannelException("Failed to apply interest: it closed"))
                 }
-            } finally {
-                selector.close()
             }
         }
     }
@@ -123,10 +121,10 @@ class ActorSelectorManager(context: CoroutineContext) : SelectorManagerSupport()
         }
     }
 
-    override fun notifyClosed(s: Selectable) {
-        cancelAllSuspensions(s, ClosedChannelException())
+    override fun notifyClosed(selectable: Selectable) {
+        cancelAllSuspensions(selectable, ClosedChannelException())
         selectorRef?.let { selector ->
-            s.channel.keyFor(selector)?.let { k ->
+            selectable.channel.keyFor(selector)?.let { k ->
                 k.cancel()
                 selectWakeup()
             }

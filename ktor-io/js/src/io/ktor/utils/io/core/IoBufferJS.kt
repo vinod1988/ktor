@@ -357,25 +357,25 @@ public actual class IoBuffer actual constructor(
     override fun toString(): String =
         "Buffer[readable = $readRemaining, writable = $writeRemaining, startGap = $startGap, endGap = $endGap]"
 
-    actual companion object {
+    public actual companion object {
         /**
          * Number of bytes usually reserved in the end of chunk
          * when several instances of [IoBuffer] are connected into a chain (usually inside of [ByteReadPacket]
          * or [BytePacketBuilder])
          */
         @DangerousInternalIoApi
-        actual val ReservedSize: Int
+        public actual val ReservedSize: Int
             get() = Buffer.ReservedSize
 
         private val EmptyBuffer = ArrayBuffer(0)
         private val EmptyDataView = DataView(EmptyBuffer)
 
-        actual val Empty = IoBuffer(Memory.Empty, null)
+        public actual val Empty = IoBuffer(Memory.Empty, null)
 
         /**
          * The default buffer pool
          */
-        actual val Pool: ObjectPool<IoBuffer> = object : DefaultPool<IoBuffer>(BUFFER_VIEW_POOL_SIZE) {
+        public actual val Pool: ObjectPool<IoBuffer> = object : DefaultPool<IoBuffer>(BUFFER_VIEW_POOL_SIZE) {
             override fun produceInstance(): IoBuffer {
                 return IoBuffer(DefaultAllocator.alloc(DEFAULT_BUFFER_SIZE), null)
             }
@@ -400,7 +400,7 @@ public actual class IoBuffer actual constructor(
             }
         }
 
-        actual val NoPool: ObjectPool<IoBuffer> = object : NoPoolImpl<IoBuffer>() {
+        public actual val NoPool: ObjectPool<IoBuffer> = object : NoPoolImpl<IoBuffer>() {
             override fun borrow(): IoBuffer {
                 return IoBuffer(DefaultAllocator.alloc(DEFAULT_BUFFER_SIZE), null)
             }
@@ -410,7 +410,7 @@ public actual class IoBuffer actual constructor(
             }
         }
 
-        actual val EmptyPool: ObjectPool<IoBuffer> = EmptyBufferPoolImpl
+        public actual val EmptyPool: ObjectPool<IoBuffer> = EmptyBufferPoolImpl
     }
 }
 

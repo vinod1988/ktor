@@ -1,14 +1,10 @@
 package io.ktor.utils.io.core.internal
 
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
-import kotlinx.atomicfu.updateAndGet
 import io.ktor.utils.io.bits.*
-import io.ktor.utils.io.bits.DefaultAllocator
 import io.ktor.utils.io.concurrent.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.pool.*
+import kotlinx.atomicfu.*
 
 @DangerousInternalIoApi
 public open class ChunkBuffer internal constructor(memory: Memory, origin: ChunkBuffer?) : Buffer(memory) {
@@ -30,7 +26,8 @@ public open class ChunkBuffer internal constructor(memory: Memory, origin: Chunk
      * @see appendNext
      * @see cleanNext
      */
-    public var next: ChunkBuffer? get() = nextRef.value
+    public var next: ChunkBuffer?
+        get() = nextRef.value
         set(newValue) {
             if (newValue == null) {
                 cleanNext()
@@ -149,7 +146,8 @@ public open class ChunkBuffer internal constructor(memory: Memory, origin: Chunk
         }
 
         @Suppress("DEPRECATION")
-        public val Empty: ChunkBuffer get() = IoBuffer.Empty
+        public val Empty: ChunkBuffer
+            get() = IoBuffer.Empty
 
         /**
          * A pool that always returns [ChunkBuffer.Empty]
