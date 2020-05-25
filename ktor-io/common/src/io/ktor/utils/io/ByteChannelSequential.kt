@@ -7,6 +7,7 @@ import io.ktor.utils.io.core.internal.*
 import io.ktor.utils.io.internal.*
 import io.ktor.utils.io.pool.*
 import kotlinx.atomicfu.locks.*
+import kotlin.math.*
 
 @Deprecated("This is going to become internal. Use ByteReadChannel receiver instead.", level = DeprecationLevel.ERROR)
 public suspend fun ByteChannelSequentialBase.joinTo(dst: ByteChannelSequentialBase, closeOnEnd: Boolean) {
@@ -198,8 +199,18 @@ public abstract class ByteChannelSequentialBase(
     }
 
     override suspend fun writeFully(src: ByteArray, offset: Int, length: Int) {
-        writable.writeFully(src, offset, length)
-        afterWrite()
+        var currentIndex = offset
+        val endIndex = offset + length
+
+        while (currentIndex < endIndex) {
+            awaitAtLeastNBytesAvailableForWrite(1)
+
+            val bytesCount = min(availableForWrite, endIndex - currentIndex)
+            writable.writeFully(src, currentIndex, bytesCount)
+
+            currentIndex += bytesCount
+            afterWrite()
+        }
     }
 
     override suspend fun writeAvailable(src: IoBuffer): Int {
