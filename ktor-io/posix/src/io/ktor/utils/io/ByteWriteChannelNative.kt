@@ -64,12 +64,12 @@ public actual interface ByteWriteChannel {
     /**
      * Writes as much as possible and only suspends if buffer is full
      */
-    suspend fun writeAvailable(src: CPointer<ByteVar>, offset: Int, length: Int): Int
+    public suspend fun writeAvailable(src: CPointer<ByteVar>, offset: Int, length: Int): Int
 
     /**
      * Writes as much as possible and only suspends if buffer is full
      */
-    suspend fun writeAvailable(src: CPointer<ByteVar>, offset: Long, length: Long): Int
+    public suspend fun writeAvailable(src: CPointer<ByteVar>, offset: Long, length: Long): Int
 
     /**
      * Writes all [src] bytes and suspends until all bytes written. Causes flush if buffer filled up or when [autoFlush]
@@ -87,13 +87,13 @@ public actual interface ByteWriteChannel {
      * Writes all [src] bytes and suspends until all bytes written. Causes flush if buffer filled up or when [autoFlush]
      * Crashes if channel get closed while writing.
      */
-    suspend fun writeFully(src: CPointer<ByteVar>, offset: Int, length: Int)
+    public suspend fun writeFully(src: CPointer<ByteVar>, offset: Int, length: Int)
 
     /**
      * Writes all [src] bytes and suspends until all bytes written. Causes flush if buffer filled up or when [autoFlush]
      * Crashes if channel get closed while writing.
      */
-    suspend fun writeFully(src: CPointer<ByteVar>, offset: Long, length: Long)
+    public suspend fun writeFully(src: CPointer<ByteVar>, offset: Long, length: Long)
 
     @Suppress("DEPRECATION")
     @Deprecated("Use write { } instead.")
@@ -167,6 +167,6 @@ public actual interface ByteWriteChannel {
      * It does nothing when invoked on a closed channel.
      */
     public actual fun flush()
-    actual suspend fun writeFully(src: Buffer)
-    actual suspend fun writeFully(memory: Memory, startIndex: Int, endIndex: Int)
+    public actual suspend fun writeFully(src: Buffer)
+    public actual suspend fun writeFully(memory: Memory, startIndex: Int, endIndex: Int)
 }

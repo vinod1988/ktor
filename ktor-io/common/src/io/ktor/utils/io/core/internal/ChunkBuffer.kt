@@ -118,7 +118,6 @@ public open class ChunkBuffer internal constructor(memory: Memory, origin: Chunk
 
         super.reset()
         @Suppress("DEPRECATION")
-        attachment = null
         nextRef.value = null
     }
 
@@ -145,7 +144,6 @@ public open class ChunkBuffer internal constructor(memory: Memory, origin: Chunk
             }
         }
 
-        @Suppress("DEPRECATION")
         public val Empty: ChunkBuffer
             get() = IoBuffer.Empty
 
@@ -158,7 +156,7 @@ public open class ChunkBuffer internal constructor(memory: Memory, origin: Chunk
             override fun borrow() = Empty
 
             override fun recycle(instance: ChunkBuffer) {
-                require(instance === ChunkBuffer.Empty) { "Only ChunkBuffer.Empty instance could be recycled." }
+                require(instance === Empty) { "Only ChunkBuffer.Empty instance could be recycled." }
             }
 
             override fun dispose() {

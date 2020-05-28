@@ -10,12 +10,12 @@ import kotlin.contracts.*
  * Concurrent unsafe. The only concurrent-safe operation is [release].
  * In most cases [ByteReadPacket] and [BytePacketBuilder] should be used instead.
  */
-@Suppress("DIFFERENT_NAMES_FOR_THE_SAME_PARAMETER_IN_SUPERTYPES", "DEPRECATION")
+@Suppress("DEPRECATION")
 @Deprecated("Use Memory, Input or Output instead.")
 public expect class IoBuffer : Input, Output, ChunkBuffer {
 
     @Suppress("ConvertSecondaryConstructorToPrimary")
-    constructor(memory: Memory, origin: ChunkBuffer?)
+    public constructor(memory: Memory, origin: ChunkBuffer?)
 
     @Deprecated(
         "Not supported anymore. All operations are big endian by default. " +
@@ -29,7 +29,7 @@ public expect class IoBuffer : Input, Output, ChunkBuffer {
 
     final override fun flush()
 
-    fun release(pool: ObjectPool<IoBuffer>)
+    public fun release(pool: ObjectPool<IoBuffer>)
 
     @Suppress("DEPRECATION")
     public companion object {
@@ -66,7 +66,7 @@ public expect class IoBuffer : Input, Output, ChunkBuffer {
 /**
  * Read the specified number of bytes specified (optional, read all remaining by default)
  */
-fun Buffer.readBytes(count: Int = readRemaining): ByteArray {
+public fun Buffer.readBytes(count: Int = readRemaining): ByteArray {
     if (count == 0) {
         return EmptyByteArray
     }
@@ -140,11 +140,11 @@ internal tailrec fun ChunkBuffer.findTail(): ChunkBuffer {
  * Summarize remainings of all elements of the chain
  */
 @DangerousInternalIoApi
-fun ChunkBuffer.remainingAll(): Long = remainingAll(0L)
+public fun ChunkBuffer.remainingAll(): Long = remainingAll(0L)
 
 @Suppress("DEPRECATION", "UNUSED")
 @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-fun remainingAll(buffer: IoBuffer): Long = buffer.remainingAll()
+public fun remainingAll(buffer: IoBuffer): Long = buffer.remainingAll()
 
 private tailrec fun ChunkBuffer.remainingAll(n: Long): Long {
     val rem = readRemaining.toLong() + n
@@ -185,4 +185,4 @@ internal fun Buffer.peekTo(destination: Memory, destinationOffset: Long, offset:
     return size
 }
 
-class BufferLimitExceededException(message: String) : Exception(message)
+public class BufferLimitExceededException(message: String) : Exception(message)

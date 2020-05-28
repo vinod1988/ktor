@@ -40,55 +40,6 @@ public actual class IoBuffer actual constructor(
         return tryPeekByte()
     }
 
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readFully(dst: ArrayBuffer, offset: Int, length: Int) {
-        (this as Buffer).readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: ArrayBuffer, offset: Int, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readAvailable(dst: IoBuffer, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFully(dst: ArrayBufferView, offset: Int, length: Int) {
-        if (readRemaining < length) throw IllegalStateException("Not enough bytes available ($readRemaining) to read $length bytes")
-        if (length > dst.byteLength) throw IllegalArgumentException("Destination buffer overflow: length = $length, buffer capacity ${dst.byteLength}")
-        require(offset >= 0) { "offset should be positive" }
-        require(offset + length <= dst.byteLength) { throw IndexOutOfBoundsException("") }
-
-        (this as Buffer).readFully(dst.buffer, dst.byteOffset + offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: ArrayBufferView, offset: Int, length: Int): Int {
-        val readRemaining = readRemaining
-        if (readRemaining == 0) return -1
-        val size = minOf(length, readRemaining)
-        (this as Buffer).readFully(dst, offset, size)
-        return size
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFully(dst: Int8Array, offset: Int, length: Int) {
-        (this as Buffer).readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: Int8Array, offset: Int, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readFully(dst: IoBuffer, length: Int) {
-        (this as Buffer).readFully(dst, length)
-    }
-
     final override fun append(csq: CharSequence?, start: Int, end: Int): Appendable {
         val idx = appendChars(csq ?: "null", start, end)
         if (idx != end) throw IllegalStateException("Not enough free space to append char sequence")
@@ -106,188 +57,9 @@ public actual class IoBuffer actual constructor(
         return this
     }
 
-    override fun append(c: Char): Appendable {
-        (this as Buffer).append(c)
+    override fun append(value: Char): Appendable {
+        (this as Buffer).append(value)
         return this
-    }
-
-    @Deprecated(
-        "Use writeFully instead",
-        ReplaceWith("writeFully(array, offset, length)"),
-        level = DeprecationLevel.ERROR
-    )
-    fun write(array: ByteArray, offset: Int, length: Int) {
-        (this as Buffer).writeFully(array, offset, length)
-    }
-
-    @Deprecated(
-        "Use writeFully instead",
-        ReplaceWith("writeFully(array, offset, length)"),
-        level = DeprecationLevel.ERROR
-    )
-    fun write(src: Int8Array, offset: Int, length: Int) {
-        (this as Buffer).writeFully(src, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readShort(): Short {
-        return (this as Buffer).readShort()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readInt(): Int {
-        return (this as Buffer).readInt()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFloat(): Float {
-        return (this as Buffer).readFloat()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readDouble(): Double {
-        return (this as Buffer).readDouble()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFully(dst: ByteArray, offset: Int, length: Int) {
-        (this as Buffer).readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFully(dst: ShortArray, offset: Int, length: Int) {
-        (this as Buffer).readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFully(dst: IntArray, offset: Int, length: Int) {
-        (this as Buffer).readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFully(dst: LongArray, offset: Int, length: Int) {
-        (this as Buffer).readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFully(dst: FloatArray, offset: Int, length: Int) {
-        (this as Buffer).readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readFully(dst: DoubleArray, offset: Int, length: Int) {
-        (this as Buffer).readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: ByteArray, offset: Int, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: ShortArray, offset: Int, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: IntArray, offset: Int, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: LongArray, offset: Int, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: FloatArray, offset: Int, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun readAvailable(dst: DoubleArray, offset: Int, length: Int): Int {
-        return (this as Buffer).readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun peekTo(buffer: IoBuffer): Int {
-        return (this as Input).peekTo(buffer)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readLong(): Long {
-        return (this as Buffer).readLong()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeShort(v: Short) {
-        (this as Buffer).writeShort(v)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeInt(v: Int) {
-        (this as Buffer).writeInt(v)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeFloat(v: Float) {
-        (this as Buffer).writeFloat(v)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeDouble(v: Double) {
-        (this as Buffer).writeDouble(v)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeFully(src: ByteArray, offset: Int, length: Int) {
-        (this as Buffer).writeFully(src, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeFully(src: ShortArray, offset: Int, length: Int) {
-        (this as Buffer).writeFully(src, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeFully(src: IntArray, offset: Int, length: Int) {
-        (this as Buffer).writeFully(src, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeFully(src: LongArray, offset: Int, length: Int) {
-        (this as Buffer).writeFully(src, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeFully(src: FloatArray, offset: Int, length: Int) {
-        (this as Buffer).writeFully(src, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeFully(src: DoubleArray, offset: Int, length: Int) {
-        (this as Buffer).writeFully(src, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun writeFully(src: IoBuffer, length: Int) {
-        (this as Buffer).writeFully(src, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override fun fill(n: Long, v: Byte) {
-        (this as Buffer).fill(n, v)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun writeLong(v: Long) {
-        (this as Buffer).writeLong(v)
-    }
-
-    @Deprecated("Use writeFully instead", ReplaceWith("writeFully(src, length)"), level = DeprecationLevel.ERROR)
-    fun writeBuffer(src: IoBuffer, length: Int): Int {
-        (this as Buffer).writeFully(src, length)
-        return length
     }
 
     actual final override fun flush() {
@@ -346,7 +118,7 @@ public actual class IoBuffer actual constructor(
         return rc
     }
 
-    actual fun release(pool: ObjectPool<IoBuffer>) {
+    public actual fun release(pool: ObjectPool<IoBuffer>) {
         releaseImpl(pool)
     }
 
@@ -414,7 +186,7 @@ public actual class IoBuffer actual constructor(
     }
 }
 
-fun Buffer.readFully(dst: ArrayBuffer, offset: Int = 0, length: Int = dst.byteLength - offset) {
+public fun Buffer.readFully(dst: ArrayBuffer, offset: Int = 0, length: Int = dst.byteLength - offset) {
     read { memory, start, endExclusive ->
         if (endExclusive - start < length) {
             throw EOFException("Not enough bytes available to read $length bytes")
@@ -425,7 +197,7 @@ fun Buffer.readFully(dst: ArrayBuffer, offset: Int = 0, length: Int = dst.byteLe
     }
 }
 
-fun Buffer.readFully(dst: ArrayBufferView, offset: Int = 0, length: Int = dst.byteLength - offset) {
+public fun Buffer.readFully(dst: ArrayBufferView, offset: Int = 0, length: Int = dst.byteLength - offset) {
     read { memory, start, endExclusive ->
         if (endExclusive - start < length) {
             throw EOFException("Not enough bytes available to read $length bytes")
@@ -436,21 +208,21 @@ fun Buffer.readFully(dst: ArrayBufferView, offset: Int = 0, length: Int = dst.by
     }
 }
 
-fun Buffer.readAvailable(dst: ArrayBuffer, offset: Int = 0, length: Int = dst.byteLength - offset): Int {
+public fun Buffer.readAvailable(dst: ArrayBuffer, offset: Int = 0, length: Int = dst.byteLength - offset): Int {
     if (!canRead()) return -1
     val readSize = minOf(length, readRemaining)
     readFully(dst, offset, readSize)
     return readSize
 }
 
-fun Buffer.readAvailable(dst: ArrayBufferView, offset: Int = 0, length: Int = dst.byteLength - offset): Int {
+public fun Buffer.readAvailable(dst: ArrayBufferView, offset: Int = 0, length: Int = dst.byteLength - offset): Int {
     if (!canRead()) return -1
     val readSize = minOf(length, readRemaining)
     readFully(dst, offset, readSize)
     return readSize
 }
 
-fun Buffer.writeFully(src: ArrayBuffer, offset: Int = 0, length: Int = src.byteLength) {
+public fun Buffer.writeFully(src: ArrayBuffer, offset: Int = 0, length: Int = src.byteLength) {
     write { memory, start, endExclusive ->
         if (endExclusive - start < length) {
             throw InsufficientSpaceException("Not enough free space to write $length bytes")
@@ -461,7 +233,7 @@ fun Buffer.writeFully(src: ArrayBuffer, offset: Int = 0, length: Int = src.byteL
     }
 }
 
-fun Buffer.writeFully(src: ArrayBufferView, offset: Int = 0, length: Int = src.byteLength - offset) {
+public fun Buffer.writeFully(src: ArrayBufferView, offset: Int = 0, length: Int = src.byteLength - offset) {
     write { memory, dstOffset, endExclusive ->
         if (endExclusive - dstOffset < length) {
             throw InsufficientSpaceException("Not enough free space to write $length bytes")
@@ -472,7 +244,7 @@ fun Buffer.writeFully(src: ArrayBufferView, offset: Int = 0, length: Int = src.b
     }
 }
 
-inline fun Buffer.writeDirect(block: (DataView) -> Int): Int {
+public inline fun Buffer.writeDirect(block: (DataView) -> Int): Int {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -482,7 +254,7 @@ inline fun Buffer.writeDirect(block: (DataView) -> Int): Int {
     }
 }
 
-inline fun Buffer.readDirect(block: (DataView) -> Int): Int {
+public inline fun Buffer.readDirect(block: (DataView) -> Int): Int {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -493,7 +265,7 @@ inline fun Buffer.readDirect(block: (DataView) -> Int): Int {
 }
 
 
-inline fun Buffer.writeDirectInt8Array(block: (Int8Array) -> Int): Int {
+public inline fun Buffer.writeDirectInt8Array(block: (Int8Array) -> Int): Int {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -503,7 +275,7 @@ inline fun Buffer.writeDirectInt8Array(block: (Int8Array) -> Int): Int {
     }
 }
 
-inline fun Buffer.readDirectInt8Array(block: (Int8Array) -> Int): Int {
+public inline fun Buffer.readDirectInt8Array(block: (Int8Array) -> Int): Int {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

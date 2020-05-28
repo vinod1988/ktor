@@ -1,11 +1,14 @@
 package io.ktor.utils.io.streams
 
-import io.ktor.utils.io.bits.Memory
-import io.ktor.utils.io.bits.storeByteArray
+import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.core.internal.*
 import io.ktor.utils.io.pool.*
 import java.io.*
+
+
+public fun InputStream.asInput(pool: ObjectPool<ChunkBuffer> = ChunkBuffer.Pool): Input =
+    InputStreamAsInput(this, pool)
 
 internal class InputStreamAsInput(
     private val stream: InputStream,
@@ -33,5 +36,3 @@ internal class InputStreamAsInput(
         stream.close()
     }
 }
-
-fun InputStream.asInput(pool: ObjectPool<ChunkBuffer> = ChunkBuffer.Pool): Input = InputStreamAsInput(this, pool)

@@ -1,10 +1,11 @@
 package io.ktor.utils.io.core
 
-expect enum class ByteOrder {
+@Suppress("NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING")
+public expect enum class ByteOrder {
     BIG_ENDIAN, LITTLE_ENDIAN;
 
-    companion object {
-        fun nativeOrder(): ByteOrder
+    public companion object {
+        public fun nativeOrder(): ByteOrder
     }
 }
 

@@ -50,7 +50,7 @@ public actual interface ByteReadChannel {
 
     public actual suspend fun readAvailable(dst: IoBuffer): Int
 
-    suspend fun readAvailable(dst: ArrayBuffer, offset: Int, length: Int): Int
+    public suspend fun readAvailable(dst: ArrayBuffer, offset: Int, length: Int): Int
 
     /**
      * Reads all [length] bytes to [dst] buffer or fails if channel has been closed.
@@ -60,7 +60,7 @@ public actual interface ByteReadChannel {
 
     public actual suspend fun readFully(dst: IoBuffer, n: Int)
 
-    suspend fun readFully(dst: ArrayBuffer, offset: Int, length: Int)
+    public suspend fun readFully(dst: ArrayBuffer, offset: Int, length: Int)
 
     /**
      * Reads the specified amount of bytes and makes a byte packet from them. Fails if channel has been closed

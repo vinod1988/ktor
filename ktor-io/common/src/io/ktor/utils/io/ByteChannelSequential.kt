@@ -9,13 +9,11 @@ import io.ktor.utils.io.pool.*
 import kotlinx.atomicfu.locks.*
 import kotlin.math.*
 
-@Deprecated("This is going to become internal. Use ByteReadChannel receiver instead.", level = DeprecationLevel.ERROR)
-public suspend fun ByteChannelSequentialBase.joinTo(dst: ByteChannelSequentialBase, closeOnEnd: Boolean) {
+internal suspend fun ByteChannelSequentialBase.joinTo(dst: ByteChannelSequentialBase, closeOnEnd: Boolean) {
     return joinToImpl(dst, closeOnEnd)
 }
 
-@Deprecated("This is going to become internal. Use ByteReadChannel receiver instead.", level = DeprecationLevel.ERROR)
-public suspend fun ByteChannelSequentialBase.copyTo(
+internal suspend fun ByteChannelSequentialBase.copyTo(
     dst: ByteChannelSequentialBase,
     limit: Long = Long.MAX_VALUE
 ): Long {
@@ -34,10 +32,6 @@ public abstract class ByteChannelSequentialBase(
     override val autoFlush: Boolean,
     pool: ObjectPool<ChunkBuffer> = ChunkBuffer.Pool
 ) : ByteChannel, ByteReadChannel, ByteWriteChannel, SuspendableReadSession, HasReadSession, HasWriteSession {
-
-    @Suppress("unused", "DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public constructor(initial: IoBuffer, autoFlush: Boolean) : this(initial, autoFlush, ChunkBuffer.Pool)
 
     protected var closed: Boolean by shared(false)
     protected val writable: BytePacketBuilder = BytePacketBuilder(0, pool)

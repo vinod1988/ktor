@@ -2,10 +2,11 @@ package io.ktor.utils.io.core
 
 import kotlinx.cinterop.*
 
-actual enum class ByteOrder {
+@Suppress("NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING")
+public actual enum class ByteOrder {
     BIG_ENDIAN, LITTLE_ENDIAN;
 
-    actual companion object {
+    public actual companion object {
         private val native: ByteOrder
 
         init {
@@ -17,6 +18,6 @@ actual enum class ByteOrder {
             }
         }
 
-        actual fun nativeOrder(): ByteOrder = native
+        public actual fun nativeOrder(): ByteOrder = native
     }
 }

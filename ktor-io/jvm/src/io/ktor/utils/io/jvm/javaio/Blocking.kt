@@ -14,13 +14,13 @@ import kotlin.coroutines.intrinsics.*
  * Create blocking [java.io.InputStream] for this channel that does block every time the channel suspends at read
  * Similar to do reading in [runBlocking] however you can pass it to regular blocking API
  */
-fun ByteReadChannel.toInputStream(parent: Job? = null): InputStream = InputAdapter(parent, this)
+public fun ByteReadChannel.toInputStream(parent: Job? = null): InputStream = InputAdapter(parent, this)
 
 /**
  * Create blocking [java.io.OutputStream] for this channel that does block every time the channel suspends at write
  * Similar to do reading in [runBlocking] however you can pass it to regular blocking API
  */
-fun ByteWriteChannel.toOutputStream(parent: Job? = null): OutputStream = OutputAdapter(parent, this)
+public fun ByteWriteChannel.toOutputStream(parent: Job? = null): OutputStream = OutputAdapter(parent, this)
 
 private class InputAdapter(parent: Job?, private val channel: ByteReadChannel) : InputStream() {
     private val loop = object : BlockingAdapter(parent) {
@@ -187,7 +187,7 @@ private abstract class BlockingAdapter(val parent: Job? = null) {
     }
 
     fun submitAndAwait(jobToken: Any): Int {
-        val thread = Thread.currentThread()!!
+        val thread = Thread.currentThread()
 
         var cont: Continuation<Any>? = null
 

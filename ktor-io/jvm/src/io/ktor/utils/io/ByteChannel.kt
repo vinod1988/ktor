@@ -6,7 +6,7 @@ import java.nio.*
 /**
  * Creates channel for reading from the specified byte buffer.
  */
-fun ByteReadChannel(content: ByteBuffer): ByteReadChannel = ByteBufferChannel(content)
+public fun ByteReadChannel(content: ByteBuffer): ByteReadChannel = ByteBufferChannel(content)
 
 /**
  * Creates buffered channel for asynchronous reading and writing of sequences of bytes.

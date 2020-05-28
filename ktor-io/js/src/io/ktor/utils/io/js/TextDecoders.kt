@@ -8,14 +8,6 @@ private val IS_NODE: Boolean = js(
     "typeof process !== 'undefined' && process.versions != null && process.versions.node != null"
 ) as Boolean
 
-@Deprecated("Use readText with charset instead", ReplaceWith("readText(Charset.forName(encoding), max)", "io.ktor.utils.io.core.readText", "io.ktor.utils.io.charsets.Charset"))
-fun ByteReadPacket.readText(encoding: String, max: Int = Int.MAX_VALUE): String = readText(Charset.forName(encoding), max)
-
-@Deprecated("Use readText with charset instead", ReplaceWith("readText(out, Charset.forName(encoding), max)", "io.ktor.utils.io.core.readText", "io.ktor.utils.io.charsets.Charset"))
-fun ByteReadPacket.readText(encoding: String = "UTF-8", out: Appendable, max: Int = Int.MAX_VALUE): Int {
-    return readText(out, Charset.forName(encoding), max)
-}
-
 internal external class TextDecoder(encoding: String, options: dynamic = definedExternally) {
     val encoding: String
 

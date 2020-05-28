@@ -7,8 +7,9 @@ import java.nio.ByteBuffer
 
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @ExperimentalIoApi
-class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
-    : ByteChannelSequentialBase(initial, autoFlush) {
+public class ByteChannelSequentialJVM(
+    initial: IoBuffer, autoFlush: Boolean
+) : ByteChannelSequentialBase(initial, autoFlush) {
 
     @Volatile
     private var attachedJob: Job? = null
@@ -129,27 +130,6 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
         }
     }
 
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override suspend fun consumeEachBufferRange(visitor: ConsumeEachBufferVisitor) {
-        val readable = readable
-        var invokedWithLast = false
-
-        while (true) {
-            readable.readDirect(1) { buffer: ByteBuffer ->
-                val last = closed && buffer.remaining() == availableForRead
-                visitor(buffer, last)
-                if (last) {
-                    invokedWithLast = true
-                }
-            }
-            if (!await(1)) break
-        }
-
-        if (!invokedWithLast) {
-            visitor(ByteBuffer.allocate(0), true)
-        }
-    }
-
     override fun <R> lookAhead(visitor: LookAheadSession.() -> R): R {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -163,8 +143,8 @@ class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean)
 
         if (!await(min)) throw EOFException("Channel closed while $min bytes expected")
 
-        readable.readDirect(min) { bb ->
-            consumer(bb)
+        readable.readDirect(min) { buffer ->
+            consumer(buffer)
         }
     }
 

@@ -1,8 +1,10 @@
 package io.ktor.utils.io.core
 
-import kotlinx.cinterop.*
-import io.ktor.utils.io.bits.Memory
+import io.ktor.utils.io.bits.*
 
+/**
+ * Shouldn't be implemented directly. Inherit [AbstractInput] instead.
+ */
 @Suppress("NO_ACTUAL_CLASS_MEMBER_FOR_EXPECTED_CLASS")
 public actual interface Input : Closeable {
     @Deprecated(
@@ -18,6 +20,8 @@ public actual interface Input : Closeable {
      * Please note that `false` value doesn't guarantee that there are available bytes so `readByte()` may fail.
      */
     public actual val endOfInput: Boolean
+
+    public actual fun readByte(): Byte
 
     /**
      * Copy at least [min] but up to [max] bytes to the specified [destination] buffer from this input
@@ -43,12 +47,6 @@ public actual interface Input : Closeable {
         min: Long,
         max: Long
     ): Long
-
-    /**
-     * Read the next upcoming byte
-     * @throws EOFException if no more bytes available.
-     */
-    public actual fun readByte(): Byte
 
     /*
      * Returns next byte (unsigned) or `-1` if no more bytes available

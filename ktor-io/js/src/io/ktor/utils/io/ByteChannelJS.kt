@@ -40,7 +40,7 @@ public actual fun ByteReadChannel(content: ByteArray, offset: Int, length: Int):
 /**
  * Creates channel for reading from the specified [ArrayBufferView]
  */
-fun ByteReadChannel(content: ArrayBufferView): ByteReadChannel {
+public fun ByteReadChannel(content: ArrayBufferView): ByteReadChannel {
     if (content.byteLength == 0) return ByteReadChannel.Empty
     val head = IoBuffer.Pool.borrow()
     var tail = head

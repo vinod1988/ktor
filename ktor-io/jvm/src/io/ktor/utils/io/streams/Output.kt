@@ -7,6 +7,8 @@ import io.ktor.utils.io.core.internal.*
 import io.ktor.utils.io.pool.*
 import java.io.*
 
+public fun OutputStream.asOutput(): Output = OutputStreamAdapter(ChunkBuffer.Pool, this)
+
 private class OutputStreamAdapter(pool: ObjectPool<ChunkBuffer>, private val stream: OutputStream) :
     AbstractOutput(pool) {
     override fun flush(source: Memory, offset: Int, length: Int) {
@@ -35,5 +37,3 @@ private class OutputStreamAdapter(pool: ObjectPool<ChunkBuffer>, private val str
         stream.close()
     }
 }
-
-fun OutputStream.asOutput(): Output = OutputStreamAdapter(ChunkBuffer.Pool, this)

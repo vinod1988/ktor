@@ -23,7 +23,7 @@ private class ChannelAsInput(private val channel: ReadableByteChannel, pool: Obj
     }
 }
 
-fun ReadableByteChannel.asInput(
+public fun ReadableByteChannel.asInput(
     pool: ObjectPool<ChunkBuffer> = ChunkBuffer.Pool
 ): Input = ChannelAsInput(this, pool)
 

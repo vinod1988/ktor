@@ -50,7 +50,7 @@ public actual interface ByteReadChannel {
      */
     public actual suspend fun readAvailable(dst: ByteArray, offset: Int, length: Int): Int
     public actual suspend fun readAvailable(dst: IoBuffer): Int
-    suspend fun readAvailable(dst: ByteBuffer): Int
+    public suspend fun readAvailable(dst: ByteBuffer): Int
 
     /**
      * Reads all [length] bytes to [dst] buffer or fails if channel has been closed.
@@ -58,7 +58,7 @@ public actual interface ByteReadChannel {
      */
     public actual suspend fun readFully(dst: ByteArray, offset: Int, length: Int)
     public actual suspend fun readFully(dst: IoBuffer, n: Int)
-    suspend fun readFully(dst: ByteBuffer): Int
+    public suspend fun readFully(dst: ByteBuffer): Int
 
     /**
      * Reads the specified amount of bytes and makes a byte packet from them. Fails if channel has been closed
@@ -140,11 +140,11 @@ public actual interface ByteReadChannel {
 
     @Suppress("DEPRECATION")
     @Deprecated("Use read { } instead.")
-    fun <R> lookAhead(visitor: LookAheadSession.() -> R): R
+    public fun <R> lookAhead(visitor: LookAheadSession.() -> R): R
 
     @Suppress("DEPRECATION")
     @Deprecated("Use read { } instead.")
-    suspend fun <R> lookAheadSuspend(visitor: suspend LookAheadSuspendSession.() -> R): R
+    public suspend fun <R> lookAheadSuspend(visitor: suspend LookAheadSuspendSession.() -> R): R
 
     /**
      * Reads a line of UTF-8 characters to the specified [out] buffer up to [limit] characters.
@@ -188,7 +188,7 @@ public actual interface ByteReadChannel {
      * @param min amount of bytes available for read, should be positive or zero
      * @param consumer to be invoked when at least [min] bytes available for read
      */
-    suspend fun read(min: Int = 1, consumer: (ByteBuffer) -> Unit)
+    public suspend fun read(min: Int = 1, consumer: (ByteBuffer) -> Unit)
 
     /**
      * Close channel with optional [cause] cancellation. Unlike [ByteWriteChannel.close] that could close channel

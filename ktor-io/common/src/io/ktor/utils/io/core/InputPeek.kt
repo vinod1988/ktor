@@ -20,9 +20,7 @@ import io.ktor.utils.io.errors.checkPeekTo
  * @param max bytes to be copied even if there are more bytes buffered, could be [Int.MAX_VALUE].
  * @return number of bytes copied to the [destination] possibly `0`
  */
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER", "DEPRECATION")
-@Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-fun Input.peekTo(destination: IoBuffer, offset: Int = 0, min: Int = 1, max: Int = Int.MAX_VALUE): Int {
+public fun Input.peekTo(destination: IoBuffer, offset: Int = 0, min: Int = 1, max: Int = Int.MAX_VALUE): Int {
     return peekTo(destination as Buffer, offset, min, max)
 }
 
@@ -44,9 +42,7 @@ fun Input.peekTo(destination: IoBuffer, offset: Int = 0, min: Int = 1, max: Int 
  * @param max bytes to be copied even if there are more bytes buffered, could be [Int.MAX_VALUE].
  * @return number of bytes copied to the [destination] possibly `0`
  */
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER", "DEPRECATION")
-@Deprecated("Use peekTo(Memory) instead.")
-fun Input.peekTo(destination: Buffer, offset: Int = 0, min: Int = 1, max: Int = Int.MAX_VALUE): Int {
+public fun Input.peekTo(destination: Buffer, offset: Int = 0, min: Int = 1, max: Int = Int.MAX_VALUE): Int {
     checkPeekTo(destination, offset, min, max)
 
     val copied = peekTo(

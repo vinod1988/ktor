@@ -214,7 +214,9 @@ public suspend fun ByteReadChannel.readRemaining(limit: Long): ByteReadPacket = 
  */
 public suspend fun ByteReadChannel.readRemaining(): ByteReadPacket = readRemaining(Long.MAX_VALUE, 0)
 
-public suspend fun ByteReadChannel.readFully(dst: IoBuffer) = readFully(dst, dst.writeRemaining)
+public suspend fun ByteReadChannel.readFully(dst: IoBuffer) {
+    readFully(dst, dst.writeRemaining)
+}
 
 public suspend fun ByteReadChannel.readUTF8LineTo(out: Appendable): Boolean {
     return readUTF8LineTo(out, Int.MAX_VALUE)
@@ -240,7 +242,9 @@ public suspend inline fun ByteReadChannel.discardExact(n: Long) {
 
 public suspend fun ByteReadChannel.readAvailable(dst: ByteArray): Int = readAvailable(dst, 0, dst.size)
 
-public suspend fun ByteReadChannel.readFully(dst: ByteArray) = readFully(dst, 0, dst.size)
+public suspend fun ByteReadChannel.readFully(dst: ByteArray) {
+    readFully(dst, 0, dst.size)
+}
 
 public expect suspend fun ByteReadChannel.joinTo(dst: ByteWriteChannel, closeOnEnd: Boolean)
 

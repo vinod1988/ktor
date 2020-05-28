@@ -3,10 +3,10 @@
 package io.ktor.utils.io.core
 
 import io.ktor.utils.io.bits.*
-import io.ktor.utils.io.charsets.Charsets
+import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.concurrent.*
 import io.ktor.utils.io.core.internal.*
-import io.ktor.utils.io.pool.ObjectPool
+import io.ktor.utils.io.pool.*
 
 /**
  * The default [Output] implementation.
@@ -14,14 +14,14 @@ import io.ktor.utils.io.pool.ObjectPool
  * @see closeDestination
  */
 @ExperimentalIoApi
-abstract class AbstractOutput
+public abstract class AbstractOutput
 internal constructor(
     private val headerSizeHint: Int,
     protected val pool: ObjectPool<ChunkBuffer>
 ) : Appendable, Output {
-    constructor(pool: ObjectPool<ChunkBuffer>) : this(0, pool)
-
-    constructor() : this(ChunkBuffer.Pool)
+    public constructor(
+        pool: ObjectPool<ChunkBuffer> = ChunkBuffer.Pool
+    ) : this(0, pool)
 
     /**
      * An implementation should write [source] to the destination exactly [length] bytes.
@@ -40,20 +40,6 @@ internal constructor(
 
     internal val head: ChunkBuffer
         get() = _head ?: ChunkBuffer.Empty
-
-    @PublishedApi
-    @Deprecated("Will be removed in future releases.", level = DeprecationLevel.HIDDEN)
-    internal val tail: ChunkBuffer
-        get() {
-            return prepareWriteHead(1)
-        }
-
-    @Deprecated("Will be removed. Override flush(buffer) properly.", level = DeprecationLevel.ERROR)
-    protected var currentTail: ChunkBuffer
-        get() = prepareWriteHead(1)
-        set(newValue) {
-            appendChain(newValue)
-        }
 
     internal var tailMemory: Memory by shared(Memory.Empty)
     internal var tailPosition by shared(0)
@@ -88,7 +74,8 @@ internal constructor(
             "to read primitives in little endian",
         level = DeprecationLevel.ERROR
     )
-    final override var byteOrder: ByteOrder get() = ByteOrder.BIG_ENDIAN
+    final override var byteOrder: ByteOrder
+        get() = ByteOrder.BIG_ENDIAN
         set(value) {
             if (value != ByteOrder.BIG_ENDIAN) {
                 throw IllegalArgumentException(
@@ -187,15 +174,15 @@ internal constructor(
         tailEndExclusive = newTail.limit
     }
 
-    final override fun writeByte(v: Byte) {
+    final override fun writeByte(value: Byte) {
         val index = tailPosition
         if (index < tailEndExclusive) {
             tailPosition = index + 1
-            tailMemory[index] = v
+            tailMemory[index] = value
             return
         }
 
-        return writeByteFallback(v)
+        return writeByteFallback(value)
     }
 
     private fun writeByteFallback(v: Byte) {
@@ -217,15 +204,15 @@ internal constructor(
     /**
      * Append single UTF-8 character
      */
-    override fun append(c: Char): AbstractOutput {
+    override fun append(value: Char): AbstractOutput {
         val tailPosition = tailPosition
         if (tailEndExclusive - tailPosition >= 3) {
-            val size = tailMemory.putUtf8Char(tailPosition, c.toInt())
+            val size = tailMemory.putUtf8Char(tailPosition, value.toInt())
             this.tailPosition = tailPosition + size
             return this
         }
 
-        appendCharFallback(c)
+        appendCharFallback(value)
         return this
     }
 
@@ -237,21 +224,21 @@ internal constructor(
         }
     }
 
-    override fun append(csq: CharSequence?): AbstractOutput {
-        if (csq == null) {
+    override fun append(value: CharSequence?): AbstractOutput {
+        if (value == null) {
             append("null", 0, 4)
         } else {
-            append(csq, 0, csq.length)
+            append(value, 0, value.length)
         }
         return this
     }
 
-    override fun append(csq: CharSequence?, start: Int, end: Int): AbstractOutput {
-        if (csq == null) {
-            return append("null", start, end)
+    override fun append(value: CharSequence?, startIndex: Int, endIndex: Int): AbstractOutput {
+        if (value == null) {
+            return append("null", startIndex, endIndex)
         }
 
-        writeText(csq, start, end, Charsets.UTF_8)
+        writeText(value, startIndex, endIndex, Charsets.UTF_8)
 
         return this
     }
@@ -354,7 +341,7 @@ internal constructor(
     /**
      * Write exact [n] bytes from packet to the builder
      */
-    fun writePacket(p: ByteReadPacket, n: Int) {
+    public fun writePacket(p: ByteReadPacket, n: Int) {
         var remaining = n
 
         while (remaining > 0) {
@@ -374,16 +361,16 @@ internal constructor(
     /**
      * Write exact [n] bytes from packet to the builder
      */
-    fun writePacket(p: ByteReadPacket, n: Long) {
+    public fun writePacket(packet: ByteReadPacket, n: Long) {
         var remaining = n
 
         while (remaining > 0L) {
-            val headRemaining = p.headRemaining.toLong()
+            val headRemaining = packet.headRemaining.toLong()
             if (headRemaining <= remaining) {
                 remaining -= headRemaining
-                appendSingleChunk(p.steal() ?: throw EOFException("Unexpected end of packet"))
+                appendSingleChunk(packet.steal() ?: throw EOFException("Unexpected end of packet"))
             } else {
-                p.read { view ->
+                packet.read { view ->
                     writeFully(view, remaining.toInt())
                 }
                 break
@@ -391,8 +378,8 @@ internal constructor(
         }
     }
 
-    override fun append(csq: CharArray, start: Int, end: Int): Appendable {
-        writeText(csq, start, end, Charsets.UTF_8)
+    override fun append(array: CharArray, startIndex: Int, endIndex: Int): Appendable {
+        writeText(array, startIndex, endIndex, Charsets.UTF_8)
         return this
     }
 
@@ -412,16 +399,6 @@ internal constructor(
         }
 
         return idx
-    }
-
-    @Deprecated("Use writeText instead", ReplaceWith("this.writeText(s)"))
-    fun writeStringUtf8(s: String) {
-        writeText(s)
-    }
-
-    @Deprecated("Use writeText instead", ReplaceWith("this.writeText(cs)"))
-    fun writeStringUtf8(cs: CharSequence) {
-        writeText(cs)
     }
 
     @Suppress("NOTHING_TO_INLINE")
@@ -450,12 +427,12 @@ internal constructor(
     /**
      * Release any resources that the builder holds. Builder shouldn't be used after release
      */
-    final fun release() {
+    public final fun release() {
         close()
     }
 
     @DangerousInternalIoApi
-    fun prepareWriteHead(n: Int): ChunkBuffer {
+    public fun prepareWriteHead(n: Int): ChunkBuffer {
         if (tailRemaining >= n) {
             _tail?.let {
                 it.commitWrittenUntilIndex(tailPosition)
@@ -466,7 +443,7 @@ internal constructor(
     }
 
     @DangerousInternalIoApi
-    fun afterHeadWrite() {
+    public fun afterHeadWrite() {
         _tail?.let { tailPosition = it.writePosition }
     }
 
@@ -481,31 +458,5 @@ internal constructor(
         } finally {
             afterHeadWrite()
         }
-    }
-
-    @PublishedApi
-    @Deprecated("There is no need to do that anymore.", level = DeprecationLevel.HIDDEN)
-    internal fun addSize(n: Int) {
-        check(n >= 0) { "It should be non-negative size increment: $n" }
-        check(n <= tailRemaining) { "Unable to mark more bytes than available: $n > $tailRemaining" }
-
-        // For binary compatibility we need to update pointers
-        tailPosition += n
-    }
-
-    @Suppress("DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    internal open fun last(buffer: IoBuffer) {
-        appendSingleChunk(buffer as ChunkBuffer)
-    }
-
-    @Suppress("DEPRECATION")
-    @Deprecated("Use appendNewChunk instead",
-        replaceWith = ReplaceWith("appendNewChunk()"),
-        level = DeprecationLevel.HIDDEN)
-    fun appendNewBuffer(): IoBuffer = appendNewChunk() as IoBuffer
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    open fun reset() {
     }
 }

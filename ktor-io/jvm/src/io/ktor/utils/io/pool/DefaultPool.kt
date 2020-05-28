@@ -16,7 +16,7 @@ public actual abstract class DefaultPool<T : Any> actual constructor(actual fina
     }
 
     protected actual abstract fun produceInstance(): T // factory
-    protected actual open fun clearInstance(instance: T) = instance // optional cleaning of poped items
+    protected actual open fun clearInstance(instance: T): T = instance // optional cleaning of poped items
     protected actual open fun validateInstance(instance: T) {} // optional validation for recycled items
     protected actual open fun disposeInstance(instance: T) {} // optional destruction of unpoolable items
 
@@ -88,7 +88,7 @@ public actual abstract class DefaultPool<T : Any> actual constructor(actual fina
         }
     }
 
-    companion object {
+    public companion object {
         // todo: replace with atomicfu, remove companion object
         private val Top = longUpdater(DefaultPool<*>::top)
     }

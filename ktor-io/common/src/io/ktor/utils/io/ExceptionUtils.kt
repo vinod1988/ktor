@@ -4,8 +4,6 @@
 
 package io.ktor.utils.io
 
-import kotlinx.coroutines.*
-
 /**
  * Print exception stacktrace.
  */

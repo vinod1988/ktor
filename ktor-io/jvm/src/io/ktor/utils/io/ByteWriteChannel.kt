@@ -58,7 +58,7 @@ public actual interface ByteWriteChannel {
      */
     public actual suspend fun writeAvailable(src: ByteArray, offset: Int, length: Int): Int
     public actual suspend fun writeAvailable(src: IoBuffer): Int
-    suspend fun writeAvailable(src: ByteBuffer): Int
+    public suspend fun writeAvailable(src: ByteBuffer): Int
 
     /**
      * Writes all [src] bytes and suspends until all bytes written. Causes flush if buffer filled up or when [autoFlush]
@@ -66,7 +66,7 @@ public actual interface ByteWriteChannel {
      */
     public actual suspend fun writeFully(src: ByteArray, offset: Int, length: Int)
     public actual suspend fun writeFully(src: IoBuffer)
-    suspend fun writeFully(src: ByteBuffer)
+    public suspend fun writeFully(src: ByteBuffer)
 
     /**
      * Invokes [block] when it will be possible to write at least [min] bytes
@@ -81,7 +81,7 @@ public actual interface ByteWriteChannel {
      * @param min amount of bytes available for write, should be positive
      * @param block to be invoked when at least [min] bytes free capacity available
      */
-    suspend fun write(min: Int = 1, block: (ByteBuffer) -> Unit)
+    public suspend fun write(min: Int = 1, block: (ByteBuffer) -> Unit)
 
     /**
      * Invokes [block] for every free buffer until it return `false`. It will also suspend every time when no free
@@ -89,7 +89,7 @@ public actual interface ByteWriteChannel {
      *
      * @param block to be invoked when there is free space available for write
      */
-    suspend fun writeWhile(block: (ByteBuffer) -> Boolean)
+    public suspend fun writeWhile(block: (ByteBuffer) -> Boolean)
 
     @Suppress("DEPRECATION")
     @Deprecated("Use write { } instead.")
@@ -162,7 +162,7 @@ public actual interface ByteWriteChannel {
      * It does nothing when invoked on a closed channel.
      */
     public actual fun flush()
-    actual suspend fun writeFully(src: Buffer)
-    actual suspend fun writeFully(memory: Memory, startIndex: Int, endIndex: Int)
+    public actual suspend fun writeFully(src: Buffer)
+    public actual suspend fun writeFully(memory: Memory, startIndex: Int, endIndex: Int)
 }
 

@@ -1,16 +1,25 @@
 package io.ktor.utils.io.core
 
-import kotlinx.cinterop.*
 import io.ktor.utils.io.bits.Memory
 
+/**
+ * Shouldn't be implemented directly. Inherit [AbstractInput] instead.
+ */
 @Suppress("NO_ACTUAL_CLASS_MEMBER_FOR_EXPECTED_CLASS")
 public actual interface Input : Closeable {
     @Deprecated(
         "Not supported anymore. All operations are big endian by default. " +
-            "Use readXXXLittleEndian or readXXX then X.reverseByteOrder() instead.",
+            "Read and readXXXLittleEndian or readXXX then X.reverseByteOrder() instead.",
         level = DeprecationLevel.ERROR
     )
+    @Suppress("ACTUAL_WITHOUT_EXPECT")
     public actual var byteOrder: ByteOrder
+        get() = ByteOrder.BIG_ENDIAN
+        set(newValue) {
+            if (newValue != ByteOrder.BIG_ENDIAN) {
+                throw IllegalArgumentException("Only BIG_ENDIAN is supported")
+            }
+        }
 
     /**
      * It is `true` when it is known that no more bytes will be available. When it is `false` then this means that

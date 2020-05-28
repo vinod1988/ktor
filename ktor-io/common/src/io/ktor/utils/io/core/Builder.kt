@@ -29,7 +29,7 @@ public expect fun BytePacketBuilder(headerSizeHint: Int = 0): BytePacketBuilder
 /**
  * Discard all written bytes and prepare to build another packet.
  */
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+
 public fun BytePacketBuilder.reset() {
     release()
 }
