@@ -140,18 +140,21 @@ internal tailrec fun ChunkBuffer.findTail(): ChunkBuffer {
  * Summarize remainings of all elements of the chain
  */
 @DangerousInternalIoApi
-fun ChunkBuffer.remainingAll(): Long = remainingAll(0L)
+fun ChunkBuffer.remainingAll(): Long {
+    var result = 0L
+    var current: ChunkBuffer? = this
+
+    while (current != null) {
+        result += readRemaining.toLong()
+        current = current.next
+    }
+
+    return result
+}
 
 @Suppress("DEPRECATION", "UNUSED")
 @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
 fun remainingAll(buffer: IoBuffer): Long = buffer.remainingAll()
-
-private tailrec fun ChunkBuffer.remainingAll(n: Long): Long {
-    val rem = readRemaining.toLong() + n
-    val next = this.next ?: return rem
-
-    return next.remainingAll(rem)
-}
 
 internal tailrec fun ChunkBuffer.isEmpty(): Boolean {
     if (readRemaining > 0) return false
