@@ -18,17 +18,18 @@ class JvmContentTest : ClientLoader() {
         16 * 1024 * 1024 // big
     )
 
+    private val bytesContent = testSize.map { makeArray(it) }
+
     @Test
     fun inputStreamTest() = clientTests {
-        testSize.forEach { size ->
-            val content = makeArray(size)
+        bytesContent.forEach { content ->
 
             test { client ->
                 val responseData = client.echo<InputStream, ByteArray>(content) { response ->
                     response.readBytes()
                 }
 
-                assertArrayEquals("Test fail with size: $size", content, responseData)
+                assertArrayEquals("Test fail with size: ${content.size}", content, responseData)
             }
         }
     }

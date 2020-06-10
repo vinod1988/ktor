@@ -28,6 +28,9 @@ class ContentTest : ClientLoader() {
         8 * 1024 * 1024 // big
     )
 
+    private val byteContent = testSize.map { makeArray(it) }
+    private val stringContent = testSize.map { makeString(it) }
+
     @Test
     fun testGetFormData() = clientTests(listOf("Js")) {
         test { client ->
@@ -47,11 +50,12 @@ class ContentTest : ClientLoader() {
     @Test
     fun testByteArray() = clientTests(listOf("Js")) {
         test { client ->
-            testSize.forEach { size ->
-                val content = makeArray(size)
+            byteContent.forEach { content ->
                 val response = client.echo<ByteArray>(content)
 
-                assertArrayEquals("Test fail with size: $size. Actual size: ${response.size}", content, response)
+                assertArrayEquals(
+                    "Test fail with size: ${content.size}. Actual size: ${response.size}", content, response
+                )
             }
         }
     }
@@ -59,12 +63,12 @@ class ContentTest : ClientLoader() {
     @Test
     fun testByteReadChannel() = clientTests(listOf("Js")) {
         test { client ->
-            testSize.forEach { size ->
-                val content = makeArray(size)
+            byteContent.forEach { content ->
                 val responseData = client.echo<ByteReadChannel>(content)
                 val data = responseData.readRemaining().readBytes()
+
                 assertArrayEquals(
-                    "Test fail with size: $size, actual size: ${data.size}",
+                    "Test fail with size: ${content.size}, actual size: ${data.size}",
                     content,
                     data
                 )
@@ -75,11 +79,12 @@ class ContentTest : ClientLoader() {
     @Test
     fun testString() = clientTests(listOf("Js", "iOS")) {
         test { client ->
-            testSize.forEach { size ->
-                val content = makeString(size)
+            stringContent.forEach { content ->
                 val requestWithBody = client.echo<String>(content)
                 assertArrayEquals(
-                    "Test fail with size: $size", content.toByteArray(), requestWithBody.toByteArray()
+                    "Test fail with size: ${content.length}",
+                    content.toByteArray(),
+                    requestWithBody.toByteArray()
                 )
             }
         }
@@ -104,11 +109,12 @@ class ContentTest : ClientLoader() {
     @Test
     fun testTextContent() = clientTests(listOf("Js", "iOS")) {
         test { client ->
-            testSize.forEach { size ->
-                val content = makeString(size)
+            stringContent.forEach { content ->
                 val response = client.echo<String>(TextContent(content, ContentType.Text.Plain))
 
-                assertArrayEquals("Test fail with size: $size", content.toByteArray(), response.toByteArray())
+                assertArrayEquals(
+                    "Test fail with size: ${content.length}", content.toByteArray(), response.toByteArray()
+                )
             }
         }
     }
@@ -116,11 +122,10 @@ class ContentTest : ClientLoader() {
     @Test
     fun testByteArrayContent() = clientTests(listOf("Js")) {
         test { client ->
-            testSize.forEach { size ->
-                val content = makeArray(size)
+            byteContent.forEach { content ->
                 val response = client.echo<ByteArray>(ByteArrayContent(content))
 
-                assertArrayEquals("Test fail with size: $size", content, response)
+                assertArrayEquals("Test fail with size: ${content.size}", content, response)
             }
         }
     }

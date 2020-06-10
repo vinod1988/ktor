@@ -18,6 +18,7 @@ import kotlin.test.*
 import io.ktor.client.tests.utils.assertFailsWith
 
 private const val TEST_URL = "$TEST_SERVER/timeout"
+private val contentString4Mb = makeString(4 * 1024 * 1024)
 
 class HttpTimeoutTest : ClientLoader() {
     @Test
@@ -485,7 +486,7 @@ class HttpTimeoutTest : ClientLoader() {
 
         test { client ->
             assertFailsWith<SocketTimeoutException> {
-                client.post("$TEST_URL/slow-read") { body = makeString(4 * 1024 * 1024) }
+                client.post("$TEST_URL/slow-read") { body = contentString4Mb }
             }
         }
     }
@@ -499,7 +500,7 @@ class HttpTimeoutTest : ClientLoader() {
         test { client ->
             assertFailsWith<SocketTimeoutException> {
                 client.post("$TEST_URL/slow-read") {
-                    body = makeString(4 * 1024 * 1024)
+                    body = contentString4Mb
                     timeout { socketTimeoutMillis = 500 }
                 }
             }

@@ -65,7 +65,6 @@ internal class ApacheResponseConsumer(
                 check(waiting.getAndSet(false))
                 interestController.resumeInputIfPossible()
             }
-
         }
     }
 

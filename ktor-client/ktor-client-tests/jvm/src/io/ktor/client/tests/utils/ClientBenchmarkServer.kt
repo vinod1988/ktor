@@ -14,12 +14,12 @@ import io.ktor.routing.*
 import io.ktor.websocket.*
 import io.ktor.utils.io.*
 
+private val testBytes = makeArray(1024 * 1024)
+private val testData = "{'message': 'Hello World'}"
+
 internal fun Application.benchmarks() {
     routing {
         route("/benchmarks") {
-            val testBytes = makeArray(1024 * 1024)
-            val testData = "{'message': 'Hello World'}"
-
             /**
              * Receive json data-class.
              */
