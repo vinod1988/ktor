@@ -36,13 +36,11 @@ class WebSocketTest : ClientLoader() {
         }
 
         test { client ->
-            withTimeout(2000) {
-                client.webSocket("$TEST_WEBSOCKET_SERVER/websockets/close") {
-                    send(Frame.Text("End"))
-                    val closeReason = closeReason.await()!!
-                    assertEquals("End", closeReason.message)
-                    assertEquals(1000, closeReason.code)
-                }
+            client.webSocket("$TEST_WEBSOCKET_SERVER/websockets/close") {
+                send(Frame.Text("End"))
+                val closeReason = closeReason.await()!!
+                assertEquals("End", closeReason.message)
+                assertEquals(1000, closeReason.code)
             }
         }
     }
