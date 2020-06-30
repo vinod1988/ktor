@@ -8,6 +8,7 @@ import ch.qos.logback.classic.*
 import io.ktor.client.tests.utils.tests.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import org.slf4j.*
 import java.io.*
 import java.util.concurrent.*
@@ -21,7 +22,7 @@ internal fun startServer(): Closeable {
 
     val proxyServer = TestTcpServer(HTTP_PROXY_PORT, ::proxyHandler)
 
-    val server = embeddedServer(CIO, DEFAULT_PORT) {
+    val server = embeddedServer(Netty, DEFAULT_PORT) {
         tests()
         benchmarks()
     }.start()

@@ -30,6 +30,14 @@ internal fun Application.contentTestServer() {
             get("/hello") {
                 call.respond("hello")
             }
+            get("/wrong-content-length") {
+                call.respond(HttpStatusCode.OK, object : OutgoingContent.WriteChannelContent() {
+                    override val contentLength: Long? = 1024
+                    override suspend fun writeTo(channel: ByteWriteChannel) {
+                        channel.writeByte(42)
+                    }
+                })
+            }
             get("/xxx") {
                 call.respond(buildString {
                     append("x".repeat(100))

@@ -259,6 +259,13 @@ class ContentTest : ClientLoader() {
         }
     }
 
+    @Test
+    fun testDownloadWithWrongContentLength() = clientTests {
+        test { client ->
+            val content = client.get<ByteArray>("$TEST_SERVER/content/wrong-content-length")
+        }
+    }
+
     private suspend inline fun <reified Response : Any> HttpClient.echo(
         body: Any
     ): Response = post("$TEST_SERVER/content/echo") {
