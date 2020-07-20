@@ -16,9 +16,9 @@ class JsonFeatureTest {
         assertTrue { config.acceptContentTypes.contains(ContentType.Application.Json) }
 
         val feature = JsonFeature(config)
-        assertTrue { feature.canReceive(ContentType.parse("application/json")) }
-        assertTrue { feature.canReceive(ContentType.parse("application/vnd.foo+json")) }
-        assertFalse { feature.canReceive(ContentType.parse("text/json")) }
+        assertTrue { feature.canHandle(ContentType.parse("application/json")) }
+        assertTrue { feature.canHandle(ContentType.parse("application/vnd.foo+json")) }
+        assertFalse { feature.canHandle(ContentType.parse("text/json")) }
     }
 
     @Test
@@ -53,6 +53,6 @@ class JsonFeatureTest {
         }
 
         val feature = JsonFeature(config)
-        assertTrue { feature.canReceive(ContentType.parse("text/json")) }
+        assertTrue { feature.canHandle(ContentType.parse("text/json")) }
     }
 }

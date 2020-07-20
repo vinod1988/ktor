@@ -99,7 +99,7 @@ class KotlinxSerializerTest : ClientLoader() {
             val response = client.post<String>("$TEST_SERVER/echo-with-content-type") {
                 body = "Hello"
             }
-            assertEquals("Hello", response)
+            assertEquals("\"Hello\"", response)
 
             val textResponse = client.post<String>("$TEST_SERVER/echo") {
                 body = "Hello"
@@ -113,10 +113,6 @@ class KotlinxSerializerTest : ClientLoader() {
 
     @Test
     fun testMultipleListSerializersWithClient() = clientTests {
-
-        // TODO: unmute when JS IR serialization is fixed https://github.com/Kotlin/kotlinx.serialization/issues/751
-        if (isKotlinJsIr) return@clientTests
-
         val testSerializer = KotlinxSerializer()
 
         config {

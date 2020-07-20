@@ -115,7 +115,7 @@ class JsonFeature internal constructor(
         }
     }
 
-    internal fun canReceive(contentType: ContentType): Boolean {
+    internal fun canHandle(contentType: ContentType): Boolean {
         val accepted = acceptContentTypes.any { contentType.match(it) }
         val matchers = receiveContentTypeMatchers
 
@@ -142,9 +142,7 @@ class JsonFeature internal constructor(
                 feature.acceptContentTypes.forEach { context.accept(it) }
 
                 val contentType = context.contentType() ?: return@intercept
-                if (feature.acceptContentTypes.none { contentType.match(it) }) {
-                    return@intercept
-                }
+                if (!feature.canHandle(contentType)) return@intercept
 
                 context.headers.remove(HttpHeaders.ContentType)
 
@@ -161,7 +159,7 @@ class JsonFeature internal constructor(
                 if (body !is ByteReadChannel) return@intercept
 
                 val contentType = context.response.contentType() ?: return@intercept
-                if (!feature.canReceive(contentType)) return@intercept
+                if (!feature.canHandle(contentType)) return@intercept
 
                 val parsedBody = feature.serializer.read(info, body.readRemaining())
                 val response = HttpResponseContainer(info, parsedBody)
