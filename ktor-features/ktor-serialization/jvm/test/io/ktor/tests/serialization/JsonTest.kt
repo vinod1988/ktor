@@ -7,6 +7,7 @@ package io.ktor.tests.serialization
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.serialization.*
+import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 class JsonTest : AbstractSerializationTest() {
@@ -17,10 +18,10 @@ class JsonTest : AbstractSerializationTest() {
     }
 
     override fun simpleDeserialize(t: ByteArray): TestEntity {
-        return Json(DefaultJsonConfiguration).parse(serializer, String(t))
+        return Json.decodeFromString(serializer, String(t))
     }
 
     override fun simpleSerialize(any: TestEntity): ByteArray {
-        return Json(DefaultJsonConfiguration).stringify(serializer, any).toByteArray()
+        return Json.encodeToString(serializer, any).toByteArray()
     }
 }
