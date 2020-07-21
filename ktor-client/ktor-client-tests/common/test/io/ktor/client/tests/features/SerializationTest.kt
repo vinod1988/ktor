@@ -57,8 +57,10 @@ class SerializationTest : ClientLoader() {
         }
 
         test { client ->
-            client.post("$TEST_SERVER/json/object") {
-                body = MyCustomObject("Foo")
+            assertFailsWith<IllegalStateException> {
+                client.post("$TEST_SERVER/json/object") {
+                    body = MyCustomObject("Foo")
+                }
             }
         }
     }
