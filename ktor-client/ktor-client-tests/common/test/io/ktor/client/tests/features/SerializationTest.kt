@@ -2,7 +2,7 @@
  * Copyright 2014-2020 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
 
-package io.ktor.client.tests
+package io.ktor.client.tests.features
 
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
@@ -16,7 +16,6 @@ import kotlin.test.*
 class MyCustomObject(val message: String)
 
 class SerializationTest : ClientLoader() {
-
     @Test
     fun testSendCustomObject() = clientTests {
         config {
@@ -47,6 +46,19 @@ class SerializationTest : ClientLoader() {
                     header(HttpHeaders.ContentType, ContentType.Application.Json)
                     body = "Hello, world"
                 }
+            }
+        }
+    }
+
+    @Test
+    fun testSendObjectWithoutContentType() = clientTests {
+        config {
+            install(JsonFeature)
+        }
+
+        test { client ->
+            client.post("$TEST_SERVER/json/object") {
+                body = MyCustomObject("Foo")
             }
         }
     }
