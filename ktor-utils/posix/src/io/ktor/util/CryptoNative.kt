@@ -4,18 +4,26 @@
 
 package io.ktor.util
 
+import platform.posix.*
+
 
 /**
  * Generates a nonce string. Could block if the system's entropy source is empty
  */
 @InternalAPI
-actual fun generateNonce(): String = error("[generateNonce] is not supported on iOS")
+actual fun generateNonce(): String {
+    val data = CharArray(16) { random().toChar() }
+    return data.concatToString()
+}
 
 /**
  * Create [Digest] from specified hash [name].
  */
 @InternalAPI
-actual fun Digest(name: String): Digest = error("[Digest] is not supported on iOS")
+actual fun Digest(name: String): Digest = when (name) {
+    "CRC32" -> CRCDigest()
+    else -> error("Unsupported digest algorithm: $name")
+}
 
 /**
  * Compute SHA-1 hash for the specified [bytes]
