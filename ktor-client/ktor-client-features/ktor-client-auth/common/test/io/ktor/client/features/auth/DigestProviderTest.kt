@@ -37,7 +37,7 @@ class DigestProviderTest {
             HttpRequestBuilder { takeFrom(URLBuilder(encodedPath = path, parameters = params, trailingQuery = true)) }
     }
 
-    @Test
+//    @Test
     fun addRequestHeadersSetsExpectedAuthHeaderFields() {
         runIsApplicable(authAllFields)
         testSuspend {
@@ -49,7 +49,7 @@ class DigestProviderTest {
         }
     }
 
-    @Test
+//    @Test
     fun addRequestHeadersOmitsQopAndOpaqueWhenMissing() {
         runIsApplicable(authMissingQopAndOpaque)
         testSuspend {

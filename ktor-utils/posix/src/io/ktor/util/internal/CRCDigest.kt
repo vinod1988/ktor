@@ -2,8 +2,9 @@
  * Copyright 2014-2020 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
 
-package io.ktor.util
+package io.ktor.util.internal
 
+import io.ktor.util.*
 import kotlinx.cinterop.*
 import platform.zlib.*
 

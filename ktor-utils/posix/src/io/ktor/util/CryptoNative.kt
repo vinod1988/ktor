@@ -4,6 +4,7 @@
 
 package io.ktor.util
 
+import io.ktor.util.internal.*
 import platform.posix.*
 
 
